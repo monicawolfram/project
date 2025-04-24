@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MANAGE USERS</title>
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+
+  <style>
+    body {
+      background: url('library-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
+
+    .sidebar {
+      background-color: white;
+      min-height: 100vh;
+      padding: 20px;
+      border-radius: 15px;
+    }
+
+    .sidebar .nav-link {
+      color: black;
+      font-size: 18px;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .sidebar .nav-link:hover {
+      background-color: green;
+      color: white;
+      border-radius: 8px;
+    }
+
+    .sidebar .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .sidebar img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background: white;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .user-toggle {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .user-toggle button {
+      background: none;
+      border: none;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .user-toggle .active {
+      color: green;
+      text-decoration: underline;
+    }
+
+    .table-container {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 15px;
+    }
+
+    .table th, .table td {
+      text-align: center;
+    }
+
+    .dots-menu {
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .dots-menu:hover {
+      color: gray;
+    }
+
+    .badge-notify {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+      <div class="logo-container">
+        <img src="sjcet.png" alt="SJCET Logo" />
+        <h4>SJUCET Library</h4>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" href="library home.html"><i class="fas fa-home"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="librarian category.html"><i class="fas fa-book"></i> Manage Catalog</a></li>
+        <li class="nav-item"><a class="nav-link" href="managerequestlibrarian.html"><i class="fas fa-tasks"></i> Manage Requests</a></li>
+        <li class="nav-item"><a class="nav-link" href="manageinventorylibrarian.html"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
+        <li class="nav-item"><a class="nav-link" href="massageandfeedback.html"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
+        <li class="nav-item"><a class="nav-link" href="generatereport.html"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
+        <li class="nav-item"><a class="nav-link" href="Itsupport.html"><i class="fas fa-tools"></i> IT Support</a></li>
+        <li class="nav-item"><a class="nav-link active" href="manageusers.html"><i class="fas fa-users"></i> Manage Users</a></li>
+        <li class="nav-item"><a class="nav-link" href="managefines.html"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <input type="text" class="form-control w-25" id="searchInput" placeholder="Search here" onkeyup="searchTable()">
+        <div class="d-flex align-items-center">
+          <!-- Notification Dropdown -->
+          <div class="dropdown me-3 position-relative">
+            <button class="btn btn-light dropdown-toggle" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-bell position-relative">
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  3
+                  <span class="visually-hidden">unread messages</span>
+                </span>
+              </i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
+              <li><a class="dropdown-item" href="booknotification.html">New book added</a></li>
+              <li><a class="dropdown-item" href="requestnotification.html">Request pending approval</a></li>
+              <li><a class="dropdown-item" href="systemnotification.html">System maintenance scheduled</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-center" href="viewallnotification.html">View all</a></li>
+            </ul>
+          </div>
+
+          <!-- User Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-user"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li><a class="dropdown-item" href="librarian account.html">Librarian Account</a></li>
+              <li><a class="dropdown-item" href="admin account.html">Admin Account</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="interface.html">Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toggle Students / Librarians -->
+      <div class="user-toggle">
+        <button id="studentsTab" class="active" onclick="showTable('students')">Students</button> |
+        <button id="librariansTab" onclick="showTable('librarians')">Librarian</button>
+      </div>
+
+      <!-- Table Section -->
+      <div class="table-container">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>⋮</th>
+            </tr>
+          </thead>
+          <tbody id="studentsTable">
+            <tr>
+              <td>011-123</td>
+              <td>Trezia Isack</td>
+              <td>trezia12@g...</td>
+              <td>12-2-2025</td>
+              <td>Active</td>
+              <td class="dots-menu">⋮</td>
+            </tr>
+          </tbody>
+          <tbody id="librariansTable" style="display: none;">
+            <tr>
+              <td>011-231</td>
+              <td>Trezia Isack</td>
+              <td>trezia12@g...</td>
+              <td>12-2-2025</td>
+              <td>Inactive</td>
+              <td class="dots-menu">⋮</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  function showTable(table) {
+    document.getElementById('studentsTable').style.display = table === 'students' ? '' : 'none';
+    document.getElementById('librariansTable').style.display = table === 'librarians' ? '' : 'none';
+
+    document.getElementById('studentsTab').classList.toggle('active', table === 'students');
+    document.getElementById('librariansTab').classList.toggle('active', table === 'librarians');
+  }
+
+  function searchTable() {
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let rows = document.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+      let text = row.innerText.toLowerCase();
+      row.style.display = text.includes(input) ? "" : "none";
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background-size: cover;
+            color: rgb(28, 27, 27);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .container-box {
+            background: rgba(113, 221, 92, 0.7);
+            padding: 50px;
+            border-radius: 50px;
+            text-align: center;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background: rgba(0, 0, 0, 0.8);
+            color: rgb(28, 26, 26);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .popup.active {
+            display: block;
+        }
+
+        .scanner-input {
+            opacity: 0;
+            position: absolute;
+            top: -100px;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="container-box">
+            <img src="sjcet.png" alt="SJUCET Logo" class="logo">
+            <h2>WELCOME TO SJUCET LIBRARY</h2>
+            <i class="fa-solid fa-user fa-4x"></i>
+            <h3>Scan Your ID to Login</h3>
+            <input type="text" id="scanner" class="scanner-input" autofocus>
+        </div>
+    </div>
+
+    <div class="popup" id="userPopup">
+        <h4 id="welcomeMsg"></h4>
+        <p><strong>Name:</strong> <span id="name"></span></p>
+        <p><strong>Reg No:</strong> <span id="regNo"></span></p>
+        <p><strong>Program:</strong> <span id="program"></span></p>
+        <p><strong>Dept:</strong> <span id="department"></span></p>
+        <p><strong>Gender:</strong> <span id="gender"></span></p>
+        <p><strong>College:</strong> <span id="college"></span></p>
+        <p><strong>DOB:</strong> <span id="dob"></span></p>
+        <p><strong>Year:</strong> <span id="year"></span></p>
+    </div>
+
+    <script>
+        document.getElementById("scanner").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                let barcode = event.target.value;
+                fetch(`/api/user/${barcode}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById("welcomeMsg").innerText = `WELCOME ${data.name} TO OUR LIBRARY`;
+                            document.getElementById("name").innerText = data.name;
+                            document.getElementById("regNo").innerText = data.reg_no;
+                            document.getElementById("program").innerText = data.program;
+                            document.getElementById("department").innerText = data.department;
+                            document.getElementById("gender").innerText = data.gender;
+                            document.getElementById("college").innerText = data.college;
+                            document.getElementById("dob").innerText = data.dob;
+                            document.getElementById("year").innerText = data.year;
+
+                            document.getElementById("userPopup").classList.add("active");
+
+                            // Send attendance message to librarian
+                            fetch("/api/attendance", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ reg_no: data.reg_no })
+                            });
+
+                            // Redirect to homepage after 5 seconds
+                            setTimeout(() => {
+                                window.location.href = "home.html";
+                            }, 5000);
+                        } else {
+                            alert("Invalid Barcode! Try Again.");
+                        }
+                    });
+                event.target.value = "";
+            }
+        });
+    </script>
+</body>
+</html>

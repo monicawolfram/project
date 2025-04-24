@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Messages & Feedback</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #0d6efd;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    .container {
+      padding: 20px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .notification {
+      background: #e9f1ff;
+      margin: 10px 0;
+      padding: 15px;
+      border-left: 5px solid #0d6efd;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .notification-content {
+      display: none;
+      margin-top: 10px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+    .notification.open .notification-content {
+      display: block;
+    }
+    .reply-box textarea {
+      height: 60px;
+    }
+    .reply-box {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>Messages & Feedback Panel</h2>
+  </header>
+
+  <div class="container">
+
+    <!-- Send Feedback -->
+    <div class="card">
+      <h5>Send Feedback</h5>
+      <label for="recipient" class="form-label">Send To:</label>
+      <select class="form-select" id="recipient">
+        <option value="all">All Librarians</option>
+        <option value="lib1">Librarian 1</option>
+        <option value="lib2">Librarian 2</option>
+      </select>
+
+      <label for="email" class="form-label mt-2">Your Email:</label>
+      <input type="email" class="form-control" id="email" placeholder="example@domain.com">
+
+      <label for="message" class="form-label mt-2">Message:</label>
+      <textarea class="form-control" id="message" rows="3" placeholder="Type your message..."></textarea>
+
+      <button class="btn btn-primary mt-3" onclick="sendMessage()">Send</button>
+    </div>
+
+    <!-- Replies -->
+    <div class="card">
+      <h5>Replies</h5>
+      <div id="replies">
+        <p><strong>Librarian 1:</strong> We've received your message. Thank you!</p>
+        <p><strong>Librarian 2:</strong> We are working on your request.</p>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="card">
+      <h5>Notification Center</h5>
+
+      <div class="notification" onclick="toggleNotification(this)">
+        <strong>New Feedback</strong> from Student A
+        <div class="notification-content">
+          <p><strong>Details:</strong> Could you extend the library hours?</p>
+          <div class="reply-box">
+            <label>Reply:</label>
+            <textarea class="form-control" placeholder="Write a reply..."></textarea>
+            <button class="btn btn-sm btn-success mt-2" onclick="replyToNotification(event)">Send Reply</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="notification" onclick="toggleNotification(this)">
+        <strong>Message</strong> from Librarian 2
+        <div class="notification-content">
+          <p><strong>Details:</strong> Need help with book categorization.</p>
+          <div class="reply-box">
+            <label>Reply:</label>
+            <textarea class="form-control" placeholder="Write a reply..."></textarea>
+            <button class="btn btn-sm btn-success mt-2" onclick="replyToNotification(event)">Send Reply</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="notification" onclick="toggleNotification(this)">
+        <strong>Approval Request</strong> for Book Purchase
+        <div class="notification-content">
+          <p><strong>Details:</strong> Request to approve purchase of 15 reference books.</p>
+          <div class="reply-box">
+            <label>Reply/Approval Note:</label>
+            <textarea class="form-control" placeholder="Approve and respond..."></textarea>
+            <button class="btn btn-sm btn-primary mt-2" onclick="replyToNotification(event)">Approve & Reply</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function toggleNotification(element) {
+      element.classList.toggle("open");
+    }
+
+    function sendMessage() {
+      const recipient = document.getElementById("recipient").value;
+      const email = document.getElementById("email").value;
+      const message = document.getElementById("message").value.trim();
+
+      if (email === "" || message === "") {
+        alert("Please enter your email and message.");
+        return;
+      }
+
+      alert(`Message sent to ${recipient === "all" ? "All Librarians" : recipient}:\n\n"${message}"`);
+      document.getElementById("message").value = "";
+      document.getElementById("email").value = "";
+    }
+
+    function replyToNotification(event) {
+      event.stopPropagation(); // Prevent notification toggle
+      const replyBox = event.target.closest('.reply-box');
+      const textarea = replyBox.querySelector('textarea');
+      const replyText = textarea.value.trim();
+
+      if (replyText === "") {
+        alert("Please write a reply before sending.");
+        return;
+      }
+
+      alert(`Reply sent:\n\n"${replyText}"`);
+      textarea.value = "";
+    }
+  </script>
+</body>
+</html>

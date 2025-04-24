@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manage Users</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    .card-header {
+      background-color: #0d6efd;
+      color: #fff;
+    }
+    .user-photo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .btn-sm {
+      margin: 2px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2 class="mb-4">Manage Users</h2>
+
+  <!-- Add User Button -->
+  <div class="mb-3">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">Add New User</button>
+  </div>
+
+  <!-- Users Table -->
+  <div class="card">
+    <div class="card-header">All Users</div>
+    <div class="card-body">
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="addUserForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Add New User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" class="form-control mb-2" placeholder="Name" id="addName" required />
+          <input type="email" class="form-control mb-2" placeholder="Email" id="addEmail" required />
+          <input type="text" class="form-control mb-2" placeholder="Role" id="addRole" required />
+          <input type="file" class="form-control" id="addPhoto" />
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Add User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="editUserForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editIndex" />
+          <input type="text" class="form-control mb-2" placeholder="Name" id="editName" required />
+          <input type="email" class="form-control mb-2" placeholder="Email" id="editEmail" required />
+          <input type="text" class="form-control mb-2" placeholder="Role" id="editRole" required />
+          <input type="file" class="form-control" id="editPhoto" />
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Update User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- View User Modal -->
+<div class="modal fade" id="viewUserModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">User Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="viewPhoto" class="user-photo mb-3" />
+        <h5 id="viewName"></h5>
+        <p id="viewEmail"></p>
+        <p><strong>Role:</strong> <span id="viewRole"></span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const users = [
+    {
+      name: "Alice John",
+      email: "alice@example.com",
+      role: "Student",
+      photo: ""
+    },
+    {
+      name: "Bob Mark",
+      email: "bob@example.com",
+      role: "Librarian",
+      photo: ""
+    }
+  ];
+
+  function renderUsers() {
+    const tbody = document.getElementById("userTableBody");
+    tbody.innerHTML = "";
+    users.forEach((user, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><img src="${user.photo || 'https://via.placeholder.com/60'}" class="user-photo" /></td>
+        <td>${user.name}</td>
+        <td>${user.email}</td>
+        <td>${user.role}</td>
+        <td>
+          <button class="btn btn-sm btn-info text-white" onclick="viewUser(${index})">View</button>
+          <button class="btn btn-sm btn-warning" onclick="openEditModal(${index})">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteUser(${index})">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  document.getElementById("addUserForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const name = document.getElementById("addName").value;
+    const email = document.getElementById("addEmail").value;
+    const role = document.getElementById("addRole").value;
+    const photoInput = document.getElementById("addPhoto");
+    const photo = photoInput.files[0] ? URL.createObjectURL(photoInput.files[0]) : "";
+
+    users.push({ name, email, role, photo });
+    renderUsers();
+    this.reset();
+    bootstrap.Modal.getInstance(document.getElementById("addUserModal")).hide();
+  });
+
+  function openEditModal(index) {
+    const user = users[index];
+    document.getElementById("editIndex").value = index;
+    document.getElementById("editName").value = user.name;
+    document.getElementById("editEmail").value = user.email;
+    document.getElementById("editRole").value = user.role;
+    document.getElementById("editPhoto").value = "";
+    new bootstrap.Modal(document.getElementById("editUserModal")).show();
+  }
+
+  document.getElementById("editUserForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const index = document.getElementById("editIndex").value;
+    const name = document.getElementById("editName").value;
+    const email = document.getElementById("editEmail").value;
+    const role = document.getElementById("editRole").value;
+    const photoInput = document.getElementById("editPhoto");
+
+    users[index].name = name;
+    users[index].email = email;
+    users[index].role = role;
+
+    if (photoInput.files[0]) {
+      users[index].photo = URL.createObjectURL(photoInput.files[0]);
+    }
+
+    renderUsers();
+    bootstrap.Modal.getInstance(document.getElementById("editUserModal")).hide();
+  });
+
+  function deleteUser(index) {
+    if (confirm("Are you sure you want to delete this user?")) {
+      users.splice(index, 1);
+      renderUsers();
+    }
+  }
+
+  function viewUser(index) {
+    const user = users[index];
+    document.getElementById("viewPhoto").src = user.photo || 'https://via.placeholder.com/60';
+    document.getElementById("viewName").textContent = user.name;
+    document.getElementById("viewEmail").textContent = user.email;
+    document.getElementById("viewRole").textContent = user.role;
+    new bootstrap.Modal(document.getElementById("viewUserModal")).show();
+  }
+
+  renderUsers();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

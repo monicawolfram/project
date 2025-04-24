@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Librarians</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .card {
+      margin-top: 20px;
+    }
+    .btn-action {
+      margin: 2px;
+    }
+    .img-thumbnail {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2 class="mt-4 mb-3">Manage Librarians</h2>
+
+  <!-- Librarians Table -->
+  <div class="card">
+    <div class="card-header bg-success text-white">
+      <strong>Librarian List</strong>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Task</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="librarianTable"></tbody>
+      </table>
+      <button class="btn btn-primary" onclick="addLibrarian()">Add Librarian</button>
+    </div>
+  </div>
+
+  <!-- Actions Log Table -->
+  <div class="card mt-5">
+    <div class="card-header bg-info text-white">
+      <strong>Action Logs</strong>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Action</th>
+            <th>Librarian</th>
+            <th>Reason</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="actionLogTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Librarian Modal -->
+<div class="modal fade" id="editLibrarianModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Edit Librarian</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editLibrarianForm">
+          <div class="mb-3">
+            <label for="editName" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="editName" required>
+          </div>
+          <div class="mb-3">
+            <label for="editEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="editEmail" required>
+          </div>
+          <div class="mb-3">
+            <label for="editRole" class="form-label">Role</label>
+            <input type="text" class="form-control" id="editRole" required>
+          </div>
+          <div class="mb-3">
+            <label for="editTask" class="form-label">Task</label>
+            <input type="text" class="form-control" id="editTask" required>
+          </div>
+          <div class="mb-3">
+            <label for="editPhoto" class="form-label">Photo URL</label>
+            <input type="text" class="form-control" id="editPhoto" required>
+          </div>
+          <div class="mb-3">
+            <label for="editReason" class="form-label">Reason</label>
+            <textarea class="form-control" id="editReason" rows="3" required></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Update Librarian</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Librarian Modal -->
+<div class="modal fade" id="viewLibrarianModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">Librarian Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="viewPhoto" src="" alt="Librarian Photo" class="img-thumbnail mb-3">
+        <h5 id="viewName"></h5>
+        <p><strong>Email:</strong> <span id="viewEmail"></span></p>
+        <p><strong>Role:</strong> <span id="viewRole"></span></p>
+        <p><strong>Task:</strong> <span id="viewTask"></span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Librarian Modal -->
+<div class="modal fade" id="deleteLibrarianModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Delete Librarian</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this librarian?</p>
+        <div class="mb-3">
+          <label for="deleteReason" class="form-label">Reason for Deleting</label>
+          <textarea class="form-control" id="deleteReason" rows="3" required></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete Librarian</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const librarians = [
+    {
+      name: 'James M.',
+      email: 'james@sjcet.ac.ke',
+      role: 'Senior Librarian',
+      task: 'Organized journals',
+      photo: 'student1'
+    },
+    {
+      name: 'Agnes O.',
+      email: 'agnes@sjcet.ac.ke',
+      role: 'Assistant Librarian',
+      task: 'Helped students',
+      photo: 'student2'
+    }
+  ];
+
+  const actionLogs = [];
+
+  function renderTable() {
+    const tbody = document.getElementById("librarianTable");
+    tbody.innerHTML = '';
+
+    librarians.forEach((lib, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><img src="${lib.photo}" class="img-thumbnail"></td>
+        <td>${lib.name}</td>
+        <td>${lib.email}</td>
+        <td>${lib.role}</td>
+        <td>${lib.task}</td>
+        <td>
+          <button class="btn btn-info btn-sm" onclick="viewLibrarian(${index})">View</button>
+          <button class="btn btn-warning btn-sm" onclick="editLibrarian(${index})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteLibrarian(${index})">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    renderActionLogs();
+  }
+
+  function renderActionLogs() {
+    const actionLogTable = document.getElementById("actionLogTable");
+    actionLogTable.innerHTML = '';
+
+    actionLogs.forEach(log => {
+      const logRow = document.createElement("tr");
+      logRow.innerHTML = `
+        <td>${log.action}</td>
+        <td>${log.librarian}</td>
+        <td>${log.reason}</td>
+        <td>${log.date}</td>
+      `;
+      actionLogTable.appendChild(logRow);
+    });
+  }
+
+  function addLibrarian() {
+    const name = prompt("Enter full name:");
+    const email = prompt("Enter email:");
+    const role = prompt("Enter role:");
+    const task = prompt("Enter task:");
+    const photo = prompt("Enter photo URL:");
+
+    if (name && email && role && task && photo) {
+      librarians.push({ name, email, role, task, photo });
+      renderTable();
+    } else {
+      alert("All fields are required.");
+    }
+  }
+
+  function viewLibrarian(index) {
+    const librarian = librarians[index];
+    document.getElementById("viewName").innerText = librarian.name;
+    document.getElementById("viewEmail").innerText = librarian.email;
+    document.getElementById("viewRole").innerText = librarian.role;
+    document.getElementById("viewTask").innerText = librarian.task;
+    document.getElementById("viewPhoto").src = librarian.photo;
+    new bootstrap.Modal(document.getElementById("viewLibrarianModal")).show();
+  }
+
+  function editLibrarian(index) {
+    const librarian = librarians[index];
+    document.getElementById("editName").value = librarian.name;
+    document.getElementById("editEmail").value = librarian.email;
+    document.getElementById("editRole").value = librarian.role;
+    document.getElementById("editTask").value = librarian.task;
+    document.getElementById("editPhoto").value = librarian.photo;
+    document.getElementById("editReason").value = '';
+
+    const form = document.getElementById("editLibrarianForm");
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      librarians[index] = {
+        name: document.getElementById("editName").value,
+        email: document.getElementById("editEmail").value,
+        role: document.getElementById("editRole").value,
+        task: document.getElementById("editTask").value,
+        photo: document.getElementById("editPhoto").value
+      };
+
+      const reason = document.getElementById("editReason").value;
+      const date = new Date().toLocaleString();
+      actionLogs.push({ action: 'Edit', librarian: librarian.name, reason, date });
+
+      renderTable();
+      new bootstrap.Modal(document.getElementById("editLibrarianModal")).hide();
+    };
+
+    new bootstrap.Modal(document.getElementById("editLibrarianModal")).show();
+  }
+
+  function deleteLibrarian(index) {
+    const librarian = librarians[index];
+    document.getElementById("deleteReason").value = '';
+
+    const modal = new bootstrap.Modal(document.getElementById("deleteLibrarianModal"));
+    modal.show();
+
+    window.confirmDelete = () => {
+      const reason = document.getElementById("deleteReason").value;
+      const date = new Date().toLocaleString();
+
+      if (confirm("Are you sure you want to delete this librarian?")) {
+        librarians.splice(index, 1);
+        actionLogs.push({ action: 'Delete', librarian: librarian.name, reason, date });
+        renderTable();
+        modal.hide();
+      }
+    };
+  }
+
+  renderTable();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

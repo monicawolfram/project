@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Library System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .profile-container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        .profile-info {
+            margin-bottom: 20px;
+        }
+        .logout-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #dc3545;
+            text-decoration: none;
+        }
+        .logout-link:hover {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="profile-container text-center">
+            <!-- Profile Picture -->
+            <img src="student1.jpeg" alt="User Image" class="profile-img">
+            <h2 id="user-name" class="mb-3">John Doe</h2>
+            <!-- Profile Information -->
+            <div class="profile-info">
+                <p>User ID: <span id="user-id">LIB123456</span></p>
+                <p>Department: <span id="user-department">Computer Science</span></p>
+                <p>Year: <span id="user-year">2nd Year</span></p>
+                <p>Sex: <span id="user-sex">Male</span></p>
+            </div>
+            <!-- Logout Link -->
+            <a href="interface.html" class="logout-link" onclick="logout()">Logout <i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </div>
+
+    <script>
+        // Mockup for user data (replace with real data from a database or session)
+        const user = {
+            name: 'John Doe',
+            userId: 'LIB123456',
+            department: 'Computer Science',
+            year: '2nd Year',
+            sex: 'Male'
+        };
+
+        // Update profile info dynamically
+        document.getElementById('user-name').textContent = user.name;
+        document.getElementById('user-id').textContent = user.userId;
+        document.getElementById('user-department').textContent = user.department;
+        document.getElementById('user-year').textContent = user.year;
+        document.getElementById('user-sex').textContent = user.sex;
+
+        // Logout function
+        function logout() {
+            // Add any necessary logout logic here (e.g., clearing session storage, API calls, etc.)
+            alert("You have successfully logged out!");
+            window.location.href = "login.html";  // Redirect to login page
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

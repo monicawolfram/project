@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MANAGE FINES</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body {
+      background: url('library-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
+
+    .sidebar {
+      background-color: white;
+      min-height: 100vh;
+      padding: 20px;
+      border-radius: 15px;
+    }
+
+    .sidebar .nav-link {
+      color: black;
+      font-size: 18px;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .sidebar .nav-link:hover {
+      background-color: green;
+      color: white;
+      border-radius: 8px;
+    }
+
+    .sidebar .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .sidebar img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background: white;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .download-options button {
+      margin-right: 10px;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      background: red;
+      color: white;
+      font-size: 10px;
+      padding: 2px 5px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+      <div class="logo-container">
+        <img src="sjcet.png" alt="SJCET Logo">
+        <h4>SJUCET Library</h4>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" href="library home.html"><i class="fas fa-home"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="librarian category.html"><i class="fas fa-book"></i> Manage Catalog</a></li>
+        <li class="nav-item"><a class="nav-link" href="managerequestlibrarian.html"><i class="fas fa-tasks"></i> Manage Requests</a></li>
+        <li class="nav-item"><a class="nav-link" href="manageinventorylibrarian.html"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
+        <li class="nav-item"><a class="nav-link" href="massageandfeedback.html"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
+        <li class="nav-item"><a class="nav-link" href="generatereport.html"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
+        <li class="nav-item"><a class="nav-link" href="Itsupport.html"><i class="fas fa-tools"></i> IT Support</a></li>
+        <li class="nav-item"><a class="nav-link" href="manageusers.html"><i class="fas fa-users"></i> Manage Users</a></li>
+        <li class="nav-item"><a class="nav-link" href="managefines.html"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <input type="text" class="form-control w-25" id="searchBar" placeholder="Search here">
+        <div class="d-flex align-items-center position-relative">
+          <!-- Notification Icon -->
+          <div class="dropdown me-3">
+            <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-bell"></i>
+              <span class="notification-badge">3</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="booknotification.html">New book added</a></li>
+              <li><a class="dropdown-item" href="requestnotification.html">Request pending approval</a></li>
+              <li><a class="dropdown-item" href="systemnotification.html">System maintenance scheduled</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-center" href="viewallnotification.html">View all</a></li>
+            </ul>
+          </div>
+
+          <!-- User Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-user"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="librarian account.html">Librarian Account</a></li>
+              <li><a class="dropdown-item" href="admin account.html">Admin Account</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="interface.html">Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manage Fines -->
+      <section class="mt-4">
+        <h2>Manage Fines</h2>
+        <button class="btn btn-primary mb-3" data-bs-toggle="collapse" data-bs-target="#addFineForm">Add Fine</button>
+        <div id="addFineForm" class="collapse">
+          <form id="newFineForm" class="mb-4">
+            <div class="row">
+              <div class="col-md-3 mb-2"><input type="text" class="form-control" id="fineId" placeholder="ID" required></div>
+              <div class="col-md-3 mb-2"><input type="text" class="form-control" id="finePaper" placeholder="Paper" required></div>
+              <div class="col-md-2 mb-2"><input type="date" class="form-control" id="fineDate" required></div>
+              <div class="col-md-2 mb-2"><input type="number" class="form-control" id="fineAmount" placeholder="Fine" required></div>
+              <div class="col-md-2 mb-2">
+                <select class="form-control" id="fineStatus">
+                  <option value="Paid">Paid</option>
+                  <option value="Unpaid">Unpaid</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-success">Add Fine</button>
+          </form>
+        </div>
+
+        <!-- Fines Table -->
+        <table class="table table-striped" id="finesTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Paper</th>
+              <th>Date</th>
+              <th>Fine</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>22171055</td>
+              <td>The Great Gatsby</td>
+              <td>2025-02-12</td>
+              <td>$500</td>
+              <td><span class="badge bg-success">Paid</span></td>
+              <td>
+                <button class="btn btn-warning btn-sm" onclick="editFine(this)">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteFine(this)">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td>22171056</td>
+              <td>1984</td>
+              <td>2025-02-15</td>
+              <td>$300</td>
+              <td><span class="badge bg-danger">Unpaid</span></td>
+              <td>
+                <button class="btn btn-warning btn-sm" onclick="editFine(this)">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteFine(this)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Search
+  document.getElementById('searchBar').addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#finesTable tbody tr');
+    rows.forEach(row => {
+      const match = Array.from(row.children).some(cell =>
+        cell.textContent.toLowerCase().includes(query)
+      );
+      row.style.display = match ? '' : 'none';
+    });
+  });
+
+  // Delete
+  function deleteFine(button) {
+    const row = button.closest('tr');
+    row.remove();
+  }
+
+  // Edit (Placeholder)
+  function editFine(button) {
+    alert("Edit fine not implemented yet.");
+  }
+
+  // Add Fine
+  document.getElementById('newFineForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const id = document.getElementById('fineId').value;
+    const paper = document.getElementById('finePaper').value;
+    const date = document.getElementById('fineDate').value;
+    const amount = document.getElementById('fineAmount').value;
+    const status = document.getElementById('fineStatus').value;
+    const table = document.querySelector('#finesTable tbody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${id}</td>
+      <td>${paper}</td>
+      <td>${date}</td>
+      <td>$${amount}</td>
+      <td><span class="badge ${status === 'Paid' ? 'bg-success' : 'bg-danger'}">${status}</span></td>
+      <td>
+        <button class="btn btn-warning btn-sm" onclick="editFine(this)">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteFine(this)">Delete</button>
+      </td>
+    `;
+    table.appendChild(row);
+    this.reset();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Borrowing Transaction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background-size: cover;
+            color: rgb(8, 7, 7);
+            font-family: 'Poppins', sans-serif;
+        }
+        .navbar {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-link {
+            color: white !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #ffdd57 !important;
+            transform: scale(1.1);
+        }
+        .container-box {
+            background: rgba(108, 255, 97, 0.8);
+            color: black;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 4px 10px rgba(0, 0, 0, 0.3);
+            margin-top: 80px;
+        }
+        .btn {
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        .btn:hover {
+            transform: scale(1.1);
+            background: #27ae60;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .receipt {
+            background-color: #f4f4f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        .receipt h4 {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <nav class="navbar d-flex justify-content-around">
+            <a href="home.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="Resources.html" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-book"></i> Resources
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="books.html">Books</a></li>
+                    <li><a class="dropdown-item" href="papers.html">Papers</a></li>
+                    <li><a class="dropdown-item" href="projects.html">Projects</a></li>
+                </ul>
+            </div>
+            <a href="attendance.html" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="transcation.html" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-exchange-alt"></i> Transaction
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="borrowing.html">Borrowing</a></li>
+                    <li><a class="dropdown-item" href="paying.html">Paying Fine</a></li>
+                </ul>
+            </div>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="viewstatus.html" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-eye"></i> Viewstatus
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="resources.html">Resources</a></li>
+                    <li><a class="dropdown-item" href="payment.html">Payment </a></li>
+                    <li><a class="dropdown-item" href="profile.html">Profile </a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container-box">
+            <h2 class="text-center"><i class="fas fa-book-reader"></i> Borrowing Transaction</h2>
+            
+            <div class="table-responsive mt-4">
+                <h3>Borrowed Resources:</h3>
+                <table class="table table-bordered text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Borrower ID</th>
+                            <th>Borrower Name</th>
+                            <th>Resource</th>
+                            <th>Borrow Date</th>
+                            <th>Return Date</th>
+                            <th>Fines</th>
+                            <th>Payment Status</th>
+                            <th>Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody id="borrowList">
+                        <!-- Borrowed resources will appear here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+<!-- Help & About Us Buttons (Moved Outside Container) -->
+<div class="footer-btns text-center mt-3">
+    <a href="About Us.html" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
+    <a href="help.html" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
+</div>
+    <script>
+        const borrowList = document.getElementById('borrowList');
+
+        const borrowedResources = [
+            {
+                borrowerID: '221745',
+                borrowerName: 'Monica',
+                resource: 'book',
+                borrowDate: '2025-04-01',
+                returnDate: '2025-04-10',
+                fineAmount: 200,
+                paymentStatus: 'Unpaid',
+                receipt: ''
+            },
+            {
+                borrowerID: '221743',
+                borrowerName: 'Trezia',
+                resource: 'paper',
+                borrowDate: '2025-03-25',
+                returnDate: '2025-04-05',
+                fineAmount: 100,
+                paymentStatus: 'Paid',
+                receipt: 'Airtel'
+            },
+            {
+                borrowerID: '221746',
+                borrowerName: 'Samuel',
+                resource: 'project',
+                borrowDate: '2025-04-02',
+                returnDate: '2025-04-12',
+                fineAmount: 300,
+                paymentStatus: 'Unpaid',
+                receipt: ''
+            }
+        ];
+
+        function updateBorrowList() {
+            borrowList.innerHTML = '';
+            borrowedResources.forEach(record => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${record.borrowerID}</td>
+                    <td>${record.borrowerName}</td>
+                    <td>${capitalize(record.resource)}</td>
+                    <td>${record.borrowDate}</td>
+                    <td>${record.returnDate}</td>
+                    <td>${record.fineAmount > 0 ? 'Yes' : 'No'}</td>
+                    <td>
+                        ${record.paymentStatus === 'Unpaid' ? 
+                            <button class="btn btn-warning" onclick="payFine('${record.borrowerID}', '${record.borrowerName}', '${record.resource}')">Pay Fine</button> : 
+                            <span class="text-success">Paid</span>
+                        }
+                    </td>
+                    <td>
+                        ${record.paymentStatus === 'Paid' ? 
+                            `<div class="receipt">
+                                <h4>Payment Receipt</h4>
+                                <p>Resource: ${capitalize(record.resource)}</p>
+                                <p>Amount: KSh ${record.fineAmount}</p>
+                                <p>Payment Method: ${record.receipt}</p>
+                            </div>` : 
+                            ''
+                        }
+                    </td>
+                `;
+                borrowList.appendChild(tr);
+            });
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function payFine(borrowerID, borrowerName, resource) {
+            const paymentMethod = prompt('Choose Payment Method: Airtel or Mpesa').toLowerCase();
+
+            const record = borrowedResources.find(r => r.borrowerID === borrowerID && r.borrowerName === borrowerName && r.resource === resource);
+            if (record) {
+                record.paymentStatus = 'Paid';
+                record.receipt = paymentMethod === 'airtel' ? 'Airtel' : 'Mpesa';
+            }
+
+            updateBorrowList();
+        }
+
+        // Initialize the borrowed resources table
+        updateBorrowList();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

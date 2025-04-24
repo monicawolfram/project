@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Librarian Account System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+    rel="stylesheet">
+  <link 
+    rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+    .card-header {
+      background-color: #198754;
+      color: white;
+    }
+    .btn-action {
+      margin: 2px;
+    }
+    .attachment-link {
+      cursor: pointer;
+      color: #0d6efd;
+      text-decoration: none;
+    }
+    .attachment-controls {
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2 class="mb-4">Librarian Account Dashboard</h2>
+
+  <!-- Librarian Table -->
+  <div class="card">
+    <div class="card-header">
+      <strong>All Librarians</strong>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Task (Today)</th>
+          <th>Check-In</th>
+          <th>Check-Out</th>
+          <th>Attachments</th>
+          <th>Admin Actions</th>
+        </tr>
+        </thead>
+        <tbody id="librarianTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Messages Section -->
+  <div class="card mt-4">
+    <div class="card-header bg-info text-white">
+      <strong>Librarian Messages</strong>
+    </div>
+    <div class="card-body">
+      <label for="librarianSelect" class="form-label">Select Librarian:</label>
+      <select class="form-select mb-3" id="librarianSelect" onchange="renderMessages()"></select>
+      <ul class="list-group" id="messageList"></ul>
+    </div>
+  </div>
+</div>
+
+<!-- Comment Modal -->
+<div class="modal fade" id="commentModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Add / View Comment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <textarea id="commentText" class="form-control" rows="4"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" onclick="saveComment()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Attachment Modal -->
+<div class="modal fade" id="attachmentModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Add Attachment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="file" id="attachmentInput" class="form-control">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="uploadAttachment()">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+  let currentIndex = -1;
+
+  const librarians = [
+    {
+      name: "James M.",
+      email: "james@sjcet.ac.ke",
+      role: "Senior Librarian",
+      task: "Organized journals & responded to queries",
+      checkin: "08:15 AM",
+      checkout: "04:30 PM",
+      attachments: ["journal_report.pdf"],
+      comment: "Well done",
+      status: "Pending"
+    },
+    {
+      name: "Agnes O.",
+      email: "agnes@sjcet.ac.ke",
+      role: "Assistant Librarian",
+      task: "Helped students access eBooks",
+      checkin: "09:00 AM",
+      checkout: "05:00 PM",
+      attachments: [],
+      comment: "",
+      status: "Pending"
+    }
+  ];
+
+  const adminMessages = [
+    { to: "James M.", message: "Meeting at 3 PM today.", date: "2025-04-16" },
+    { to: "James M.", message: "Submit inventory update report.", date: "2025-04-17" },
+    { to: "Agnes O.", message: "Update the overdue list by end of day.", date: "2025-04-16" }
+  ];
+
+  function renderTable() {
+    const tbody = document.getElementById("librarianTable");
+    tbody.innerHTML = "";
+
+    librarians.forEach((lib, index) => {
+      const attachments = lib.attachments.map((att, i) => `
+        <div>
+          <span class="attachment-link">${att}</span>
+          <div class="attachment-controls text-muted">
+            <a href="remove.html" onclick="removeAttachment(${index}, ${i})">Remove</a>
+            |
+            <a href="uodate.html" onclick="updateAttachment(${index}, ${i})">Update</a>
+          </div>
+        </div>
+      `).join("");
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${lib.name}</td>
+        <td>${lib.email}</td>
+        <td>${lib.role}</td>
+        <td>${lib.task}</td>
+        <td>${lib.checkin}</td>
+        <td>${lib.checkout}</td>
+        <td>
+          ${attachments}
+          <button class="btn btn-sm btn-outline-primary mt-2" onclick="openAttachmentModal(${index})">Add</button>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-success btn-action" onclick="approveTask(${index})">Approve</button>
+          <button class="btn btn-sm btn-secondary btn-action" onclick="rejectTask(${index})">Reject</button>
+          <button class="btn btn-sm btn-warning btn-action" onclick="editTask(${index})">Update</button>
+          <button class="btn btn-sm btn-danger btn-action" onclick="deleteTask(${index})">Delete</button>
+          <button class="btn btn-sm btn-primary btn-action" onclick="openCommentModal(${index})">Comment</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    // Populate dropdown
+    const select = document.getElementById("librarianSelect");
+    select.innerHTML = "";
+    librarians.forEach(lib => {
+      const opt = document.createElement("option");
+      opt.value = lib.name;
+      opt.textContent = lib.name;
+      select.appendChild(opt);
+    });
+    renderMessages();
+  }
+
+  function renderMessages() {
+    const selected = document.getElementById("librarianSelect").value;
+    const list = document.getElementById("messageList");
+    list.innerHTML = "";
+
+    const filtered = adminMessages.filter(msg => msg.to === selected);
+    if (filtered.length === 0) {
+      list.innerHTML = `<li class="list-group-item text-muted">No messages found.</li>`;
+      return;
+    }
+
+    filtered.forEach(msg => {
+      const li = document.createElement("li");
+      li.classList.add("list-group-item");
+      li.innerHTML = `<strong>Date:</strong> ${msg.date}<br><strong>Message:</strong> ${msg.message}`;
+      list.appendChild(li);
+    });
+  }
+
+  function openAttachmentModal(index) {
+    currentIndex = index;
+    document.getElementById("attachmentInput").value = "";
+    new bootstrap.Modal(document.getElementById("attachmentModal")).show();
+  }
+
+  function uploadAttachment() {
+    const input = document.getElementById("attachmentInput");
+    const fileName = input.files[0]?.name;
+    if (fileName && currentIndex >= 0) {
+      librarians[currentIndex].attachments.push(fileName);
+      renderTable();
+      bootstrap.Modal.getInstance(document.getElementById("attachmentModal")).hide();
+    }
+  }
+
+  function removeAttachment(userIndex, fileIndex) {
+    if (confirm("Remove this attachment?")) {
+      librarians[userIndex].attachments.splice(fileIndex, 1);
+      renderTable();
+    }
+  }
+
+  function updateAttachment(userIndex, fileIndex) {
+    const newName = prompt("Enter new attachment name:");
+    if (newName) {
+      librarians[userIndex].attachments[fileIndex] = newName;
+      renderTable();
+    }
+  }
+
+  function openCommentModal(index) {
+    currentIndex = index;
+    document.getElementById("commentText").value = librarians[index].comment || "";
+    new bootstrap.Modal(document.getElementById("commentModal")).show();
+  }
+
+  function saveComment() {
+    if (currentIndex >= 0) {
+      librarians[currentIndex].comment = document.getElementById("commentText").value;
+      renderTable();
+      bootstrap.Modal.getInstance(document.getElementById("commentModal")).hide();
+    }
+  }
+
+  function approveTask(index) {
+    librarians[index].status = "Approved";
+    alert("Task Approved!");
+    renderTable();
+  }
+
+  function rejectTask(index) {
+    librarians[index].status = "Rejected";
+    alert("Task Rejected.");
+    renderTable();
+  }
+
+  function editTask(index) {
+    const newTask = prompt("Update today's task:", librarians[index].task);
+    if (newTask) {
+      librarians[index].task = newTask;
+      renderTable();
+    }
+  }
+
+  function deleteTask(index) {
+    if (confirm("Delete this task completely?")) {
+      librarians.splice(index, 1);
+      renderTable();
+    }
+  }
+
+  renderTable();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

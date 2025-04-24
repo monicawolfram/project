@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notifications Panel - LMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .notification-card {
+      border-radius: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .notification-status {
+      font-size: 0.85rem;
+    }
+
+    .reply-box {
+      display: none;
+    }
+
+    .reply-box textarea {
+      resize: none;
+    }
+
+    .reply-thread {
+      margin-top: 10px;
+      padding-left: 20px;
+      border-left: 2px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+<div class="container py-4">
+  <h3 class="mb-4"><i class="fa-solid fa-bell me-2"></i>Notifications Center</h3>
+
+  <div id="notificationsList">
+    <!-- Sample Notification -->
+    <div class="card notification-card p-3" data-status="pending">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h5 class="mb-1">New Book Added: "Modern JS Essentials"</h5>
+          <p class="text-muted mb-1">Submitted by: Student A (2025-04-17)</p>
+          <span class="badge bg-warning text-dark notification-status">Pending</span>
+        </div>
+        <button class="btn btn-outline-primary btn-sm" onclick="toggleReplyBox(this)">Reply</button>
+      </div>
+
+      <!-- Existing Replies -->
+      <div class="reply-thread mt-3">
+        <strong>Librarian Mary:</strong> Thank you for the suggestion, we’ll review it today.
+      </div>
+
+      <!-- Reply Box -->
+      <div class="reply-box mt-3">
+        <textarea class="form-control mb-2" rows="2" placeholder="Type your reply..."></textarea>
+        <button class="btn btn-success btn-sm" onclick="submitReply(this)">Send Reply</button>
+      </div>
+    </div>
+
+    <!-- Approved Notification -->
+    <div class="card notification-card p-3" data-status="approved">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h5 class="mb-1">Book Request Approved: "AI Fundamentals"</h5>
+          <p class="text-muted mb-1">Requested by: Student B (2025-04-15)</p>
+          <span class="badge bg-success notification-status">Approved</span>
+        </div>
+        <button class="btn btn-outline-primary btn-sm" onclick="toggleReplyBox(this)">Reply</button>
+      </div>
+
+      <div class="reply-thread mt-3">
+        <strong>Librarian James:</strong> This book has been added to the digital catalog.
+      </div>
+
+      <div class="reply-box mt-3">
+        <textarea class="form-control mb-2" rows="2" placeholder="Type your reply..."></textarea>
+        <button class="btn btn-success btn-sm" onclick="submitReply(this)">Send Reply</button>
+      </div>
+    </div>
+
+    <!-- Add more notifications dynamically from backend -->
+  </div>
+</div>
+
+<script>
+  function toggleReplyBox(btn) {
+    const card = btn.closest(".notification-card");
+    const box = card.querySelector(".reply-box");
+    box.style.display = box.style.display === "none" || !box.style.display ? "block" : "none";
+  }
+
+  function submitReply(button) {
+    const replyBox = button.closest(".reply-box");
+    const textArea = replyBox.querySelector("textarea");
+    const reply = textArea.value.trim();
+
+    if (!reply) return alert("Please enter a reply before sending.");
+
+    // Simulate adding the reply to the thread
+    const thread = button.closest(".notification-card").querySelector(".reply-thread");
+    const newReply = document.createElement("div");
+    newReply.innerHTML = `<strong>You:</strong> ${reply}`;
+    thread.appendChild(newReply);
+
+    textArea.value = "";
+    replyBox.style.display = "none";
+
+    // TODO: Send this reply to backend using fetch/axios POST
+    console.log("Reply sent:", reply);
+  }
+
+  function submitReply(button) {
+  const card = button.closest(".notification-card");
+  const notificationId = card.dataset.id;
+  const replyBox = card.querySelector(".reply-box");
+  const textArea = replyBox.querySelector("textarea");
+  const reply = textArea.value.trim();
+
+  if (!reply) return alert("Please enter a reply before sending.");
+
+  fetch('http://localhost:5000/api/notifications/reply', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      notification_id: notificationId,
+      reply: reply,
+      replied_by: 'Librarian John' // dynamic from session/login later
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      const thread = card.querySelector(".reply-thread");
+      const newReply = document.createElement("div");
+      newReply.innerHTML = `<strong>You:</strong> ${reply}`;
+      thread.appendChild(newReply);
+      textArea.value = "";
+      replyBox.style.display = "none";
+    })
+    .catch(err => console.error(err));
+}
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

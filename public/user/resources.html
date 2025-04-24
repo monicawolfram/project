@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Status - Resources</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body {
+      background-color: #f4f6f9;
+      font-family: 'Poppins', sans-serif;
+    }
+    .navbar {
+      background: rgba(0, 0, 0, 0.85);
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .nav-link {
+      color: white !important;
+    }
+    .nav-link:hover {
+      color: #ffcc00 !important;
+    }
+    
+
+    .container-box {
+            background: rgba(108, 255, 97, 0.8);
+            color: black;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 4px 10px rgba(0, 0, 0, 0.3);
+            margin-top: 80px;
+        }
+        
+    .btn-borrow {
+      background-color: #28a745;
+      color: white;
+      border-radius: 20px;
+    }
+    .btn-borrow:hover {
+      background-color: #218838;
+    }
+
+    .btn {
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        .btn:hover {
+            transform: scale(1.1);
+            background: #27ae60;
+        }
+  </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <nav class="navbar d-flex justify-content-around">
+            <a href="home.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="Resources.html" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-book"></i> Resources
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="books.html">Books</a></li>
+                    <li><a class="dropdown-item" href="papers.html">Papers</a></li>
+                    <li><a class="dropdown-item" href="projects.html">Projects</a></li>
+                </ul>
+            </div>
+            <a href="attendance.html" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="transcation.html" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-exchange-alt"></i> Transaction
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="borrowing.html">Borrowing</a></li>
+                    <li><a class="dropdown-item" href="paying.html">Paying Fine</a></li>
+                </ul>
+            </div>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="viewstatus.html" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-eye"></i> Viewstatus
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="resources.html">Resources</a></li>
+                    <li><a class="dropdown-item" href="payment.html">Payment </a></li>
+                    <li><a class="dropdown-item" href="profile.html">Profile </a></li>
+                </ul>
+            </div>
+        </nav>
+
+    <div class="container-box mt-4">
+      <h2 class="text-center mb-4"><i class="fas fa-folder-open"></i> Resources Status</h2>
+
+      <ul class="nav nav-tabs" id="resourceTabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#available" role="tab">Available</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#borrowed" role="tab">Borrowed</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#returned" role="tab">Returned</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#new" role="tab">New</a>
+        </li>
+      </ul>
+
+      <div class="tab-content mt-3">
+        <div class="tab-pane fade show active" id="available" role="tabpanel">
+          <table class="table table-bordered text-center">
+            <thead class="table-success">
+              <tr>
+                <th>Resource</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody id="availableList"></tbody>
+          </table>
+        </div>
+
+        <div class="tab-pane fade" id="borrowed" role="tabpanel">
+          <table class="table table-bordered text-center">
+            <thead class="table-warning">
+              <tr>
+                <th>Borrower</th>
+                <th>Resource</th>
+                <th>Type</th>
+                <th>Borrow Date</th>
+                <th>Return Date</th>
+              </tr>
+            </thead>
+            <tbody id="borrowedList"></tbody>
+          </table>
+        </div>
+
+        <div class="tab-pane fade" id="returned" role="tabpanel">
+          <table class="table table-bordered text-center">
+            <thead class="table-info">
+              <tr>
+                <th>Resource</th>
+                <th>Type</th>
+                <th>Return Date</th>
+                <th>Borrow Again</th>
+              </tr>
+            </thead>
+            <tbody id="returnedList"></tbody>
+          </table>
+        </div>
+
+        <div class="tab-pane fade" id="new" role="tabpanel">
+          <table class="table table-bordered text-center">
+            <thead class="table-primary">
+              <tr>
+                <th>Resource</th>
+                <th>Type</th>
+                <th>Date Added</th>
+              </tr>
+            </thead>
+            <tbody id="newList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Help & About Us Buttons (Moved Outside Container) -->
+<div class="footer-btns text-center mt-3">
+    <a href="About Us.html" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
+    <a href="help.html" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
+</div>
+
+  <script>
+    const availableList = document.getElementById('availableList');
+    const borrowedList = document.getElementById('borrowedList');
+    const returnedList = document.getElementById('returnedList');
+    const newList = document.getElementById('newList');
+
+    const resources = [
+      { resource: 'Book A', type: 'Book', status: 'available' },
+      { resource: 'Paper X', type: 'Paper', status: 'borrowed', borrower: 'Monica', borrowDate: '2025-04-01', returnDate: '2025-04-10' },
+      { resource: 'Project Alpha', type: 'Project', status: 'returned', returnDate: '2025-04-05' },
+      { resource: 'Book B', type: 'Book', status: 'new', dateAdded: '2025-04-09' },
+      { resource: 'Paper Y', type: 'Paper', status: 'available' },
+      { resource: 'Project Beta', type: 'Project', status: 'borrowed', borrower: 'Samuel', borrowDate: '2025-04-03', returnDate: '2025-04-13' },
+      { resource: 'Book C', type: 'Book', status: 'returned', returnDate: '2025-04-08' },
+    ];
+
+    resources.forEach(item => {
+      let row = document.createElement('tr');
+
+      if (item.status === 'available') {
+        row.innerHTML = '<td>${item.resource}</td><td>${item.type}</td>';
+        availableList.appendChild(row);
+      }
+
+      if (item.status === 'borrowed') {
+        row.innerHTML = '<td>${item.borrower}</td><td>${item.resource}</td><td>${item.type}</td><td>${item.borrowDate}</td><td>${item.returnDate}</td>';
+        borrowedList.appendChild(row);
+      }
+
+      if (item.status === 'returned') {
+        row.innerHTML = '<td>${item.resource}</td><td>${item.type}</td><td>${item.returnDate}</td><td><button class="btn btn-borrow">Borrow</button></td>';
+        returnedList.appendChild(row);
+      }
+
+      if (item.status === 'new') {
+        row.innerHTML = '<td>${item.resource}</td><td>${item.type}</td><td>${item.dateAdded}</td>';
+        newList.appendChild(row);
+      }
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notifications - Library System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f6f9;
+      padding: 20px;
+    }
+
+    .card {
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .badge-status {
+      font-size: 0.8rem;
+    }
+
+    .reply-box {
+      margin-top: 10px;
+    }
+
+    .notification-item {
+      margin-bottom: 20px;
+    }
+
+    .admin-tag {
+      font-size: 0.75rem;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h3 class="mb-4 text-primary"><i class="bi bi-bell-fill me-2"></i>Notification Center</h3>
+
+    <div id="notifications-list">
+      <!-- Notifications will be injected here -->
+    </div>
+  </div>
+
+  <script>
+    const notificationsList = document.getElementById('notifications-list');
+
+    // Sample notifications data (replace with actual backend data)
+    const notifications = [
+      {
+        id: 1,
+        title: 'New Book Request Pending',
+        message: 'A new book request has been made and is pending approval.',
+        status: 'pending',
+        sender: 'User John Doe',
+        recipient: 'Librarian Alice',
+        timestamp: '2025-04-17 10:15 AM'
+      },
+      {
+        id: 2,
+        title: 'Request Approved',
+        message: 'Your recent book request has been approved. You can now pick it up.',
+        status: 'approved',
+        sender: 'Librarian Alice',
+        recipient: 'User John Doe',
+        timestamp: '2025-04-17 11:00 AM'
+      }
+    ];
+
+    // Display notifications
+    function displayNotifications() {
+      notificationsList.innerHTML = '';
+      notifications.forEach(notification => {
+        const div = document.createElement('div');
+        div.className = 'card p-3 notification-item';
+
+        div.innerHTML = `
+          <h5>${notification.title}</h5>
+          <p class="mb-1">${notification.message}</p>
+          <span class="badge ${notification.status === 'pending' ? 'bg-warning' : notification.status === 'approved' ? 'bg-success' : 'bg-secondary'} badge-status">
+            ${notification.status.charAt(0).toUpperCase() + notification.status.slice(1)}
+          </span>
+          <span class="admin-tag d-block mt-2">From: ${notification.sender} | To: ${notification.recipient}</span>
+
+          <div class="reply-box mt-3">
+            <textarea class="form-control mb-2" placeholder="Write a reply..." id="reply-${notification.id}"></textarea>
+            <button class="btn btn-sm btn-primary" onclick="sendReply(${notification.id})">Send Reply</button>
+          </div>
+        `;
+
+        notificationsList.appendChild(div);
+      });
+    }
+
+    // Send reply to the notification
+    async function sendReply(id) {
+      const message = document.getElementById(`reply-${id}`).value;
+      if (!message.trim()) return alert("Reply cannot be empty");
+
+      // Simulate sending the reply (replace with actual backend logic)
+      alert(`Reply sent for notification ID: ${id}`);
+      notifications.find(notification => notification.id === id).status = 'replied'; // Update status
+      displayNotifications(); // Re-render notifications with updated status
+    }
+
+    displayNotifications(); // Call function to display notifications
+  </script>
+
+</body>
+</html>

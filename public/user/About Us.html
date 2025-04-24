@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABOUT US</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background: url('Library.jpg') no-repeat center center/cover;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            transition: background 1s ease-in-out;
+        }
+        .navbar {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-link {
+            color: white !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #ffdd57 !important;
+            transform: scale(1.1);
+        }
+        .container-box {
+            background: transparent;
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .about-us {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .librarian-card {
+            background: white;
+            color: black;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .librarian-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .footer-btns {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .footer-btns .btn {
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        .footer-btns .btn:hover {
+            transform: scale(1.1);
+            background: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <nav class="navbar d-flex justify-content-around">
+            <a href="home.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="Resources.html" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-book"></i> Resources
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="books.html">Books</a></li>
+                    <li><a class="dropdown-item" href="papers.html">Papers</a></li>
+                    <li><a class="dropdown-item" href="projects.html">Projects</a></li>
+                </ul>
+            </div>
+            <a href="attendance.html" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="transcation.html" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-exchange-alt"></i> Transaction
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="borrowing.html">Borrowing</a></li>
+                    <li><a class="dropdown-item" href="paying.html">Paying Fine</a></li>
+                </ul>
+            </div>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="viewstatus.html" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-eye"></i> Viewstatus
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="resources.html">Resources</a></li>
+                    <li><a class="dropdown-item" href="payment.html">Payment </a></li>
+                    <li><a class="dropdown-item" href="profile.html">Profile </a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="about-us">
+            <h2>About Us</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="librarian-card">
+                        <img src="student4.jpeg" alt="Alice William">
+                        <h4>Alice William</h4>
+                        <p>Alice is a dedicated librarian with years of experience in managing library resources and assisting readers.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="librarian-card">
+                        <img src="student1.jpeg" alt="Trezia Izack">
+                        <h4>Trezia Izack</h4>
+                        <p>Trezia is passionate about books and ensures the library operates smoothly for all members.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-btns">
+            <a href="About Us.html" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
+            <a href="help.html" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

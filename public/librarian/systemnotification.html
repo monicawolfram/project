@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Notifications - Admin/Librarian Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <style>
+    body {
+      background-color: #f1f1f1;
+    }
+    .notification-card {
+      border-left: 5px solid;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      background: white;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+    .notification-card.pending {
+      border-color: orange;
+    }
+    .notification-card.approved {
+      border-color: green;
+    }
+    .notification-card.maintenance {
+      border-color: #6f42c1;
+    }
+    .notification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .reply-box {
+      margin-top: 10px;
+    }
+    .reply-box textarea {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    .reply-box button {
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container mt-5">
+  <h2 class="mb-4"><i class="fa-solid fa-bell me-2"></i>System Notifications</h2>
+
+  <!-- Pending Request -->
+  <div class="notification-card pending">
+    <div class="notification-header">
+      <h5><i class="fa-solid fa-hourglass-half me-2"></i>Pending Book Request</h5>
+      <small class="text-muted">2 mins ago</small>
+    </div>
+    <p><strong>John Doe</strong> requested "JavaScript for Beginners". Awaiting approval.</p>
+    <div class="reply-box">
+      <textarea rows="2" placeholder="Reply as librarian..."></textarea>
+      <button class="btn btn-sm btn-outline-primary">Send Reply</button>
+    </div>
+  </div>
+
+  <!-- Approved Request -->
+  <div class="notification-card approved">
+    <div class="notification-header">
+      <h5><i class="fa-solid fa-check-circle me-2"></i>Request Approved</h5>
+      <small class="text-muted">10 mins ago</small>
+    </div>
+    <p>"Python Programming 101" has been approved and is now available for pickup.</p>
+    <div class="reply-box">
+      <textarea rows="2" placeholder="Notify admin or user..."></textarea>
+      <button class="btn btn-sm btn-outline-success">Send Reply</button>
+    </div>
+  </div>
+
+  <!-- System Maintenance -->
+  <div class="notification-card maintenance">
+    <div class="notification-header">
+      <h5><i class="fa-solid fa-wrench me-2"></i>System Maintenance Scheduled</h5>
+      <small class="text-muted">30 mins ago</small>
+    </div>
+    <p>The system will be under maintenance on <strong>April 21, 2025</strong> from <strong>10:00 PM to 12:00 AM</strong>.</p>
+    <div class="reply-box">
+      <textarea rows="2" placeholder="Acknowledge or escalate to team..."></textarea>
+      <button class="btn btn-sm btn-outline-warning">Send Reply</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

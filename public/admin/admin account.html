@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Account</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+    rel="stylesheet">
+  <link 
+    rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .profile-card {
+      max-width: 600px;
+      margin: 50px auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .profile-header {
+      background-color: #198754;
+      color: white;
+      padding: 20px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      text-align: center;
+    }
+    .profile-img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .profile-body {
+      padding: 25px;
+    }
+    .profile-actions button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card profile-card">
+    <div class="profile-header">
+      <img src="student1.jpeg" alt="Admin" class="profile-img">
+      <h3><i class="fa-solid fa-user-shield"></i> Admin Profile</h3>
+    </div>
+    <div class="profile-body">
+      <div class="mb-3 row">
+        <label class="col-sm-4 col-form-label">Full Name:</label>
+        <div class="col-sm-8">
+          <p class="form-control-plaintext" id="adminName">Monica W. Mgeni</p>
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <label class="col-sm-4 col-form-label">Email:</label>
+        <div class="col-sm-8">
+          <p class="form-control-plaintext" id="adminEmail">admin@library.ac.tz</p>
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <label class="col-sm-4 col-form-label">Phone:</label>
+        <div class="col-sm-8">
+          <p class="form-control-plaintext" id="adminPhone">+255 676 375038</p>
+        </div>
+      </div>
+      <div class="profile-actions text-center">
+        <button class="btn btn-outline-primary" onclick="editInfo()">
+          <i class="fa-solid fa-pen-to-square"></i> Edit Info
+        </button>
+        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#loginModal">
+          <i class="fa-solid fa-clock-rotate-left"></i> View Activity
+        </button>
+        <button class="btn btn-outline-danger" onclick="logout()">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Admin Login</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username:</label>
+            <input type="text" class="form-control" id="username" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password:</label>
+            <input type="password" class="form-control" id="password" required>
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-success">Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function editInfo() {
+    const newName = prompt("Update name:", document.getElementById("adminName").textContent);
+    const newEmail = prompt("Update email:", document.getElementById("adminEmail").textContent);
+    const newPhone = prompt("Update phone:", document.getElementById("adminPhone").textContent);
+
+    if (newName) document.getElementById("adminName").textContent = newName;
+    if (newEmail) document.getElementById("adminEmail").textContent = newEmail;
+    if (newPhone) document.getElementById("adminPhone").textContent = newPhone;
+
+    alert("Information updated successfully!");
+  }
+
+  function logout() {
+    if (confirm("Are you sure you want to logout?")) {
+      alert("Logging out...");
+      window.location.href = "library home.html";
+      // Redirect to login page if needed
+    }
+  }
+
+  // Login Logic
+  document.getElementById("loginForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (username === "admin" && password === "admin123") {
+      alert("Login successful!");
+      window.location.href = "admin dashboard.html";
+    } else {
+      alert("Invalid credentials. Try again.");
+    }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
