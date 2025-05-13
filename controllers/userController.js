@@ -19,6 +19,40 @@ exports.interface = (req, res) => {
 exports.home = (req, res) => {
   res.sendFile(path.join(__dirname, '../public/user/home.html'));
 };
+exports.books = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/books.html'));
+};
+exports.papers = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/papers.html'));
+};
+exports.projects = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/projects.html'));
+};
+exports.Attendance = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/Attendance.html'));
+};
+exports.borrowing = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/borrowing.html'));
+};
+exports.paying = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/paying.html'));
+};
+exports.resources = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/resources.html'));
+};
+exports.payment = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/payment.html'));
+};
+exports.profile = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/profile.html'));
+};
+exports.AboutUs = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/AboutUs.html'));
+};
+exports.help = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/help.html'));
+};
+
 exports.sendFeedback = (req, res) => {
   const { user_id, subject, message } = req.body;
   if (!user_id || !subject || !message) {
