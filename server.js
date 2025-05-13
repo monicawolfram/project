@@ -10,10 +10,12 @@ app.use(express.json());
 // Routes
 const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
+const initialRoutes = require('./routes/initial');
 const librarianRoutes = require('./routes/librarianRoutes');
 
 app.use('/admin', adminRoutes);
 app.use('/user', userRoutes);
+app.use('/', initialRoutes);
 app.use('/librarian', librarianRoutes);
 
 // Start server
