@@ -4,7 +4,7 @@ services:
     env: node
     plan: free
     buildCommand: npm install
-    startCommand: node app.js  # or server.js if that's your entry point
+    startCommand: node server.js  # or server.js if that's your entry point
     envVars:
       - key: NODE_ENV
         value: production
