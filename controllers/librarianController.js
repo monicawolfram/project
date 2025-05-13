@@ -6,6 +6,61 @@ const { body, param, query, validationResult } = require('express-validator'); /
 exports.interface = (req, res) => {
   res.sendFile(path.join(__dirname, '../public/librarian/librarian _interface.html'));
 };
+exports.librarian_home = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/librarian_home.html'));
+};
+exports.librarian_category = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/librarian_category.html'));
+};
+exports.manageinventorylibrarian = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/manageinventorylibrarian.html'));
+};
+exports.managefines = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/managefines.html'));
+};
+exports.managerequestlibrarian= (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/managerequestlibrarian.html'));
+};
+exports.manageusers = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/manageusers.html'));
+};
+exports.admin_account = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/admin_account.html'));
+};
+exports.booknotification = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/booknotification.html'));
+};
+exports.generatereport = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/generatereport.html'));
+};
+exports.Itsupport = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/Itsupport.html'));
+};
+exports.librarian_account = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/librarian_account.html'));
+};
+exports.massageandfeedback = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/massageandfeedback.html'));
+};
+exports.profile = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/profile.html'));
+};
+exports.requestnotification = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/requestnotification.html'));
+};
+exports.systemnotification = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/systemnotification.html'));
+};
+exports.viewallnotification = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/viewallnotification.html'));
+};
+
+
+
+
+
+
+
 
 
 
