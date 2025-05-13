@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const librarianController = require('../controllers/librarianController');
 
+
 // Middleware for authentication (example placeholder)
 const authenticateLibrarian = (req, res, next) => {
   next();
@@ -16,5 +17,9 @@ router.get('/books/:id', authenticateLibrarian,librarianController.getBookById);
 router.post('/books', authenticateLibrarian, librarianController.addBook); // Spread the array
 router.put('/books/:id', authenticateLibrarian, librarianController.updateBook); // Spread the array
 router.delete('/books/:id', authenticateLibrarian, librarianController.deleteBook); // Spread the array
+
+//
+// This will serve interface.html when visiting /api/librarian/
+router.get('/librarian_interface', librarianController.librarian_interface);
 
 module.exports = router;

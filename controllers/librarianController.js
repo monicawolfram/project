@@ -1,5 +1,13 @@
 const db = require('../db');
+const path = require('path');
 const { body, param, query, validationResult } = require('express-validator'); // Include validationResult
+
+
+exports.interface = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/librarian _interface.html'));
+};
+
+
 
 // Constants
 const STATUS = { ACTIVE: 'no', DELETED: 'yes' };
@@ -112,3 +120,7 @@ exports.deleteBook = [
     }
   }
 ];
+
+exports.librarian_interface = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/librarian/librarian_interface.html'));
+}; 
