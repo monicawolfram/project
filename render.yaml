@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: library-management-system
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node app.js  # or server.js if that's your entry point
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_HOST
+        value: your-database-host
+      - key: DB_USER
+        value: your-db-username
+      - key: DB_PASSWORD
+        value: your-db-password
+      - key: DB_NAME
+        value: your-database-name
+    autoDeploy: true

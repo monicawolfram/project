@@ -12,9 +12,9 @@ const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
 const librarianRoutes = require('./routes/librarianRoutes');
 
-app.use('/api/admin', adminRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/librarian', librarianRoutes);
+app.use('/admin', adminRoutes);
+app.use('/user', userRoutes);
+app.use('/librarian', librarianRoutes);
 
 // Start server
 app.listen(PORT, () => {
