@@ -24,7 +24,7 @@ router.get('/education', userController.education);
 router.get('/eee', userController.eee);
 router.get('/mech', userController.mech);
 router.get('/isne', userController.isne);
-router.get('/mechactronics', userController.mechactronics);
+router.get('/mechactronics', userController.mechatronics);
 router.get('/papers', userController.papers);
 router.get('/projects', userController.projects);
 router.get('/Attendance', userController.Attendance);
