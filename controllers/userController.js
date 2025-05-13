@@ -1,4 +1,5 @@
 const db = require('../db');
+const path = require('path');
 
 exports.dashboard = (req, res) => {
   res.json({ message: 'User Dashboard' });
@@ -12,6 +13,12 @@ exports.getNotifications = (req, res) => {
   });
 };
 
+exports.interface = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/interface.html'));
+}; 
+exports.home = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/home.html'));
+};
 exports.sendFeedback = (req, res) => {
   const { user_id, subject, message } = req.body;
   if (!user_id || !subject || !message) {

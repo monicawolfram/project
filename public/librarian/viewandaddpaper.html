@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librarian</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            background: url('library-bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+
+        .sidebar {
+            background-color: white;
+            min-height: 100vh;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .sidebar img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .sidebar .nav-link {
+            color: black;
+            font-size: 18px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: green;
+            color: white;
+            border-radius: 8px;
+        }
+
+       
+
+        .sidebar .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            color: rgb(19, 19, 19);
+            font-size: 18px;
+            padding: 10px 15px;
+            text-align: left;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .content-container {
+            background: rgba(161, 247, 122, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .tab-content {
+            padding: 15px;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="logo-container">
+                    <img src="../images/sjcet.png" alt="SJCET Logo"> 
+                    <h4>SJUCET Library</h4>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="nav-link" href="library home.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="librarian category.html"><i class="fas fa-book"></i> Manage Catalog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="managerequestlibrarian.html"><i class="fas fa-tasks"></i> Manage Requests</a></li>
+                    <li class="nav-item"><a class="nav-link" href="manageinventorylibrarian.html"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
+                    <li class="nav-item"><a class="nav-link" href="massageandfeedback.html"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
+                    <li class="nav-item"><a class="nav-link" href="generatereport.html"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Itsupport.html"><i class="fas fa-tools"></i> IT Support</a></li>
+                    <li class="nav-item"><a class="nav-link" href="manageusers.html"><i class="fas fa-users"></i> Manage Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="managefines.html"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
+                </ul>
+            </nav>
+     <!-- Main Content -->
+     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            
+       <!-- Top Bar -->
+       <div class="top-bar d-flex justify-content-between align-items-center">
+        <input type="text" class="form-control w-25" placeholder="Search here">
+        <div class="d-flex align-items-center">
+            <!-- Notification Dropdown -->
+            <div class="dropdown me-3">
+                <button class="btn btn-light dropdown-toggle" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
+                    <li><a class="dropdown-item" href="#">New book added</a></li>
+                    <li><a class="dropdown-item" href="#">Request pending approval</a></li>
+                    <li><a class="dropdown-item" href="#">System maintenance scheduled</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-center" href="#">View all</a></li>
+                </ul>
+            </div>
+
+            <!-- User Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li><a class="dropdown-item" href="#">Librarian Account</a></li>
+                    <li><a class="dropdown-item" href="#">Admin Account</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+                <div class="content-container">
+                    <h2 class="text-center mb-4">Librarian Dashboard</h2>
+                    
+                    <!-- View & Add Sections -->
+                    <ul class="nav nav-tabs" id="libraryTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#viewBooks">View Books</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#addBooks">Add Books</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#removeBooks">Remove Books</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content mt-3">
+                        <!-- View Section -->
+                        <div class="tab-pane fade show active" id="viewBooks">
+                            <ul class="nav nav-pills mb-3" id="viewTabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-bs-toggle="pill" href="#availableBooks">Available Books</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#deletedBooks">Deleted Books</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#borrowedBooks">Borrowed Books</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#departments">Departments</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#newBooks">New Books</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#updatedBooks">Recently Updated Books</a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="availableBooks">
+                                    <p>List of available books will be displayed here.</p>
+                                </div>
+                                <div class="tab-pane fade" id="deletedBooks">
+                                    <p>List of deleted books will be displayed here.</p>
+                                </div>
+                                <div class="tab-pane fade" id="borrowedBooks">
+                                    <p>List of borrowed books and borrowers will be displayed here.</p>
+                                </div>
+                                <div class="tab-pane fade" id="departments">
+                                    <p>List of departments and book categories.</p>
+                                </div>
+                                <div class="tab-pane fade" id="newBooks">
+                                    <p>Recently added books will be displayed here.</p>
+                                </div>
+                                <div class="tab-pane fade" id="updatedBooks">
+                                    <p>Recently updated book details will be displayed here.</p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Add Section -->
+                        <div class="tab-pane fade" id="addBooks">
+                            <h4 class="text-center">Add a New Book</h4>
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Title</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Author</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Book Code</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="bookCode" readonly>
+                                        <button type="button" class="btn btn-primary" onclick="generateCode()">Generate Code</button>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success">Submit</button>
+                            </form>
+                        </div>
+
+                          
+
+<!-- Remove Book Section -->
+<div class="tab-pane fade" id="removeBooks">
+    <h4 class="text-center">Remove a Book</h4>
+    <form>
+        <div class="mb-3">
+            <label class="form-label">Enter Book Code or Title</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchBook">
+                <button type="button" class="btn btn-secondary" onclick="searchBook()">Search</button>
+            </div>
+        </div>
+        <div id="bookDetails" class="mb-3 d-none">
+            <p><strong>Title:</strong> <span id="bookTitle"></span></p>
+            <p><strong>Author:</strong> <span id="bookAuthor"></span></p>
+            <button type="button" class="btn btn-danger" onclick="removeBook()">Remove Book</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function searchBook() {
+        let searchInput = document.getElementById("searchBook").value;
+        if (!searchInput) {
+            alert("Please enter a book code or title.");
+            return;
+        }
+
+        fetch('http://localhost:3000/api/books/${searchInput}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else {
+                    document.getElementById("bookTitle").textContent = data.title;
+                    document.getElementById("bookAuthor").textContent = data.author;
+                    document.getElementById("bookDetails").classList.remove("d-none");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    }
+
+    function removeBook() {
+        let searchInput = document.getElementById("searchBook").value;
+        if (!confirm("Are you sure you want to remove this book?")) return;
+
+        fetch('http://localhost:3000/api/books/${searchInput}, { method: "DELETE" }')
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById("bookDetails").classList.add("d-none");
+                document.getElementById("searchBook").value = "";
+            })
+            .catch(error => console.error("Error:", error));
+    }
+</script>
+
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function generateCode() {
+            document.getElementById("bookCode").value = "BK" + Math.floor(1000 + Math.random() * 9000);
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

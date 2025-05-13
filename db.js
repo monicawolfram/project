@@ -1,14 +1,21 @@
+require('dotenv').config();
 const mysql = require('mysql2');
 
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'Admin', // your MySQL password
-  database: 'librarian_db'
-});
-db.connect((err) => {
-  if (err) throw err;
-  console.log('✅ Connected to MySQL database');
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'Admin',
+  database: process.env.DB_NAME || 'librarian_db',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  connectTimeout: 30000,
+  // acquireTimeout: 30000 <-- USIITUMIE
 });
 
-module.exports = db;
+
+pool.on('error', (err) => {
+  console.error('Database pool error:', err.message);
+});
+
+module.exports = pool;
