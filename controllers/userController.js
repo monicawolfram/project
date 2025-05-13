@@ -19,8 +19,50 @@ exports.interface = (req, res) => {
 exports.home = (req, res) => {
   res.sendFile(path.join(__dirname, '../public/user/home.html'));
 };
+exports.rules_and_regulation = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/rules_and_regulation.html'));
+};
 exports.books = (req, res) => {
   res.sendFile(path.join(__dirname, '../public/user/books.html'));
+};
+exports.cs = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/cs.html'));
+};
+exports.yearone = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/yearone.html'));
+};
+exports.yeartwo = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/yeartwo.html'));
+};
+exports.yearthree= (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/yearthree.html'));
+};
+exports.yearfour = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/yearfour.html'));
+};
+exports.It = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/It.html'));
+};
+exports.cse = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/cse.html'));
+};
+  exports.civil = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/civil.html'));
+};
+exports.education = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/education.html'));
+};
+exports.eee = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/eee.html'));
+};
+exports.mech = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/mech.html'));
+};
+exports.isne = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/isne.html'));
+};
+exports.mechatronics = (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/user/mechatronics.html'));
 };
 exports.papers = (req, res) => {
   res.sendFile(path.join(__dirname, '../public/user/papers.html'));
