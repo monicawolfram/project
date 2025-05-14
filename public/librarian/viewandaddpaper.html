@@ -94,8 +94,8 @@
                     <h4>SJUCET Library</h4>
                 </div>
                 <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link" href="library home.html"><i class="fas fa-home"></i> Home</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="librarian category.html"><i class="fas fa-book"></i> Manage Catalog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="librarian_home.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="librarian_category.html"><i class="fas fa-book"></i> Manage Catalog</a></li>
                     <li class="nav-item"><a class="nav-link" href="managerequestlibrarian.html"><i class="fas fa-tasks"></i> Manage Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="manageinventorylibrarian.html"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
                     <li class="nav-item"><a class="nav-link" href="massageandfeedback.html"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
@@ -118,11 +118,11 @@
                     <i class="fas fa-bell"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-                    <li><a class="dropdown-item" href="#">New book added</a></li>
-                    <li><a class="dropdown-item" href="#">Request pending approval</a></li>
-                    <li><a class="dropdown-item" href="#">System maintenance scheduled</a></li>
+                    <li><a class="dropdown-item" href="booknotification.html">New book added</a></li>
+                    <li><a class="dropdown-item" href="requestnotification.html">Request pending approval</a></li>
+                    <li><a class="dropdown-item" href="systemnotification.html">System maintenance scheduled</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-center" href="#">View all</a></li>
+                    <li><a class="dropdown-item text-center" href="viewallnotification.html">View all</a></li>
                 </ul>
             </div>
 
@@ -132,10 +132,10 @@
                     <i class="fas fa-user"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item" href="#">Librarian Account</a></li>
-                    <li><a class="dropdown-item" href="#">Admin Account</a></li>
+                    <li><a class="dropdown-item" href="librarian_account.html">Librarian Account</a></li>
+                    <li><a class="dropdown-item" href="admin_account.html">Admin Account</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="librarian_interface.html">Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -146,13 +146,13 @@
                     <!-- View & Add Sections -->
                     <ul class="nav nav-tabs" id="libraryTabs">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#viewBooks">View Books</a>
+                            <a class="nav-link active" data-bs-toggle="tab" href="#viewpapers">View papers</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#addBooks">Add Books</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="#addpapers">Add papers</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#removeBooks">Remove Books</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="#removepapers">Remove papers</a>
                         </li>
                     </ul>
 
@@ -161,51 +161,51 @@
                         <div class="tab-pane fade show active" id="viewBooks">
                             <ul class="nav nav-pills mb-3" id="viewTabs">
                                 <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="pill" href="#availableBooks">Available Books</a>
+                                    <a class="nav-link active" data-bs-toggle="pill" href="#availablepapers">Available papers</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#deletedBooks">Deleted Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill" href="#deletedpapers">Deleted papers</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#borrowedBooks">Borrowed Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill" href="#borrowedpapers">Borrowed papers</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" data-bs-toggle="pill" href="#departments">Departments</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#newBooks">New Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill" href="#newpapers">New papers</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#updatedBooks">Recently Updated Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill" href="#updatedpapers">Recently Updated papers</a>
                                 </li>
                             </ul>
 
                             <div class="tab-content">
-                                <div class="tab-pane fade show active" id="availableBooks">
-                                    <p>List of available books will be displayed here.</p>
+                                <div class="tab-pane fade show active" id="availablepapers">
+                                    <p>List of available papers will be displayed here.</p>
                                 </div>
-                                <div class="tab-pane fade" id="deletedBooks">
-                                    <p>List of deleted books will be displayed here.</p>
+                                <div class="tab-pane fade" id="deletedpapers">
+                                    <p>List of deleted papers will be displayed here.</p>
                                 </div>
-                                <div class="tab-pane fade" id="borrowedBooks">
-                                    <p>List of borrowed books and borrowers will be displayed here.</p>
+                                <div class="tab-pane fade" id="borrowedpapers">
+                                    <p>List of borrowed papers and borrowers will be displayed here.</p>
                                 </div>
                                 <div class="tab-pane fade" id="departments">
-                                    <p>List of departments and book categories.</p>
+                                    <p>List of departments and papers categories.</p>
                                 </div>
-                                <div class="tab-pane fade" id="newBooks">
-                                    <p>Recently added books will be displayed here.</p>
+                                <div class="tab-pane fade" id="newpapers">
+                                    <p>Recently added papers will be displayed here.</p>
                                 </div>
-                                <div class="tab-pane fade" id="updatedBooks">
-                                    <p>Recently updated book details will be displayed here.</p>
+                                <div class="tab-pane fade" id="updatedpapers">
+                                    <p>Recently updated papers details will be displayed here.</p>
                                 </div>
                             </div>
                         </div>
 
 
                         <!-- Add Section -->
-                        <div class="tab-pane fade" id="addBooks">
-                            <h4 class="text-center">Add a New Book</h4>
+                        <div class="tab-pane fade" id="addpapers">
+                            <h4 class="text-center">Add a New papers</h4>
                             <form>
                                 <div class="mb-3">
                                     <label class="form-label">Title</label>
@@ -220,7 +220,7 @@
                                     <input type="date" class="form-control">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Book Code</label>
+                                    <label class="form-label">paper Code</label>
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="bookCode" readonly>
                                         <button type="button" class="btn btn-primary" onclick="generateCode()">Generate Code</button>
@@ -233,11 +233,11 @@
                           
 
 <!-- Remove Book Section -->
-<div class="tab-pane fade" id="removeBooks">
-    <h4 class="text-center">Remove a Book</h4>
+<div class="tab-pane fade" id="removepapers">
+    <h4 class="text-center">Remove a papers</h4>
     <form>
         <div class="mb-3">
-            <label class="form-label">Enter Book Code or Title</label>
+            <label class="form-label">Enter paper Code or Title</label>
             <div class="input-group">
                 <input type="text" class="form-control" id="searchBook">
                 <button type="button" class="btn btn-secondary" onclick="searchBook()">Search</button>
@@ -246,7 +246,7 @@
         <div id="bookDetails" class="mb-3 d-none">
             <p><strong>Title:</strong> <span id="bookTitle"></span></p>
             <p><strong>Author:</strong> <span id="bookAuthor"></span></p>
-            <button type="button" class="btn btn-danger" onclick="removeBook()">Remove Book</button>
+            <button type="button" class="btn btn-danger" onclick="removeBook()">Remove paper</button>
         </div>
     </form>
 </div>
