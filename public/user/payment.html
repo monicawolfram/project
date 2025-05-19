@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment History - Library System</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
-body {
+        body {
             background-size: cover;
             color: rgb(8, 7, 7);
             font-family: 'Poppins', sans-serif;
@@ -34,22 +34,17 @@ body {
             color: #ffdd57 !important;
             transform: scale(1.1);
         }
-
-
         /* Custom styles */
         .payment-history {
             margin-top: 30px;
         }
-
         .table th,
         .table td {
             text-align: center;
         }
-
         .badge {
             font-size: 1rem;
         }
-
         /* Toast notification styling */
         .toast {
             position: fixed;
@@ -68,7 +63,11 @@ body {
             transform: scale(1.1);
             background: #27ae60;
         }
-
+        /* Ensure table readability */
+        .table {
+            background: #fff;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -107,8 +106,9 @@ body {
             </div>
         </nav>
 
-    <div class="container">
         <h2 class="text-center mt-4">Library Payment History</h2>
+
+        <!-- Payment History Table -->
         <div class="payment-history">
             <table class="table table-striped">
                 <thead>
@@ -117,47 +117,43 @@ body {
                         <th>Student ID</th>
                         <th>Student Name</th>
                         <th>Payment Date</th>
-                        <th>Amount (tsh)</th>
+                        <th>Amount (TZS)</th>
                         <th>Payment Method</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="payment-history-table">
-                    <!-- Data will be inserted here dynamically -->
+                    <tr><td colspan="7" class="text-center">Loading payment history...</td></tr>
                 </tbody>
             </table>
         </div>
-    </div>
 
-    <!-- Toast Notification -->
-    <div id="payment-toast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body">
-                Payment completed successfully!
+        <!-- Toast Notification -->
+        <div id="payment-toast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Payment history loaded successfully!
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+
+        <!-- Help & About Us Buttons -->
+        <div class="footer-btns text-center mt-3">
+            <a href="AboutUs.html" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
+            <a href="help.html" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
         </div>
     </div>
-<!-- Help & About Us Buttons (Moved Outside Container) -->
-<div class="footer-btns text-center mt-3">
-    <a href="AboutUs.html" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
-    <a href="help.html" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
-</div>
-
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Sample data of payments made by the user
-        const payments = [
-            { studentId: "S123", studentName: "John Doe", date: "2025-04-01", amount: 500, method: "Airtel Money", status: "Completed" },
-            { studentId: "S124", studentName: "Jane Smith", date: "2025-03-25", amount: 350, method: "Mpesa", status: "Completed" },
-            { studentId: "S125", studentName: "Alice Johnson", date: "2025-03-15", amount: 200, method: "Airtel Money", status: "Pending" },
-        ];
+        // User identifier (should be dynamic, e.g., from session or login)
+        const regNo = "23IT013"; // Hardcoded for now, replace with dynamic value
 
         // Function to render the payment history in the table
-        function renderPaymentHistory() {
+        function renderPaymentHistory(payments) {
             const tableBody = document.getElementById('payment-history-table');
             tableBody.innerHTML = ''; // Clear existing data
 
@@ -178,22 +174,50 @@ body {
                 `;
                 tableBody.appendChild(row);
             });
+
+            if (payments.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No payment history available.</td></tr>';
+            }
         }
 
-        // Show payment success toast
+        // Show success toast
         function showPaymentSuccessToast() {
             const toast = new bootstrap.Toast(document.getElementById('payment-toast'));
             toast.show();
         }
 
-        // Initially render the payment history
-        renderPaymentHistory();
+        // Show error toast
+        function showPaymentErrorToast(message) {
+            const toast = new bootstrap.Toast(document.getElementById('payment-toast'));
+            document.getElementById('payment-toast').classList.replace('text-bg-success', 'text-bg-danger');
+            document.querySelector('.toast-body').textContent = message;
+            toast.show();
+        }
 
-        // Trigger the success toast notification (this would be called after a successful payment action)
-        setTimeout(showPaymentSuccessToast, 2000); // Example: Show toast 2 seconds after loading
+        // Fetch payment history from backend
+        async function fetchPaymentHistory() {
+            try {
+                const response = await fetch(`http://localhost:5000/api/payments/${regNo}`);
+                if (response.ok) {
+                    const payments = await response.json();
+                    renderPaymentHistory(payments);
+                    showPaymentSuccessToast();
+                } else {
+                    console.error('Failed to fetch payment history:', response.status);
+                    renderPaymentHistory([]);
+                    showPaymentErrorToast('Failed to load payment history');
+                }
+            } catch (err) {
+                console.error('Error fetching payments:', err);
+                renderPaymentHistory([]);
+                showPaymentErrorToast('Error loading payment history');
+            }
+        }
+
+        // Load payment history on page ready
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPaymentHistory();
+        });
     </script>
-
 </body>
-
 </html>
-

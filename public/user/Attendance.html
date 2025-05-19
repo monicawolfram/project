@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>attendance</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Library Management System</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- FontAwesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
         /* Background Image for Entire Page */
         body {
             background-size: cover;
@@ -34,7 +39,6 @@
             transform: scale(1.1);
         }
 
-        
         /* Button Styling */
         .footer-btns .btn {
             border-radius: 25px;
@@ -50,8 +54,8 @@
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <nav class="navbar d-flex justify-content-around">
+  <div class="container mt-4">
+    <nav class="navbar d-flex justify-content-around">
             <a href="home.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
             <div class="dropdown">
                 <a class="nav-link dropdown-toggle" href="Resources.html" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -84,108 +88,125 @@
                 </ul>
             </div>
         </nav>
-       <!-- Attendance Panel -->
-  <div class="container my-4 bg-light text-dark rounded shadow p-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div>
-        <select id="month" class="form-select d-inline w-auto">
-          <option selected>DECEMBER</option>
-          <option selected>NOVEMBER</option>
-          <option selected>OCTOBER</option>
-          <option selected>SEPTEMBER</option>
-          <option selected>AUGUST</option>
-          <option selected>JULY</option>
-          <option selected>JUNE</option>
-          <option selected>MAY</option>
-          <option selected>APRIL</option>
-          <option selected>MARCH</option>
-          <option selected>FEBRUARY</option>
-          <option selected>JANUARY</option>
-      </select>
 
-      <select id="yearSelect" class="form-select d-inline w-auto">
-        <option selected>2025</option>
-        <option>2024</option>
-    </select>
+    <div class="container my-4 bg-light text-dark rounded shadow p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <select id="monthSelect" class="form-select d-inline w-auto"></select>
+          <select id="yearSelect" class="form-select d-inline w-auto"></select>
+        </div>
+        <div class="fw-bold"><i class="fa fa-user-circle"></i> Alice William</div>
       </div>
-      <div class="fw-bold"><i class="bi bi-person-circle"></i> Alice William</div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Date</th>
+              <th>Monday</th>
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>
+              <th>Friday</th>
+            </tr>
+          </thead>
+          <tbody id="attendance-body">
+            <tr><td colspan="6">Loading attendance...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- Week Selector -->
-    <div class="btn-group mb-3" id="weekButtons">
-      <button class="btn btn-outline-dark active" onclick="showWeek(1)">Week 1</button>
-      <button class="btn btn-outline-dark" onclick="showWeek(2)">Week 2</button>
-      <button class="btn btn-outline-dark" onclick="showWeek(3)">Week 3</button>
-      <button class="btn btn-outline-dark" onclick="showWeek(4)">Week 4</button>
-  </div>
-
-
-    <!-- Attendance Table -->
-    <div class="table-responsive">
-      <table class="table table-bordered text-center align-middle">
-        <thead class="table-dark">
-          <tr>
-            <th>Date</th>
-            <th>Monday</th>
-            <th>Tuesday</th>
-            <th>Wednesday</th>
-            <th>Thursday</th>
-            <th>Friday</th>
-          </tr>
-        </thead>
-        <tbody id="attendance-body">
-          <!-- JS will fill rows -->
-        </tbody>
-      </table>
+    <div class="footer-btns text-center mt-3">
+      <a href="AboutUs.html" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
+      <a href="help.html" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
     </div>
   </div>
 
- <!-- Help & About Us Buttons (Moved Outside Container) -->
- <div class="footer-btns text-center mt-3">
-    <a href="AboutUs.html" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
-    <a href="help.html" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
-</div>
+  <!-- Bootstrap JS (required for dropdown functionality) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
-    // Dummy attendance data simulation
-const attendanceData = [
-  { date: "11-10-2025", times: ["8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am"] },
-  { date: "12-10-2025", times: ["8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am"] },
-  { date: "13-10-2025", times: ["8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am"] },
-  { date: "14-10-2025", times: ["8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am", "8:30am - 10:50am"] },
-];
+    const regNo = "23IT013"; // Change to dynamic user registration number
+    const attendanceBody = document.getElementById("attendance-body");
+    const monthSelect = document.getElementById("monthSelect");
+    const yearSelect = document.getElementById("yearSelect");
 
-function populateAttendance() {
-  const tbody = document.getElementById("attendance-body");
-  tbody.innerHTML = "";
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
 
-  attendanceData.forEach(record => {
-    const tr = document.createElement("tr");
-    const dateTd = document.createElement("td");
-    dateTd.textContent = record.date;
-    tr.appendChild(dateTd);
+    // Populate dropdowns
+    function populateDropdowns() {
+      const now = new Date();
+      months.forEach((month, index) => {
+        const opt = document.createElement("option");
+        opt.value = index + 1;
+        opt.textContent = month;
+        if (index === now.getMonth()) opt.selected = true;
+        monthSelect.appendChild(opt);
+      });
 
-    record.times.forEach(time => {
-      const td = document.createElement("td");
-      td.textContent = time;
-      tr.appendChild(td);
+      for (let y = now.getFullYear(); y >= 2020; y--) {
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        if (y === now.getFullYear()) opt.selected = true;
+        yearSelect.appendChild(opt);
+      }
+    }
+
+    // Render attendance data
+    function renderAttendance(data) {
+      attendanceBody.innerHTML = "";
+      data.forEach((record) => {
+        const tr = document.createElement("tr");
+        const dateCell = document.createElement("td");
+        dateCell.textContent = record.date;
+        tr.appendChild(dateCell);
+
+        ["monday", "tuesday", "wednesday", "thursday", "friday"].forEach((day) => {
+          const td = document.createElement("td");
+          td.textContent = record[day] || "-";
+          tr.appendChild(td);
+        });
+
+        attendanceBody.appendChild(tr);
+      });
+
+      if (data.length === 0) {
+        attendanceBody.innerHTML = '<tr><td colspan="6">No attendance data available.</td></tr>';
+      }
+    }
+
+    // Fetch attendance from backend
+    function fetchAttendance() {
+      const month = monthSelect.value;
+      const year = yearSelect.value;
+
+      fetch(`http://localhost:5000/api/attendance/${regNo}?month=${month}&year=${year}`)
+        .then((res) => res.json())
+        .then((data) => {
+          renderAttendance(data);
+        })
+        .catch((err) => {
+          console.error("Error fetching attendance:", err);
+          attendanceBody.innerHTML = '<tr><td colspan="6" class="text-danger">Error loading data</td></tr>';
+        });
+    }
+
+    // Auto refresh every 10 seconds
+    setInterval(fetchAttendance, 10000); // 10,000 ms = 10 sec
+
+    // Load on page ready
+    document.addEventListener("DOMContentLoaded", () => {
+      populateDropdowns();
+      fetchAttendance();
+
+      monthSelect.addEventListener("change", fetchAttendance);
+      yearSelect.addEventListener("change", fetchAttendance);
     });
-
-    tbody.appendChild(tr);
-  });
-}
-
-// Simulate loading attendance after user signs in
-document.addEventListener("DOMContentLoaded", () => {
-  populateAttendance();
-});
-
-
-fetch('http://localhost:5000/api/attendance/23IT013')
-  .then(res => res.json())
-  .then(data => {
-    console.log(data);
-    // Populate attendance table using data
-  });
   </script>
 </body>
 </html>
