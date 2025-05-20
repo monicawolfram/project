@@ -5,6 +5,7 @@ const path = require('path');
 
 app.use(express.static(path.join(__dirname, 'public')));
 // Middleware
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Routes
