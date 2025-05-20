@@ -17,7 +17,7 @@ router.get('/books/:id', authenticateLibrarian,librarianController.getBookById);
 router.post('/books', authenticateLibrarian, librarianController.addBook); // Spread the array
 router.put('/books/:id', authenticateLibrarian, librarianController.updateBook); // Spread the array
 router.delete('/books/:id', authenticateLibrarian, librarianController.deleteBook); // Spread the array
-
+router.post('/add-book', authenticateLibrarian, librarianController.addBook); // Spread the array
 
 // This will serve interface.html when visiting /api/librarian/
 router.get('/librarian_interface', librarianController.librarian_interface);
@@ -37,6 +37,7 @@ router.get('/profile', librarianController.profile);
 router.get('/requestnotification', librarianController.requestnotification);
 router.get('/systemnotification', librarianController.systemnotification);
 router.get('/viewallnotification', librarianController.viewallnotification);
+
 
 
 
