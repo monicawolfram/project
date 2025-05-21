@@ -2,9 +2,17 @@ const express = require('express');
 const app = express();
 const PORT = 3000;
 const path = require('path');
-
 const session = require('express-session');
 const flash = require('express-flash');
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.static('public'));
+app.use(session({ secret: 'your-secret', resave: false, saveUninitialized: false }));
+app.use(flash());
+
+
 
 app.use(session({
   secret: 'secret_key',

@@ -4,55 +4,55 @@ const { body, param, query, validationResult } = require('express-validator'); /
 
 
 exports.interface = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/librarian _interface.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/librarian _interface.html'));
 };
 exports.librarian_home = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/librarian_home.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/librarian_home.html'));
 };
 exports.librarian_category = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/librarian_category.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/librarian_category.html'));
 };
 exports.manageinventorylibrarian = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/manageinventorylibrarian.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/manageinventorylibrarian.html'));
 };
 exports.managefines = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/managefines.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/managefines.html'));
 };
 exports.managerequestlibrarian= (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/managerequestlibrarian.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/managerequestlibrarian.html'));
 };
 exports.manageusers = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/manageusers.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/manageusers.html'));
 };
 exports.admin_account = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/admin_account.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/admin_account.html'));
 };
 exports.booknotification = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/booknotification.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/booknotification.html'));
 };
 exports.generatereport = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/generatereport.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/generatereport.html'));
 };
 exports.Itsupport = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/Itsupport.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/Itsupport.html'));
 };
 exports.librarian_account = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/librarian_account.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/librarian_account.html'));
 };
 exports.massageandfeedback = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/massageandfeedback.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/massageandfeedback.html'));
 };
 exports.profile = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/profile.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/profile.html'));
 };
 exports.requestnotification = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/requestnotification.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/requestnotification.html'));
 };
 exports.systemnotification = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/systemnotification.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/systemnotification.html'));
 };
 exports.viewallnotification = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/viewallnotification.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/viewallnotification.html'));
 };
 
 
@@ -119,7 +119,10 @@ exports.getBookById = [
 
 
 
-
+// GET: Show Add Book Form
+exports.getAddBookForm = (req, res) => {
+  return res.render('librarian/viewandaddbook', { messages: req.flash() });
+};
 exports.addBook = (req, res) => {
   const {
     title, author, department, date_added,
@@ -137,7 +140,7 @@ exports.addBook = (req, res) => {
     }
 
     req.flash('error', message);
-    return res.redirect('/path-to-add-book-form'); // adjust as needed
+    return res.redirect('/librarian/add-book'); // Redirect to the form route
   }
 
   const sql = `
@@ -163,7 +166,7 @@ exports.addBook = (req, res) => {
       }
 
       req.flash('error', message);
-      return res.sendFile(path.join(__dirname, '../public/librarian/viewandaddbook.html'));
+      return res.render('librarian/viewandaddbook', { messages: req.flash() });
     }
 
     const message = 'Book added successfully!';
@@ -173,7 +176,7 @@ exports.addBook = (req, res) => {
     }
 
     req.flash('success', message);
-    return res.sendFile(path.join(__dirname, '../public/librarian/viewandaddbook.html'));
+    return res.render('librarian/viewandaddbook', { messages: req.flash() });
   });
 };
 
@@ -220,5 +223,5 @@ exports.deleteBook = [
 ];
 
 exports.librarian_interface = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/librarian/librarian_interface.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/librarian_interface.html'));
 }; 

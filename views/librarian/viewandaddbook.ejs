@@ -205,52 +205,45 @@
                         <!-- Add Section -->
                         <div class="tab-pane fade" id="addBooks">
                             <h4 class="text-center">Add a New Book</h4>
-                            <form action="/librarian/add-book" method="POST">
-    <div class="mb-3">
-        <label class="form-label">Title</label>
-        <input type="text" class="form-control" name="title" required>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Author</label>
-        <input type="text" class="form-control" name="author" required>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Department</label>
-        <input type="text" class="form-control" name="department" required>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Date</label>
-        <input type="date" class="form-control" name="date_added" required>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Book Code</label>
-        <div class="input-group">
-            <input type="text" class="form-control" name="book_code" id="bookCode" readonly required>
-            <button type="button" class="btn btn-primary" onclick="generateCode()">Generate Code</button>
-        </div>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Shelf Number</label>
-        <input type="number" class="form-control" name="shelf_no" required>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Drawer Number</label>
-        <input type="number" class="form-control" name="draw_no" required>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Year</label>
-        <input type="number" class="form-control" name="year" required>
-    </div>
-
-    <button type="submit" class="btn btn-success">Submit</button>
-</form>
+    <form id="addBookForm" method="POST">
+            <div class="mb-3">
+                <label class="form-label">Title</label>
+                <input type="text" class="form-control" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Author</label>
+                <input type="text" class="form-control" name="author" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Department</label>
+                <input type="text" class="form-control" name="department" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control" name="date_added" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Book Code</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" name="book_code" id="bookCode" readonly required>
+                    <button type="button" class="btn btn-primary" onclick="generateCode()">Generate Code</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Shelf Number</label>
+                <input type="number" class="form-control" name="shelf_no" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Drawer Number</label>
+                <input type="number" class="form-control" name="draw_no" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Year</label>
+                <input type="number" class="form-control" name="year" required>
+            </div>
+            <input type="hidden" name="to_json" value="true">
+            <button type="submit" class="btn btn-success">Submit</button>
+        </form>
 
                         </div>
 
@@ -316,6 +309,50 @@
     .then(data => {
         console.log(data); // Render book data
     });
+
+
+    function generateCode() {
+            document.getElementById('bookCode').value = 'BOOK-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        }
+
+        $(document).ready(function() {
+            $('#addBookForm').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/librarian/add-book',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: response.message,
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                $('#addBookForm')[0].reset(); // Clear form
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message,
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred. Please try again.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            });
+        });
 
 </script>
 

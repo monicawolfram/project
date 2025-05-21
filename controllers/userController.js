@@ -14,85 +14,85 @@ exports.getNotifications = (req, res) => {
 };
 
 exports.interface = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/interface.html'));
+  res.sendFile(path.join(__dirname, '../views/user/interface.html'));
 }; 
 exports.home = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/home.html'));
+  res.sendFile(path.join(__dirname, '../views/user/home.html'));
 };
 exports.rules_and_regulation = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/rules_and_regulation.html'));
+  res.sendFile(path.join(__dirname, '../views/user/rules_and_regulation.html'));
 };
 exports.books = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/books.html'));
+  res.sendFile(path.join(__dirname, '../views/user/books.html'));
 };
 exports.cs = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/cs.html'));
+  res.sendFile(path.join(__dirname, '../views/user/cs.html'));
 };
 exports.yearone = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/yearone.html'));
+  res.sendFile(path.join(__dirname, '../views/user/yearone.html'));
 };
 exports.yeartwo = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/yeartwo.html'));
+  res.sendFile(path.join(__dirname, '../views/user/yeartwo.html'));
 };
 exports.yearthree= (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/yearthree.html'));
+  res.sendFile(path.join(__dirname, '../views/user/yearthree.html'));
 };
 exports.yearfour = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/yearfour.html'));
+  res.sendFile(path.join(__dirname, '../views/user/yearfour.html'));
 };
 exports.It = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/It.html'));
+  res.sendFile(path.join(__dirname, '../views/user/It.html'));
 };
 exports.cse = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/cse.html'));
+  res.sendFile(path.join(__dirname, '../views/user/cse.html'));
 };
   exports.civil = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/civil.html'));
+  res.sendFile(path.join(__dirname, '../views/user/civil.html'));
 };
 exports.education = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/education.html'));
+  res.sendFile(path.join(__dirname, '../views/user/education.html'));
 };
 exports.eee = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/eee.html'));
+  res.sendFile(path.join(__dirname, '../views/user/eee.html'));
 };
 exports.mech = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/mech.html'));
+  res.sendFile(path.join(__dirname, '../views/user/mech.html'));
 };
 exports.isne = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/isne.html'));
+  res.sendFile(path.join(__dirname, '../views/user/isne.html'));
 };
 exports.mechatronics = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/mechatronics.html'));
+  res.sendFile(path.join(__dirname, '../views/user/mechatronics.html'));
 };
 exports.papers = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/papers.html'));
+  res.sendFile(path.join(__dirname, '../views/user/papers.html'));
 };
 exports.projects = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/projects.html'));
+  res.sendFile(path.join(__dirname, '../views/user/projects.html'));
 };
 exports.Attendance = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/Attendance.html'));
+  res.sendFile(path.join(__dirname, '../views/user/Attendance.html'));
 };
 exports.borrowing = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/borrowing.html'));
+  res.sendFile(path.join(__dirname, '../views/user/borrowing.html'));
 };
 exports.paying = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/paying.html'));
+  res.sendFile(path.join(__dirname, '../views/user/paying.html'));
 };
 exports.resources = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/resources.html'));
+  res.sendFile(path.join(__dirname, '../views/user/resources.html'));
 };
 exports.payment = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/payment.html'));
+  res.sendFile(path.join(__dirname, '../views/user/payment.html'));
 };
 exports.profile = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/profile.html'));
+  res.sendFile(path.join(__dirname, '../views/user/profile.html'));
 };
 exports.AboutUs = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/AboutUs.html'));
+  res.sendFile(path.join(__dirname, '../views/user/AboutUs.html'));
 };
 exports.help = (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/user/help.html'));
+  res.sendFile(path.join(__dirname, '../views/user/help.html'));
 };
 
 exports.sendFeedback = (req, res) => {
