@@ -122,53 +122,61 @@ exports.getBookById = [
 
 exports.addBook = (req, res) => {
   const {
-    title,
-    author,
-    department,
-    date_added,
-    book_code,
-    shelf_no,
-    draw_no,
-    year
+    title, author, department, date_added,
+    book_code, shelf_no, draw_no, year,
+    to_json
   } = req.body;
 
-  // Validate only the fields that must come from the request
+  const wantsJson = to_json === 'true' || to_json === true;
+
   if (!title || !author || !department || !date_added || !book_code || !shelf_no || !draw_no || !year) {
-    return res.status(400).json({ error: 'Please fill in all required fields.' });
+    const message = 'Please fill in all required fields.';
+
+    if (wantsJson) {
+      return res.status(400).json({ success: false, message });
+    }
+
+    req.flash('error', message);
+    return res.redirect('/path-to-add-book-form'); // adjust as needed
   }
 
   const sql = `
-    INSERT INTO books
-    (title, author, department, date_added, book_code, is_deleted, is_borrowed, borrowed_by, shelf_no, draw_no, year, created_at, updated_at)
+    INSERT INTO books (
+      title, author, department, date_added,
+      book_code, is_deleted, is_borrowed, borrowed_by,
+      shelf_no, draw_no, year, created_at, updated_at
+    )
     VALUES (?, ?, ?, ?, ?, 'no', 'no', NULL, ?, ?, ?, NOW(), NOW())
   `;
 
-  const values = [
-    title,
-    author,
-    department,
-    date_added,
-    book_code,
-    shelf_no,
-    draw_no,
-    year
-  ];
+  const values = [title, author, department, date_added, book_code, shelf_no, draw_no, year];
 
   db.query(sql, values, (err, result) => {
     if (err) {
+      let message = 'Database error. Please try again.';
       if (err.code === 'ER_DUP_ENTRY') {
-        return res.status(409).json({ error: 'Book code already exists.' });
+        message = 'Book code already exists.';
       }
-      console.error('Error inserting book:', err);
-      return res.status(500).json({ error: 'Database error.' });
+
+      if (wantsJson) {
+        return res.status(500).json({ success: false, message });
+      }
+
+      req.flash('error', message);
+      return res.sendFile(path.join(__dirname, '../public/librarian/viewandaddbook.html'));
     }
 
-    res.status(201).json({
-      message: 'Book added successfully',
-      bookId: result.insertId
-    });
+    const message = 'Book added successfully!';
+
+    if (wantsJson) {
+      return res.status(200).json({ success: true, message });
+    }
+
+    req.flash('success', message);
+    return res.sendFile(path.join(__dirname, '../public/librarian/viewandaddbook.html'));
   });
 };
+
 
 
 

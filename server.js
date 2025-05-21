@@ -3,10 +3,24 @@ const app = express();
 const PORT = 3000;
 const path = require('path');
 
+const session = require('express-session');
+const flash = require('express-flash');
+
+app.use(session({
+  secret: 'secret_key',
+  resave: false,
+  saveUninitialized: true
+}));
+app.use(flash());
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+
+
 
 // Routes
 const adminRoutes = require('./routes/adminRoutes');
