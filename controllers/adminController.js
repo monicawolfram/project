@@ -4,28 +4,28 @@ const path = require('path');
 
 
 exports.dashboard = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/admin_dashboard.html'));
+  res.sendFile(path.join(__dirname, '../views/admin/admin_dashboard.ejs'));
 };
 exports.admin_account = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/admin_account.html'));
+  res.sendFile(path.join(__dirname, '../views/admin/admin_account.ejs'));
 };
 exports.admin_users = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/admin_users.html'));
+  res.sendFile(path.join(__dirname, '../views/admin/admin_users.ejs'));
 };
 exports.admin_resourcestatus = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/admin_resourcestatus.html'));
+  res.sendFile(path.join(__dirname, '../views/admin/admin_resourcestatus.ejs'));
 };
 exports.admin_report = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/admin_report.html'));
+  res.sendFile(path.join(__dirname, '../views/admin/admin_report.ejs'));
 };
 exports.admin_itsupport = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/admin_itsupport.html'));
+  res.sendFile(path.join(__dirname, '../views/admin/admin_itsupport.ejs'));
 };
 exports.admin_massage = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/admin_massage.html'));
+  res.sendFile(path.join(__dirname, '../views/admin/admin_massage.ejs'));
 };
 exports.admin_librarian = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/admin_librarian.html'));
+  res.sendFile(path.join(__dirname, '../views/admin/admin_librarian.ejs'));
 };
 
 // Function to create a new user      

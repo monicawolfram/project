@@ -4,55 +4,55 @@ const { body, param, query, validationResult } = require('express-validator'); /
 
 
 exports.interface = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/librarian _interface.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/librarian _interface.ejs'));
 };
 exports.librarian_home = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/librarian_home.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/librarian_home.ejs'));
 };
 exports.librarian_category = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/librarian_category.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/librarian_category.ejs'));
 };
 exports.manageinventorylibrarian = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/manageinventorylibrarian.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/manageinventorylibrarian.ejs'));
 };
 exports.managefines = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/managefines.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/managefines.ejs'));
 };
 exports.managerequestlibrarian= (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/managerequestlibrarian.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/managerequestlibrarian.ejs'));
 };
 exports.manageusers = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/manageusers.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/manageusers.ejs'));
 };
 exports.admin_account = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/admin_account.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/admin_account.ejs'));
 };
 exports.booknotification = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/booknotification.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/booknotification.ejs'));
 };
 exports.generatereport = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/generatereport.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/generatereport.ejs'));
 };
 exports.Itsupport = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/Itsupport.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/Itsupport.ejs'));
 };
 exports.librarian_account = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/librarian_account.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/librarian_account.ejs'));
 };
 exports.massageandfeedback = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/massageandfeedback.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/massageandfeedback.ejs'));
 };
 exports.profile = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/profile.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/profile.ejs'));
 };
 exports.requestnotification = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/requestnotification.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/requestnotification.ejs'));
 };
 exports.systemnotification = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/systemnotification.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/systemnotification.ejs'));
 };
 exports.viewallnotification = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/viewallnotification.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/viewallnotification.ejs'));
 };
 
 
@@ -223,5 +223,5 @@ exports.deleteBook = [
 ];
 
 exports.librarian_interface = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/librarian/librarian_interface.html'));
+  res.sendFile(path.join(__dirname, '../views/librarian/librarian_interface.ejs'));
 }; 
