@@ -14,85 +14,85 @@ exports.getNotifications = (req, res) => {
 };
 
 exports.interface = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/interface.ejs'));
+ res.render('user/interface');
 }; 
 exports.home = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/home.ejs'));
+ res.render('user/home');
 };
 exports.rules_and_regulation = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/rules_and_regulation.ejs'));
+ res.render('user/rules_and_regulation');
 };
 exports.books = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/books.ejs'));
+ res.render('user/books');
 };
 exports.cs = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/cs.ejs'));
+ res.render('user/cs');
 };
 exports.yearone = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/yearone.ejs'));
+ res.render('user/yearone');
 };
 exports.yeartwo = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/yeartwo.ejs'));
+ res.render('user/yeartwo');
 };
 exports.yearthree= (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/yearthree.ejs'));
+ res.render('user/yearthree');
 };
 exports.yearfour = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/yearfour.ejs'));
+ res.render('user/yearfour');
 };
 exports.It = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/It.ejs'));
+ res.render('user/It');
 };
 exports.cse = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/cse.ejs'));
+ res.render('user/cse');
 };
   exports.civil = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/civil.ejs'));
+ res.render('user/civil');
 };
 exports.education = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/education.ejs'));
+ res.render('user/education');
 };
 exports.eee = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/eee.ejs'));
+ res.render('user/eee');
 };
 exports.mech = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/mech.ejs'));
+ res.render('user/mech');
 };
 exports.isne = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/isne.ejs'));
+ res.render('user/isne');
 };
 exports.mechatronics = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/mechatronics.ejs'));
+ res.render('user/mechatronics');
 };
 exports.papers = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/papers.ejs'));
+ res.render('user/papers');
 };
 exports.projects = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/projects.ejs'));
+ res.render('user/projects');
 };
 exports.Attendance = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/Attendance.ejs'));
+ res.render('user/Attendance');
 };
 exports.borrowing = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/borrowing.ejs'));
+ res.render('user/borrowing');
 };
 exports.paying = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/paying.ejs'));
+ res.render('user/paying');
 };
 exports.resources = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/resources.ejs'));
+ res.render('user/resources');
 };
 exports.payment = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/payment.ejs'));
+ res.render('user/payment');
 };
 exports.profile = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/profile.ejs'));
+ res.render('user/profile');
 };
 exports.AboutUs = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/AboutUs.ejs'));
+ res.render('user/AboutUs');
 };
 exports.help = (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/user/help.ejs'));
+ res.render('user/help');
 };
 
 exports.sendFeedback = (req, res) => {
