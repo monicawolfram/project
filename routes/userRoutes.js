@@ -8,7 +8,7 @@ router.post('/send-feedback', userController.sendFeedback);
 
 
 //
-router.get('/', userController.interface);
+router.get('/interface', userController.interface);
 router.get('/home', userController.home);
 router.get('/rules_and_regulation', userController.rules_and_regulation);
 router.get('/books', userController.books);

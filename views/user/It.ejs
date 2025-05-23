@@ -88,11 +88,11 @@
 
   <body>
     <nav class="navbar navbar-expand-lg d-flex justify-content-between">
-      <a href="home.ejs" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <a href="/user/home" class="nav-link"><i class="fas fa-home"></i> Home</a>
       <div class="dropdown">
         <a
           class="nav-link dropdown-toggle"
-          href="Resources.ejs"
+          href="/user/Resources"
           role="button"
           data-bs-toggle="dropdown"
           aria-expanded="false"
@@ -100,16 +100,16 @@
           <i class="fas fa-book"></i> Resources
         </a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="books.ejs">Books</a></li>
-          <li><a class="dropdown-item" href="papers.ejs">Papers</a></li>
-          <li><a class="dropdown-item" href="projects.ejs">Projects</a></li>
+          <li><a class="dropdown-item" href="/user/books">Books</a></li>
+          <li><a class="dropdown-item" href="/user/papers">Papers</a></li>
+          <li><a class="dropdown-item" href="/user/projects">Projects</a></li>
         </ul>
       </div>
-      <a href="attendance.ejs" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
+      <a href="/user/attendance" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
       <div class="dropdown">
         <a
           class="nav-link dropdown-toggle"
-          href="transcation.ejs"
+          href="/user/transcation"
           role="button"
           data-bs-toggle="dropdown"
           aria-expanded="false"
@@ -117,14 +117,14 @@
           <i class="fas fa-exchange-alt"></i> Transaction
         </a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="borrowing.ejs">Borrowing</a></li>
-          <li><a class="dropdown-item" href="paying.ejs">Paying Fine</a></li>
+          <li><a class="dropdown-item" href="/user/borrowing">Borrowing</a></li>
+          <li><a class="dropdown-item" href="/user/paying">Paying Fine</a></li>
         </ul>
       </div>
       <div class="dropdown">
         <a
           class="nav-link dropdown-toggle"
-          href="viewstatus.ejs"
+          href="/user/viewstatus"
           role="button"
           data-bs-toggle="dropdown"
           aria-expanded="false"
@@ -132,9 +132,9 @@
           <i class="fas fa-eye"></i> Viewstatus
         </a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="resources.ejs">Resources</a></li>
-          <li><a class="dropdown-item" href="payment.ejs">Payment</a></li>
-          <li><a class="dropdown-item" href="profile.ejs">Profile</a></li>
+          <li><a class="dropdown-item" href="/user/resources">Resources</a></li>
+          <li><a class="dropdown-item" href="/user/payment">Payment</a></li>
+          <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
         </ul>
       </div>
     </nav>
@@ -153,7 +153,7 @@
               alt="Book Image"
             />
             <div class="card-body">
-              <a href="yearone.ejs" class="btn btn-custom mb-3">First Year</a>
+              <a href="/user/yearone" class="btn btn-custom mb-3">First Year</a>
               <p><strong>Name:</strong> Practical Cryptography</p>
               <p><strong>Author:</strong> Svetlin Nakov</p>
               <p><strong>Shelf no:</strong> 43</p>
@@ -171,7 +171,7 @@
               alt="Book Image"
             />
             <div class="card-body">
-              <a href="yeartwo.ejs" class="btn btn-custom mb-3">Second Year</a>
+              <a href="/user/yeartwo" class="btn btn-custom mb-3">Second Year</a>
               <p><strong>Name:</strong> Practical Cryptography</p>
               <p><strong>Author:</strong> Svetlin Nakov</p>
               <p><strong>Shelf no:</strong> 43</p>
@@ -189,7 +189,7 @@
               alt="Book Image"
             />
             <div class="card-body">
-              <a href="yearthird.ejs" class="btn btn-custom mb-3">Third Year</a>
+              <a href="/user/yearthird" class="btn btn-custom mb-3">Third Year</a>
               <p><strong>Name:</strong> Practical Cryptography</p>
               <p><strong>Author:</strong> Svetlin Nakov</p>
               <p><strong>Shelf no:</strong> 43</p>
@@ -205,8 +205,8 @@
 
     <!-- Footer Buttons -->
     <div class="footer-btns text-center mt-3">
-      <a href="AboutUs.ejs" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
-      <a href="help.ejs" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
+      <a href="/user/AboutUs" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
+      <a href="/user/help" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
   </div>
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
