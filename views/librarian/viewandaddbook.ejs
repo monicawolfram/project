@@ -206,7 +206,7 @@
                         <!-- Add Section -->
                         <div class="tab-pane fade" id="addBooks">
                             <h4 class="text-center">Add a New Book</h4>
-    <form id="addBookForm" method="POST">
+    <form id="addBookForm" method="POST" action="/librarian/books/add" enctype="multipart/form-data">
         <div class="mb-3">
         <label class="form-label">Book Cover Image</label>
         <input type="file" class="form-control" name="book_image" accept="image/*" required>
@@ -320,44 +320,53 @@
             document.getElementById('bookCode').value = 'BOOK-' + Math.random().toString(36).substr(2, 9).toUpperCase();
         }
 
-        $(document).ready(function() {
-            $('#addBookForm').on('submit', function(e) {
-                e.preventDefault();
-                $.ajax({
-                    url: '/librarian/add-book',
-                    method: 'POST',
-                    data: $(this).serialize(),
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: response.message,
-                                confirmButtonText: 'OK'
-                            }).then(() => {
-                                $('#addBookForm')[0].reset(); // Clear form
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.message,
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    },
-                    error: function() {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'An error occurred. Please try again.',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                });
-            });
-        });
+    
+// $(document).ready(function () {
+//     $('#addBookForm').on('submit', function (e) {
+//         e.preventDefault();
+
+//         const formElement = this;
+//         const formData = new FormData(formElement); // includes image and all fields
+
+//         $.ajax({
+//             url: '/librarian/books/add',
+//             method: 'POST',
+//             data: formData,
+//             processData: false,  // don't convert to query string
+//             contentType: false,  // allow multipart/form-data
+//             dataType: 'json',
+//             success: function (response) {
+//                 if (response.success) {
+//                     Swal.fire({
+//                         icon: 'success',
+//                         title: 'Success',
+//                         text: response.message,
+//                         confirmButtonText: 'OK'
+//                     }).then(() => {
+//                         formElement.reset(); // Clear form
+//                         $('#bookCode').val(''); // Clear book code display
+//                     });
+//                 } else {
+//                     Swal.fire({
+//                         icon: 'error',
+//                         title: 'Error',
+//                         text: response.message || 'Failed to add book.',
+//                         confirmButtonText: 'OK'
+//                     });
+//                 }
+//             },
+//             error: function (xhr) {
+//                 const msg = xhr.responseJSON?.message || 'An unexpected error occurred.';
+//                 Swal.fire({
+//                     icon: 'error',
+//                     title: 'Error',
+//                     text: msg,
+//                     confirmButtonText: 'OK'
+//                 });
+//             }
+//         });
+//     });
+// });
 
 </script>
 
@@ -386,7 +395,7 @@ document.addEventListener("DOMContentLoaded", function () {
         bookCard.className = 'col-md-4 mb-3';
         bookCard.innerHTML = `
           <div class="card h-100 shadow-sm">
-            <img src="/images/default-book.png" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">
+            <img src="/uploads/books/${book.image}" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">
             <div class="card-body">
               <h5 class="card-title">${book.title}</h5>
               <h6 class="card-subtitle mb-2 text-muted">${book.author}</h6>

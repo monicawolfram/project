@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const librarianController = require('../controllers/librarianController');
-
+const upload = require('../config/upload'); // adjust path
 
 // Middleware for authentication (example placeholder)
 const authenticateLibrarian = (req, res, next) => {
@@ -18,7 +18,8 @@ router.get('/books/:id', authenticateLibrarian,librarianController.getBookById);
 router.post('/books', authenticateLibrarian, librarianController.addBook); // Spread the array
 router.put('/books/:id', authenticateLibrarian, librarianController.updateBook); // Spread the array
 router.delete('/books/:id', authenticateLibrarian, librarianController.deleteBook); // Spread the array
-router.post('/add-book', authenticateLibrarian, librarianController.addBook); // Spread the array
+//router.post('/add-book', authenticateLibrarian, librarianController.addBook); // Spread the array
+router.post('/books/add', upload.single('book_image'), librarianController.addBook);
 router.get('/add-book',  authenticateLibrarian, librarianController.getAddBookForm);
 
 

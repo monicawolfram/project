@@ -11,6 +11,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
 app.use(session({ secret: 'your-secret', resave: false, saveUninitialized: false }));
 app.use(flash());
+app.use('/uploads/books', express.static(path.join(__dirname, 'public/uploads/books')));
 
 
 

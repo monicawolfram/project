@@ -67,15 +67,28 @@ exports.viewandaddproject = (req, res) => {
 
 // Controller to get available books
 exports.getAvailableBooks = (req, res) => {
-  const sql = "SELECT * FROM books WHERE status = 'available'";
+  const sql = "SELECT id, title, author, department, shelf_no, draw_no, image FROM books WHERE status = 'available'";
+
   db.query(sql, (err, results) => {
     if (err) {
       console.error('Error fetching books:', err);
       return res.status(500).json({ error: 'Database error' });
     }
-    res.json(results);
+
+    const formattedResults = results.map(book => ({
+      id: book.id,
+      title: book.title,
+      author: book.author,
+      department: book.department,
+      shelf_no: book.shelf_no,
+      draw_no: book.draw_no,
+      image: book.image || 'default-book.png'  // fallback if image is null
+    }));
+
+    res.json(formattedResults);
   });
 };
+
 
 
 
@@ -145,59 +158,43 @@ exports.getAddBookForm = (req, res) => {
 exports.addBook = (req, res) => {
   const {
     title, author, department, date_added,
-    book_code, shelf_no, draw_no, year,
-    to_json
+    book_code, shelf_no, draw_no, year
   } = req.body;
 
-  const wantsJson = to_json === 'true' || to_json === true;
-
-  if (!title || !author || !department || !date_added || !book_code || !shelf_no || !draw_no || !year) {
-    const message = 'Please fill in all required fields.';
-
-    if (wantsJson) {
-      return res.status(400).json({ success: false, message });
-    }
-
-    req.flash('error', message);
-    return res.redirect('/librarian/add-book'); // Redirect to the form route
-  }
+  const book_image = req.file ? req.file.filename : null;
 
   const sql = `
-    INSERT INTO books (
-      title, author, department, date_added,
-      book_code, is_deleted, is_borrowed, borrowed_by,
-      shelf_no, draw_no, year, created_at, updated_at
-    )
-    VALUES (?, ?, ?, ?, ?, 'no', 'no', NULL, ?, ?, ?, NOW(), NOW())
+    INSERT INTO books 
+    (title, author, department, date_added, book_code, shelf_no, draw_no, year, image, status, is_deleted, is_borrowed) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no', 'no')
   `;
 
-  const values = [title, author, department, date_added, book_code, shelf_no, draw_no, year];
+  const values = [
+    title, author, department, date_added,
+    book_code, shelf_no, draw_no, year, book_image
+  ];
 
   db.query(sql, values, (err, result) => {
     if (err) {
-      let message = 'Database error. Please try again.';
+      console.error('❌ Database Insert Error:', err.sqlMessage);
+
+      if (err.code === 'ER_BAD_NULL_ERROR') {
+        return res.status(400).json({ status: 'error', error: 'Please fill all required fields.' });
+      }
+
       if (err.code === 'ER_DUP_ENTRY') {
-        message = 'Book code already exists.';
+        return res.status(400).json({ status: 'error', error: 'A book with the same code already exists.' });
       }
 
-      if (wantsJson) {
-        return res.status(500).json({ success: false, message });
-      }
-
-      req.flash('error', message);
-      return res.render('librarian/viewandaddbook', { messages: req.flash() });
+      return res.status(500).json({ status: 'error', error: 'Something went wrong while saving the book. Please try again later.' });
     }
 
-    const message = 'Book added successfully!';
-
-    if (wantsJson) {
-      return res.status(200).json({ success: true, message });
-    }
-
-    req.flash('success', message);
-    return res.render('librarian/viewandaddbook', { messages: req.flash() });
+    res.json({ status: 'success', message: 'Book added successfully!' });
   });
 };
+
+
+
 
 
 
