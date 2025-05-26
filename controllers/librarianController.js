@@ -54,9 +54,28 @@ exports.systemnotification = (req, res) => {
 exports.viewallnotification = (req, res) => {
  res.render('librarian/viewallnotification');
 };
+exports.viewandaddbook = (req, res) => {
+ res.render('librarian/viewandaddbook');   
+};
+exports.viewandaddpaper = (req, res) => {
+  res.render('librarian/viewandaddpaper');
+};
+exports.viewandaddproject = (req, res) => {
+  res.render('librarian/viewandaddproject');
+};
 
 
-
+// Controller to get available books
+exports.getAvailableBooks = (req, res) => {
+  const sql = "SELECT * FROM books WHERE status = 'available'";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching books:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(results);
+  });
+};
 
 
 

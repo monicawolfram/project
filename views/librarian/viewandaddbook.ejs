@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Librarian</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         body {
             background: url('library-bg.jpg') no-repeat center center fixed;
@@ -93,15 +93,15 @@
                     <h4>SJUCET Library</h4>
                 </div>
                 <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link" href="librarian_home.ejs"><i class="fas fa-home"></i> Home</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="librarian_category.ejs"><i class="fas fa-book"></i> Manage Catalog</a></li>
-                    <li class="nav-item"><a class="nav-link" href="managerequestlibrarian.ejs"><i class="fas fa-tasks"></i> Manage Requests</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manageinventorylibrarian.ejs"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
-                    <li class="nav-item"><a class="nav-link" href="massageandfeedback.ejs"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
-                    <li class="nav-item"><a class="nav-link" href="generatereport.ejs"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
-                    <li class="nav-item"><a class="nav-link" href="Itsupport.ejs"><i class="fas fa-tools"></i> IT Support</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manageusers.ejs"><i class="fas fa-users"></i> Manage Users</a></li>
-                    <li class="nav-item"><a class="nav-link" href="managefines.ejs"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
+                    <li class="nav-item"><a class="nav-link"href="/librarian/librarian_home"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link active"href="/librarian/librarian_category"><i class="fas fa-book"></i> Manage Catalog</a></li>
+                    <li class="nav-item"><a class="nav-link"href="/librarian/managerequestlibrarian"><i class="fas fa-tasks"></i> Manage Requests</a></li>
+                    <li class="nav-item"><a class="nav-link"href="/librarian/manageinventorylibrarian"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
+                    <li class="nav-item"><a class="nav-link"href="/librarian/massageandfeedback"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
+                    <li class="nav-item"><a class="nav-link"href="/librarian/generatereport"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
+                    <li class="nav-item"><a class="nav-link"href="/librarian/Itsupport"><i class="fas fa-tools"></i> IT Support</a></li>
+                    <li class="nav-item"><a class="nav-link"href="/librarian/manageusers"><i class="fas fa-users"></i> Manage Users</a></li>
+                    <li class="nav-item"><a class="nav-link"href="/librarian/managefines"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
                 </ul>
             </nav>
      <!-- Main Content -->
@@ -117,11 +117,11 @@
                     <i class="fas fa-bell"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-                    <li><a class="dropdown-item" href="#">New book added</a></li>
-                    <li><a class="dropdown-item" href="#">Request pending approval</a></li>
-                    <li><a class="dropdown-item" href="#">System maintenance scheduled</a></li>
+                    <li><a class="dropdown-item"href="/librarian/#">New book added</a></li>
+                    <li><a class="dropdown-item"href="/librarian/#">Request pending approval</a></li>
+                    <li><a class="dropdown-item"href="/librarian/#">System maintenance scheduled</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-center" href="#">View all</a></li>
+                    <li><a class="dropdown-item text-center"href="/librarian/#">View all</a></li>
                 </ul>
             </div>
 
@@ -131,10 +131,10 @@
                     <i class="fas fa-user"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item" href="librarian_account.ejs">Librarian Account</a></li>
-                    <li><a class="dropdown-item" href="admin_account.ejs">Admin Account</a></li>
+                    <li><a class="dropdown-item"href="/librarian/librarian_account">Librarian Account</a></li>
+                    <li><a class="dropdown-item"href="/librarian/admin_account">Admin Account</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="librarian_interface.ejs">Logout</a></li>
+                    <li><a class="dropdown-item text-danger"href="/librarian/librarian_interface">Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -145,13 +145,13 @@
                     <!-- View & Add Sections -->
                     <ul class="nav nav-tabs" id="libraryTabs">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#viewBooks">View Books</a>
+                            <a class="nav-link active" data-bs-toggle="tab"href="/librarian/#viewBooks">View Books</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#addBooks">Add Books</a>
+                            <a class="nav-link" data-bs-toggle="tab"href="/librarian/#addBooks">Add Books</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#removeBooks">Remove Books</a>
+                            <a class="nav-link" data-bs-toggle="tab"href="/librarian/#removeBooks">Remove Books</a>
                         </li>
                     </ul>
 
@@ -160,29 +160,30 @@
                         <div class="tab-pane fade show active" id="viewBooks">
                             <ul class="nav nav-pills mb-3" id="viewTabs">
                                 <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="pill" href="#availableBooks">Available Books</a>
+                                    <a class="nav-link active" data-bs-toggle="pill"href="/librarian/#availableBooks">Available Books</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#deletedBooks">Deleted Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill"href="/librarian/#deletedBooks">Deleted Books</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#borrowedBooks">Borrowed Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill"href="/librarian/#borrowedBooks">Borrowed Books</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#departments">Departments</a>
+                                    <a class="nav-link" data-bs-toggle="pill"href="/librarian/#departments">Departments</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#newBooks">New Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill"href="/librarian/#newBooks">New Books</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#updatedBooks">Recently Updated Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill"href="/librarian/#updatedBooks">Recently Updated Books</a>
                                 </li>
                             </ul>
 
                             <div class="tab-content">
-                                <div class="tab-pane fade show active" id="availableBooks">
-                                    <p>List of available books will be displayed here.</p>
+                                    <div class="tab-pane fade show active" id="availableBooks">
+                                       <div id="availableBooksList" class="row"></div>
                                 </div>
+
                                 <div class="tab-pane fade" id="deletedBooks">
                                     <p>List of deleted books will be displayed here.</p>
                                 </div>
@@ -206,6 +207,10 @@
                         <div class="tab-pane fade" id="addBooks">
                             <h4 class="text-center">Add a New Book</h4>
     <form id="addBookForm" method="POST">
+        <div class="mb-3">
+        <label class="form-label">Book Cover Image</label>
+        <input type="file" class="form-control" name="book_image" accept="image/*" required>
+    </div>
             <div class="mb-3">
                 <label class="form-label">Title</label>
                 <input type="text" class="form-control" name="title" required>
@@ -362,6 +367,46 @@
             </main>
         </div>
     </div>
+
+<<script>
+document.addEventListener("DOMContentLoaded", function () {
+  fetch('/librarian/books/available')
+    .then(response => response.json())
+    .then(books => {
+      const bookList = document.getElementById('availableBooksList');
+      bookList.innerHTML = '';
+
+      if (books.length === 0) {
+        bookList.innerHTML = '<p>No available books found.</p>';
+        return;
+      }
+
+      books.forEach(book => {
+        const bookCard = document.createElement('div');
+        bookCard.className = 'col-md-4 mb-3';
+        bookCard.innerHTML = `
+          <div class="card h-100 shadow-sm">
+            <img src="/images/default-book.png" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">${book.title}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">${book.author}</h6>
+              <p class="card-text"><strong>Department:</strong> ${book.department}</p>
+              <p class="card-text"><strong>Drawer No:</strong> ${book.draw_no}</p>
+              <p class="card-text"><strong>Shelf No:</strong> ${book.shelf_no}</p>
+            </div>
+          </div>
+        `;
+        bookList.appendChild(bookCard);
+      });
+    })
+    .catch(err => {
+      console.error('Error fetching books:', err);
+      document.getElementById('availableBooksList').innerHTML = '<p>Error loading books.</p>';
+    });
+});
+</script>
+
+
 
     <script>
         function generateCode() {

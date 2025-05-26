@@ -12,6 +12,7 @@ const authenticateLibrarian = (req, res, next) => {
 router.get('/dashboard', authenticateLibrarian, librarianController.dashboard);
 // router.get('/manage-resources', authenticateLibrarian, librarianController.manageResources);
 // router.post('/respond-feedback', authenticateLibrarian, librarianController.respondFeedback);
+router.get('/books/available', librarianController.getAvailableBooks);
 router.get('/books', authenticateLibrarian, librarianController.getBooks);
 router.get('/books/:id', authenticateLibrarian,librarianController.getBookById); // Spread the array
 router.post('/books', authenticateLibrarian, librarianController.addBook); // Spread the array
@@ -19,6 +20,8 @@ router.put('/books/:id', authenticateLibrarian, librarianController.updateBook);
 router.delete('/books/:id', authenticateLibrarian, librarianController.deleteBook); // Spread the array
 router.post('/add-book', authenticateLibrarian, librarianController.addBook); // Spread the array
 router.get('/add-book',  authenticateLibrarian, librarianController.getAddBookForm);
+
+
 // This will serve interface.html when visiting /api/librarian/
 router.get('/librarian_interface', librarianController.librarian_interface);
 router.get('/librarian_home', librarianController.librarian_home);
@@ -37,7 +40,9 @@ router.get('/profile', librarianController.profile);
 router.get('/requestnotification', librarianController.requestnotification);
 router.get('/systemnotification', librarianController.systemnotification);
 router.get('/viewallnotification', librarianController.viewallnotification);
-
+router.get('/viewandaddbook', librarianController.viewandaddbook);
+router.get('/viewandaddpaper', librarianController.viewandaddpaper);
+router.get('/viewandaddproject', librarianController.viewandaddproject);
 
 
 
