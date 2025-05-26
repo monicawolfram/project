@@ -158,7 +158,7 @@ exports.getAddBookForm = (req, res) => {
 exports.addBook = (req, res) => {
   const {
     title, author, department, date_added,
-    book_code, shelf_no, draw_no, year
+    book_code, shelf_no, draw_no, year, toJson
   } = req.body;
 
   const book_image = req.file ? req.file.filename : null;
@@ -175,25 +175,35 @@ exports.addBook = (req, res) => {
   ];
 
   db.query(sql, values, (err, result) => {
+    const isJson = toJson === 'true';
+
     if (err) {
       console.error('❌ Database Insert Error:', err.sqlMessage);
 
+      let errorMessage = 'Something went wrong while saving the book. Please try again later.';
+
       if (err.code === 'ER_BAD_NULL_ERROR') {
-        return res.status(400).json({ status: 'error', error: 'Please fill all required fields.' });
+        errorMessage = 'Please fill all required fields.';
+      } else if (err.code === 'ER_DUP_ENTRY') {
+        errorMessage = 'A book with the same code already exists.';
       }
 
-      if (err.code === 'ER_DUP_ENTRY') {
-        return res.status(400).json({ status: 'error', error: 'A book with the same code already exists.' });
+      if (isJson) {
+        return res.status(400).json({ status: 'error', error: errorMessage });
+      } else {
+        // Optionally: req.flash('error', errorMessage);
+        return res.redirect('/librarian/viewandaddbook');
       }
-
-      return res.status(500).json({ status: 'error', error: 'Something went wrong while saving the book. Please try again later.' });
     }
 
-    res.json({ status: 'success', message: 'Book added successfully!' });
+    if (isJson) {
+      return res.json({ status: 'success', message: 'Book added successfully!' });
+    } else {
+      // Optionally: req.flash('success', 'Book added successfully!');
+      return res.redirect('/librarian/viewandaddbook');
+    }
   });
 };
-
-
 
 
 
