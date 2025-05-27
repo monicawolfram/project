@@ -15,14 +15,16 @@ router.get('/dashboard', authenticateLibrarian, librarianController.dashboard);
 router.get('/books/available', librarianController.getAvailableBooks);
 router.get('/books', authenticateLibrarian, librarianController.getBooks);
 router.get('/search', librarianController.searchBooks);
+router.get('/deleted-books/', authenticateLibrarian,librarianController.getDeletedBooks);
 router.delete('/delete/book/:id', librarianController.deleteBook); 
 router.get('/books/:id', authenticateLibrarian,librarianController.getBookById); // Spread the array
 router.post('/books', authenticateLibrarian, librarianController.addBook); // Spread the array
 router.put('/books/:id', authenticateLibrarian, librarianController.updateBook); // Spread the array
 router.delete('/books/:id', authenticateLibrarian, librarianController.deleteBook); // Spread the array
-//router.post('/add-book', authenticateLibrarian, librarianController.addBook); // Spread the array
 router.post('/books/add', upload.single('book_image'), librarianController.addBook);
 router.get('/add-book',  authenticateLibrarian, librarianController.getAddBookForm);
+
+
 
 // This will serve interface.html when visiting /api/librarian/
 router.get('/librarian_interface', librarianController.librarian_interface);

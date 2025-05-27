@@ -224,7 +224,7 @@ exports.deleteBook = async (req, res) => {
     const bookId = req.params.id;
     try {
         const [result] = await db.execute(
-            "UPDATE books SET is_deleted = 'yes' WHERE id = ?",
+            "UPDATE books SET is_deleted = 'yes', deleted_at = NOW() WHERE id = ?",
             [bookId]
         );
         if (result.affectedRows > 0) {
@@ -236,6 +236,32 @@ exports.deleteBook = async (req, res) => {
         console.error(err);
         res.status(500).json({ success: false, message: "Server error" });
     }
+};
+
+exports.getDeletedBooks = async (req, res) => {
+  try {
+    const [rows] = await db.execute("SELECT id, title, author,department,  shelf_no, draw_no, book_code, deleted_at, image FROM books WHERE is_deleted = 'yes'");
+     const formattedResults = rows.map(book => ({
+      id: book.id,
+      title: book.title,
+      author: book.author,
+      department: book.department,
+      shelf_no: book.shelf_no,
+      draw_no: book.draw_no,
+      book_code: book.book_code,
+      deleted_at: book.deleted_at ? new Date(book.deleted_at).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }) : 'Not specified',
+      image: book.image || 'default-book.png'
+    }));
+
+    res.json(formattedResults);
+  } catch (err) {
+    console.error('Error fetching deleted books:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
 };
 
 
