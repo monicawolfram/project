@@ -208,17 +208,19 @@ exports.addBook = async (req, res) => {
 
 exports.searchBooks = async (req, res) => {
     const q = req.query.q;
+
     try {
         const [rows] = await db.execute(
-            "SELECT id, code, title, author FROM books WHERE code LIKE ? OR title LIKE ?",
+            "SELECT id, book_code, title, author FROM books WHERE book_code LIKE ? OR title LIKE ?",
             [`%${q}%`, `%${q}%`]
         );
         res.json({ success: true, books: rows });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: "Server error" });
+        console.error("Database query failed:", err); // log full error
+       res.status(500).json({ success: false, message: "Server error" });
     }
 };
+
 
 exports.deleteBook = async (req, res) => {
     const bookId = req.params.id;

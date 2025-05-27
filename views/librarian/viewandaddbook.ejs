@@ -257,153 +257,89 @@
 <!-- Remove Book Section -->
 <div class="tab-pane fade" id="removeBooks">
     <h4 class="text-center">Remove a Book</h4>
+<!-- Search Form -->
+ <!-- Search Form -->
     <form onsubmit="return false;">
         <div class="mb-3">
             <label class="form-label">Enter Book Code or Title</label>
             <div class="input-group">
                 <input type="text" class="form-control" id="searchBook">
-                <button type="button" class="btn btn-secondary" onclick="searchBook()">Search</button>
+                 <a href="#" class="btn btn-secondary" onclick="searchBook(); return false;">Search</a>
             </div>
         </div>
     </form>
 
-    <!-- Add this to your HTML where needed -->
-<div id="searchResults" class="table-responsive d-none mt-3">
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Code</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="resultsTableBody">
-            <!-- Dynamically filled -->
-        </tbody>
-    </table>
-</div>
+    <!-- Results Table -->
+    <div id="searchResults" class="d-none">
+        <h5>Search Results</h5>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>book_code</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="resultsTableBody"></tbody>
+        </table>
+    </div>
 
-</div>
-
-
-<script>
-    function searchBook() {
-    const searchInput = document.getElementById("searchBook").value.trim();
-    if (!searchInput) {
-        alert("Please enter a book code or title.");
-        return;
-    }
-
-    fetch(`http://localhost:3000/api/books/search?q=${encodeURIComponent(searchInput)}`)
-        .then(response => response.json())
-        .then(data => {
-            const resultsTable = document.getElementById("searchResults");
-            const tbody = document.getElementById("resultsTableBody");
-            tbody.innerHTML = "";
-
-            if (data.success && data.books.length > 0) {
-                data.books.forEach(book => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${book.code}</td>
-                        <td>${book.title}</td>
-                        <td>${book.author}</td>
-                        <td>
-                            <button class="btn btn-danger btn-sm" onclick="removeBook(${book.id})">Delete</button>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-                resultsTable.classList.remove("d-none");
-            } else {
-                alert("No books found.");
-                resultsTable.classList.add("d-none");
+    <script>
+        function searchBook() {
+            const searchInput = document.getElementById("searchBook").value.trim();
+            if (!searchInput) {
+                alert("Please enter a book code or title.");
+                return;
             }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Something went wrong while searching.");
-        });
-}
 
-function removeBook(bookId) {
-    if (!confirm("Are you sure you want to remove this book?")) return;
+            fetch(`http://localhost:3000/librarian/search/book?q=${encodeURIComponent(searchInput)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsTable = document.getElementById("searchResults");
+                    const tbody = document.getElementById("resultsTableBody");
+                    tbody.innerHTML = "";
 
-    fetch(`http://localhost:3000/api/books/${bookId}`, { method: "DELETE" })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message || "Book deleted.");
-            searchBook(); // Refresh the list
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Failed to delete book.");
-        });
-}
-
-   
-    fetch('/api/catalog/books')
-    .then(res => res.json())
-    .then(data => {
-        console.log(data); // Render book data
-    });
-
-
-    function generateCode() {
-            document.getElementById('bookCode').value = 'BOOK-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                    if (data.success && data.books.length > 0) {
+                        data.books.forEach(book => {
+                            const row = document.createElement("tr");
+                            row.innerHTML = `
+                                <td>${book.book_code}</td>
+                                <td>${book.title}</td>
+                                <td>${book.author}</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" onclick="removeBook(${book.id})">Delete</button>
+                                </td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                        resultsTable.classList.remove("d-none");
+                    } else {
+                        alert("No books found.");
+                        resultsTable.classList.add("d-none");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Something went wrong while searching.");
+                });
         }
 
-    
-// $(document).ready(function () {
-//     $('#addBookForm').on('submit', function (e) {
-//         e.preventDefault();
+        function removeBook(bookId) {
+            if (!confirm("Are you sure you want to delete this book?")) return;
 
-//         const formElement = this;
-//         const formData = new FormData(formElement); // includes image and all fields
-
-//         $.ajax({
-//             url: '/librarian/books/add',
-//             method: 'POST',
-//             data: formData,
-//             processData: false,  // don't convert to query string
-//             contentType: false,  // allow multipart/form-data
-//             dataType: 'json',
-//             success: function (response) {
-//                 if (response.success) {
-//                     Swal.fire({
-//                         icon: 'success',
-//                         title: 'Success',
-//                         text: response.message,
-//                         confirmButtonText: 'OK'
-//                     }).then(() => {
-//                         formElement.reset(); // Clear form
-//                         $('#bookCode').val(''); // Clear book code display
-//                     });
-//                 } else {
-//                     Swal.fire({
-//                         icon: 'error',
-//                         title: 'Error',
-//                         text: response.message || 'Failed to add book.',
-//                         confirmButtonText: 'OK'
-//                     });
-//                 }
-//             },
-//             error: function (xhr) {
-//                 const msg = xhr.responseJSON?.message || 'An unexpected error occurred.';
-//                 Swal.fire({
-//                     icon: 'error',
-//                     title: 'Error',
-//                     text: msg,
-//                     confirmButtonText: 'OK'
-//                 });
-//             }
-//         });
-//     });
-// });
-
-</script>
-
+            fetch(`http://localhost:3000/api/books/${bookId}`, { method: "DELETE" })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message || "Book deleted.");
+                    searchBook(); // Refresh list
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Failed to delete book.");
+                });
+        }
+    </script>
                     </div>
                 </div>
 

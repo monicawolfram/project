@@ -14,7 +14,7 @@ router.get('/dashboard', authenticateLibrarian, librarianController.dashboard);
 // router.post('/respond-feedback', authenticateLibrarian, librarianController.respondFeedback);
 router.get('/books/available', librarianController.getAvailableBooks);
 router.get('/books', authenticateLibrarian, librarianController.getBooks);
-router.get('/search', librarianController.searchBooks);
+router.get('/search/book', librarianController.searchBooks);
 router.get('/deleted-books/', authenticateLibrarian,librarianController.getDeletedBooks);
 router.delete('/delete/book/:id', librarianController.deleteBook); 
 router.get('/books/:id', authenticateLibrarian,librarianController.getBookById); // Spread the array
