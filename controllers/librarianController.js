@@ -66,14 +66,11 @@ exports.viewandaddproject = (req, res) => {
 
 
 // Controller to get available books
-exports.getAvailableBooks = (req, res) => {
-  const sql = "SELECT id, title, author, department, shelf_no, draw_no, image FROM books WHERE status = 'available'";
-
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error('Error fetching books:', err);
-      return res.status(500).json({ error: 'Database error' });
-    }
+exports.getAvailableBooks = async (req, res) => {
+  try {
+    const [results] = await db.execute(
+      "SELECT id, title, author, department, shelf_no, draw_no, image FROM books WHERE status = 'available' AND is_deleted = 'no'"
+    );
 
     const formattedResults = results.map(book => ({
       id: book.id,
@@ -82,12 +79,16 @@ exports.getAvailableBooks = (req, res) => {
       department: book.department,
       shelf_no: book.shelf_no,
       draw_no: book.draw_no,
-      image: book.image || 'default-book.png'  // fallback if image is null
+      image: book.image || 'default-book.png'
     }));
 
     res.json(formattedResults);
-  });
+  } catch (err) {
+    console.error('Error fetching books:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
 };
+
 
 
 
@@ -155,13 +156,14 @@ exports.getBookById = [
 exports.getAddBookForm = (req, res) => {
   return res.render('librarian/viewandaddbook', { messages: req.flash() });
 };
-exports.addBook = (req, res) => {
+exports.addBook = async (req, res) => {
   const {
     title, author, department, date_added,
     book_code, shelf_no, draw_no, year, toJson
   } = req.body;
 
   const book_image = req.file ? req.file.filename : null;
+  const isJson = toJson === 'true';
 
   const sql = `
     INSERT INTO books 
@@ -174,39 +176,67 @@ exports.addBook = (req, res) => {
     book_code, shelf_no, draw_no, year, book_image
   ];
 
-  db.query(sql, values, (err, result) => {
-    const isJson = toJson === 'true';
-
-    if (err) {
-      console.error('❌ Database Insert Error:', err.sqlMessage);
-
-      let errorMessage = 'Something went wrong while saving the book. Please try again later.';
-
-      if (err.code === 'ER_BAD_NULL_ERROR') {
-        errorMessage = 'Please fill all required fields.';
-      } else if (err.code === 'ER_DUP_ENTRY') {
-        errorMessage = 'A book with the same code already exists.';
-      }
-
-      if (isJson) {
-        return res.status(400).json({ status: 'error', error: errorMessage });
-      } else {
-        // Optionally: req.flash('error', errorMessage);
-        return res.redirect('/librarian/viewandaddbook');
-      }
-    }
+  try {
+    const [result] = await db.execute(sql, values);
 
     if (isJson) {
       return res.json({ status: 'success', message: 'Book added successfully!' });
     } else {
-      // Optionally: req.flash('success', 'Book added successfully!');
       return res.redirect('/librarian/viewandaddbook');
     }
-  });
+
+  } catch (err) {
+    console.error('❌ Database Insert Error:', err.sqlMessage);
+
+    let errorMessage = 'Something went wrong while saving the book. Please try again later.';
+
+    if (err.code === 'ER_BAD_NULL_ERROR') {
+      errorMessage = 'Please fill all required fields.';
+    } else if (err.code === 'ER_DUP_ENTRY') {
+      errorMessage = 'A book with the same code already exists.';
+    }
+
+    if (isJson) {
+      return res.status(400).json({ status: 'error', error: errorMessage });
+    } else {
+      return res.redirect('/librarian/viewandaddbook');
+    }
+  }
 };
 
 
 
+exports.searchBooks = async (req, res) => {
+    const q = req.query.q;
+    try {
+        const [rows] = await db.execute(
+            "SELECT id, code, title, author FROM books WHERE code LIKE ? OR title LIKE ?",
+            [`%${q}%`, `%${q}%`]
+        );
+        res.json({ success: true, books: rows });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+exports.deleteBook = async (req, res) => {
+    const bookId = req.params.id;
+    try {
+        const [result] = await db.execute(
+            "UPDATE books SET is_deleted = 'yes' WHERE id = ?",
+            [bookId]
+        );
+        if (result.affectedRows > 0) {
+            res.json({ success: true, message: "Book marked as deleted." });
+        } else {
+            res.json({ success: false, message: "Book not found." });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
 
 
 exports.updateBook = [
