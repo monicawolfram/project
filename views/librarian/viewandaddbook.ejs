@@ -192,8 +192,9 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="departments">
-                                    <p>List of departments and book categories.</p>
+                                     <div id="departments" class="row"></div>
                                 </div>
+                                
                                 <div class="tab-pane fade" id="newBooks">
                                     <p>Recently added books will be displayed here.</p>
                                 </div>
@@ -483,18 +484,20 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(res => res.json())
     .then(data => {
       const container = document.getElementById("borrowedBooksList");
+
       if (data.success && data.data.length > 0) {
         container.innerHTML = data.data.map(book => `
           <div class="col-md-4">
             <div class="card mb-3 shadow">
-              <img src="/uploads/${book.image || 'default.jpg'}" class="card-img-top" alt="${book.title}">
+             <img src="/uploads/books/${book.image}" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">
               <div class="card-body">
                 <h5 class="card-title">${book.title}</h5>
                 <p class="card-text">
                   <strong>Author:</strong> ${book.author}<br>
-                  <strong>Borrower:</strong> ${book.borrower_name} (${book.email})<br>
-                  <strong>Borrowed on:</strong> ${new Date(book.borrow_date).toLocaleDateString()}<br>
-                  <strong>Return by:</strong> ${book.return_date ? new Date(book.return_date).toLocaleDateString() : 'N/A'}
+                  <strong>Borrowed by:</strong> ${book.borrowed_by}<br>
+                 <strong>Borrowed at:</strong> ${book.borrowed_at ? new Date(book.borrowed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}<br>
+                 <strong>Return at:</strong> ${book.return_at ? new Date(book.return_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
+
                 </p>
               </div>
             </div>
@@ -506,10 +509,13 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch(err => {
       console.error('Fetch error:', err);
-      document.getElementById("borrowedBooksList").innerHTML = `<p class="text-danger">Failed to load borrowed books.</p>`;
+      document.getElementById("borrowedBooksList").innerHTML =
+        `<p class="text-danger">Failed to load borrowed books.</p>`;
     });
 });
 </script>
+
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
