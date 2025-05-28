@@ -89,7 +89,7 @@
             <!-- Sidebar -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar">
                 <div class="logo-container">
-                    <img src="sjcet.png" alt="SJCET Logo"> 
+                    <img src="/public/images/sjcet.png" alt="SJCET Logo"> 
                     <h4>SJUCET Library</h4>
                 </div>
                 <ul class="nav flex-column">
@@ -117,11 +117,11 @@
                     <i class="fas fa-bell"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-                    <li><a class="dropdown-item"href="/librarian/#">New book added</a></li>
-                    <li><a class="dropdown-item"href="/librarian/#">Request pending approval</a></li>
-                    <li><a class="dropdown-item"href="/librarian/#">System maintenance scheduled</a></li>
+                    <li><a class="dropdown-item" href="/librarian/requestnotification">New book added</a></li>
+                    <li><a class="dropdown-item" href="/librarian/requestnotification">Request pending approval</a></li>
+                    <li><a class="dropdown-item" href="/librarian/systemnotification">System maintenance scheduled</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-center"href="/librarian/#">View all</a></li>
+                    <li><a class="dropdown-item text-center" href="/librarian/viewallnotification">View all</a></li>
                 </ul>
             </div>
 
@@ -131,10 +131,10 @@
                     <i class="fas fa-user"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item"href="/librarian/librarian_account">Librarian Account</a></li>
-                    <li><a class="dropdown-item"href="/librarian/admin_account">Admin Account</a></li>
+                    <li><a class="dropdown-item" href="/librarian/librarian_account">Librarian Account</a></li>
+                    <li><a class="dropdown-item" href="/librarian/admin_account">Admin Account</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger"href="/librarian/librarian_interface">Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="/librarian/librarian_interface">Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -145,13 +145,13 @@
                     <!-- View & Add Sections -->
                     <ul class="nav nav-tabs" id="libraryTabs">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab"href="/librarian/#viewBooks">View Books</a>
+                            <a class="nav-link active" data-bs-toggle="tab" href="/librarian/#viewBooks">View Books</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab"href="/librarian/#addBooks">Add Books</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="/librarian/#addBooks">Add Books</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab"href="/librarian/#removeBooks">Remove Books</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="/librarian/#removeBooks">Remove Books</a>
                         </li>
                     </ul>
 
@@ -160,22 +160,22 @@
                         <div class="tab-pane fade show active" id="viewBooks">
                             <ul class="nav nav-pills mb-3" id="viewTabs">
                                 <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="pill"href="/librarian/#availableBooks">Available Books</a>
+                                    <a class="nav-link active" data-bs-toggle="pill" href="/librarian/#availableBooks">Available Books</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill"href="/librarian/#deletedBooks">Deleted Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill" href="/librarian/#deletedBooks">Deleted Books</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill"href="/librarian/#borrowedBooks">Borrowed Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill" href="/librarian/#borrowedBooks">Borrowed Books</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill"href="/librarian/#departments">Departments</a>
+                                    <a class="nav-link" data-bs-toggle="pill" href="/librarian/#departments">Departments</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill"href="/librarian/#newBooks">New Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill" href="/librarian/#newBooks">New Books</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill"href="/librarian/#updatedBooks">Recently Updated Books</a>
+                                    <a class="nav-link" data-bs-toggle="pill" href="/librarian/#updatedBooks">Recently Updated Books</a>
                                 </li>
                             </ul>
 
@@ -188,8 +188,9 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="borrowedBooks">
-                                    <p>List of borrowed books and borrowers will be displayed here.</p>
+                                    <div id="borrowedBooksList" class="row"></div>
                                 </div>
+
                                 <div class="tab-pane fade" id="departments">
                                     <p>List of departments and book categories.</p>
                                 </div>
@@ -252,8 +253,7 @@
 
                         </div>
 
-                          
-
+                    
 <!-- Remove Book Section -->
 <div class="tab-pane fade" id="removeBooks">
     <h4 class="text-center">Remove a Book</h4>
@@ -271,17 +271,18 @@
     <!-- Results Table -->
     <div id="searchResults" class="d-none">
         <h5>Search Results</h5>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>book_code</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="resultsTableBody"></tbody>
-        </table>
+       <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Book Code</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Action</th> 
+        </tr>
+    </thead>
+    <tbody id="resultsTableBody"></tbody>
+</table>
+
     </div>
 
     <script>
@@ -291,7 +292,6 @@
                 alert("Please enter a book code or title.");
                 return;
             }
-
             fetch(`http://localhost:3000/librarian/search/book?q=${encodeURIComponent(searchInput)}`)
                 .then(response => response.json())
                 .then(data => {
@@ -306,9 +306,18 @@
                                 <td>${book.book_code}</td>
                                 <td>${book.title}</td>
                                 <td>${book.author}</td>
-                                <td>
-                                    <button class="btn btn-danger btn-sm" onclick="removeBook(${book.id})">Delete</button>
-                                </td>
+                              <td>
+  <!-- Soft Delete Button -->
+  <button class="btn btn-warning btn-sm" onclick="softDeleteBook(${book.id})">
+    <i class="fas fa-ban"></i>
+  </button>
+
+  <!-- Hard Delete Button -->
+  <button class="btn btn-danger btn-sm" onclick="hardDeleteBook(${book.id})">
+    <i class="fas fa-trash-alt"></i>
+  </button>
+</td>
+
                             `;
                             tbody.appendChild(row);
                         });
@@ -323,21 +332,40 @@
                     alert("Something went wrong while searching.");
                 });
         }
+function softDeleteBook(bookId) {
+  if (!confirm("Are you sure you want to hide this book?")) return;
 
-        function removeBook(bookId) {
-            if (!confirm("Are you sure you want to delete this book?")) return;
+  fetch(`/librarian/delete/book/${bookId}`, {
+    method: 'DELETE'
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || "Book  hided.");
+      searchBook(); // refresh list
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      alert("Failed to hide book.");
+    });
+}
+function hardDeleteBook(bookId) {
+  if (!confirm("Are you sure you want to permanently delete this book?")) return;
 
-            fetch(`http://localhost:3000/librarian/remove/book/:id${bookId}`, { method: "DELETE" })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message || "Book deleted.");
-                    searchBook(); // Refresh list
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    alert("Failed to delete book.");
-                });
-        }
+  fetch(`/librarian/remove/book/${bookId}`, {
+    method: 'DELETE'
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || "Book permanently deleted.");
+      searchBook(); // refresh list
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      alert("Failed to permanently delete book.");
+    }); 
+}
+
+
     </script>
                     </div>
                 </div>
@@ -449,6 +477,39 @@ loadDeletedBooks()
 
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  fetch('/librarian/borrowed/books')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("borrowedBooksList");
+      if (data.success && data.data.length > 0) {
+        container.innerHTML = data.data.map(book => `
+          <div class="col-md-4">
+            <div class="card mb-3 shadow">
+              <img src="/uploads/${book.image || 'default.jpg'}" class="card-img-top" alt="${book.title}">
+              <div class="card-body">
+                <h5 class="card-title">${book.title}</h5>
+                <p class="card-text">
+                  <strong>Author:</strong> ${book.author}<br>
+                  <strong>Borrower:</strong> ${book.borrower_name} (${book.email})<br>
+                  <strong>Borrowed on:</strong> ${new Date(book.borrow_date).toLocaleDateString()}<br>
+                  <strong>Return by:</strong> ${book.return_date ? new Date(book.return_date).toLocaleDateString() : 'N/A'}
+                </p>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = `<p class="text-muted">No borrowed books found.</p>`;
+      }
+    })
+    .catch(err => {
+      console.error('Fetch error:', err);
+      document.getElementById("borrowedBooksList").innerHTML = `<p class="text-danger">Failed to load borrowed books.</p>`;
+    });
+});
+</script>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

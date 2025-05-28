@@ -239,6 +239,35 @@ exports.removeBook = async (req, res) => {
     }
 };
 
+exports.getBorrowedBooks = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT 
+        b.id AS book_id,
+        b.title,
+        b.author,
+        b.image,
+        u.name AS borrower_name,
+        u.email,
+        br.borrowed_at,
+        br.return_at,
+        br.status
+      FROM borrowed br
+      JOIN books b ON br.book_id = b.id
+      JOIN users u ON br.user_id = u.id
+      WHERE br.status = 'borrowed'
+      ORDER BY br.borrowed_at DESC
+    `);
+
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    console.error('Error fetching borrowed books:', err.message);
+    res.status(500).json({ success: false, message: "server error" });
+  }
+};
+
+
+
 
 exports.deleteBook = async (req, res) => {
     const bookId = req.params.id;
