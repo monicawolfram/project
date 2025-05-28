@@ -221,6 +221,24 @@ exports.searchBooks = async (req, res) => {
     }
 };
 
+exports.removeBook = async (req, res) => {
+   const bookId = req.params.id;
+    try {
+        const [result] = await db.execute(
+            "DELETE books FROM  books WHERE id = ?",
+            [bookId]
+        );
+        if (result.affectedRows > 0) {
+            res.json({ success: true, message: "Book marked as deleted." });
+        } else {
+            res.json({ success: false, message: "Book not found." });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "server error" });
+    }
+};
+
 
 exports.deleteBook = async (req, res) => {
     const bookId = req.params.id;

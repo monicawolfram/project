@@ -23,7 +23,7 @@ router.put('/books/:id', authenticateLibrarian, librarianController.updateBook);
 router.delete('/books/:id', authenticateLibrarian, librarianController.deleteBook); // Spread the array
 router.post('/books/add', upload.single('book_image'), librarianController.addBook);
 router.get('/add-book',  authenticateLibrarian, librarianController.getAddBookForm);
-
+router.delete('/remove/book/:id', authenticateLibrarian, librarianController.removeBook); // Spread the array
 
 
 // This will serve interface.html when visiting /api/librarian/
