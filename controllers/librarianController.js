@@ -263,6 +263,29 @@ exports.getBorrowedBooks = async (req, res) => {
   }
 };
 
+exports.getDepartmentsCatalogs = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT 
+        department,
+        title,
+        author,
+        year,
+        book_code,
+        status,
+        type,        -- 'book', 'paper', or 'project'
+        image
+      FROM books
+      WHERE is_deleted = 'no'
+      ORDER BY department, type, title
+    `);
+
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    console.error("Error fetching department catalogs:", err.message);
+    res.status(500).json({ success: false, message: err });
+  }
+};
 
 
 

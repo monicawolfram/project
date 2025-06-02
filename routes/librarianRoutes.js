@@ -25,6 +25,7 @@ router.post('/books/add', upload.single('book_image'), librarianController.addBo
 router.get('/add-book',  authenticateLibrarian, librarianController.getAddBookForm);
 router.delete('/remove/book/:id', authenticateLibrarian, librarianController.removeBook); // Spread the array
 router.get('/borrowed/books', authenticateLibrarian, librarianController.getBorrowedBooks);
+router.get('/departments/catalogs', librarianController.getDepartmentsCatalogs)
 
 
 

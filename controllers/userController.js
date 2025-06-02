@@ -107,3 +107,40 @@ exports.sendFeedback = (req, res) => {
     res.json({ message: 'Feedback sent' });
   });
 };
+
+
+
+
+
+exports.getUserByReg_no = async (req, res) => {
+  const reg_no = req.query.reg;  // <-- get from query param 'reg'
+  if (!reg_no) {
+    return res.status(400).json({ success: false, message: "reg query parameter is required" });
+  }
+
+  try {
+    const [rows] = await db.execute("SELECT * FROM users WHERE reg_no = ?", [reg_no]);
+    if (rows.length === 0) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    const user = rows[0];
+    res.json({
+      success: true,
+      name: user.name,
+      reg_no: user.reg_no,
+      program: user.program,
+      department: user.department,
+      gender: user.gender,
+      college: user.college,
+      year: user.year,
+      Time_In: user.time_in,
+      Time_Out: user.time_out,
+      image: user.image 
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+

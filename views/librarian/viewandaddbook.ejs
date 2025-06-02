@@ -194,7 +194,7 @@
                                 <div class="tab-pane fade" id="departments">
                                      <div id="departments" class="row"></div>
                                 </div>
-                                
+
                                 <div class="tab-pane fade" id="newBooks">
                                     <p>Recently added books will be displayed here.</p>
                                 </div>
@@ -515,6 +515,64 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  fetch('/librarian/departments/catalogs')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.querySelector('#departments');
+
+      if (data.success && data.data.length > 0) {
+        const grouped = {};
+
+        // Organize by department and then by type
+        data.data.forEach(item => {
+          const dept = item.department;
+          const type = item.type;
+
+          if (!grouped[dept]) grouped[dept] = {};
+          if (!grouped[dept][type]) grouped[dept][type] = [];
+
+          grouped[dept][type].push(item);
+        });
+
+        // Render HTML
+        container.innerHTML = Object.entries(grouped).map(([dept, types]) => `
+          <div class="col-12">
+            <h3 class="mt-4 text-primary">${dept}</h3>
+            ${Object.entries(types).map(([type, items]) => `
+              <h5 class="text-secondary mt-3 text-capitalize">${type}s</h5>
+              <div class="row">
+                ${items.map(item => `
+                  <div class="col-md-4">
+                    <div class="card mb-3 shadow-sm">
+                      <img src="/uploads/${item.image || 'default.jpg'}" class="card-img-top" alt="${item.title}">
+                      <div class="card-body">
+                        <h5 class="card-title">${item.title}</h5>
+                        <p class="card-text">
+                          <strong>Author:</strong> ${item.author}<br>
+                          <strong>Year:</strong> ${item.year}<br>
+                          <strong>Status:</strong> ${item.status}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `).join('')}
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = `<p class="text-muted">No catalog entries found.</p>`;
+      }
+    })
+    .catch(err => {
+      console.error('Error loading catalogs:', err);
+      document.querySelector('#departments').innerHTML =
+        `<p class="text-danger">Failed to load catalogs.</p>`;
+    });
+});
+</script>
 
 
 

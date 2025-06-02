@@ -1,119 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        body {
-            background-size: cover;
-            color: rgb(28, 27, 27);
-            font-family: 'Poppins', sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Library Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
-        .container-box {
-            background: rgba(113, 221, 92, 0.7);
-            padding: 50px;
-            border-radius: 50px;
-            text-align: center;
-            max-width: 1000px;
-            margin: auto;
-        }
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-size: cover;
+      color: rgb(28, 27, 27);
+      min-height: 100vh;
+      overflow: hidden;
+      transition: background-color 0.5s ease;
+    }
 
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 400px;
-            background: rgba(0, 0, 0, 0.8);
-            color: rgb(28, 26, 26);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        }
-        
-        .popup.active {
-            display: block;
-        }
+    .container-box {
+      background: rgba(113, 221, 92, 0.7);
+      padding: 50px;
+      border-radius: 50px;
+      text-align: center;
+      max-width: 1000px;
+      margin:  auto;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    }
 
-        .scanner-input {
-            opacity: 0;
-            position: absolute;
-            top: -100px;
-        }
+    .scanner-input {
+      opacity: 0;
+      position: absolute;
+      top: -100px;
+    }
 
-        .logo {
-            width: 150px;
-            margin-bottom: 15px;
-        }
-    </style>
+    .logo {
+      width: 120px;
+      margin-bottom: 15px;
+    }
+
+    .popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 450px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #000;
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.popup.active {
+  display: block;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+
+    .popup h4 {
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #28a745;
+    }
+
+    .popup p {
+      margin: 5px 0;
+    }
+
+ .popup-photo {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #28a745;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+
+    @keyframes popupSlideUp {
+      0% {
+        bottom: -100%;
+        opacity: 0;
+        transform: translateX(-50%) scale(0.5);
+      }
+      60% {
+        bottom: 55%;
+        opacity: 1;
+        transform: translateX(-50%) scale(1.05);
+      }
+      100% {
+        bottom: 50%;
+        transform: translateX(-50%) scale(1);
+      }
+    }
+
+    .fadeout-white {
+      background-color: white !important;
+      transition: background-color 0.8s ease;
+    }
+  </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="container-box">
-            <img src="/images/sjcet.png" alt="SJUCET Logo" class="logo">
-            <h2>WELCOME TO SJUCET LIBRARY</h2>
-            <i class="fa-solid fa-user fa-4x"></i>
-            <h3>Scan Your ID to Login</h3>
-            <input type="text" id="scanner" class="scanner-input" autofocus>
-        </div>
+  <div class="container mt-5">
+    <div class="container-box">
+      <img src="/images/sjcet.png" alt="SJUCET Logo" class="logo" />
+      <h2>WELCOME TO SJUCET LIBRARY</h2>
+      <i class="fa-solid fa-user fa-4x my-3"></i>
+      <h4 class="mb-3">Scan Your ID to Login</h4>
+      <input type="text" id="scanner" class="scanner-input" autofocus />
     </div>
+  </div>
 
-    <div class="popup" id="userPopup">
-        <h4 id="welcomeMsg"></h4>
-        <p><strong>Name:</strong> <span id="name"></span></p>
-        <p><strong>Reg No:</strong> <span id="regNo"></span></p>
-        <p><strong>Program:</strong> <span id="program"></span></p>
-        <p><strong>Dept:</strong> <span id="department"></span></p>
-        <p><strong>Gender:</strong> <span id="gender"></span></p>
-        <p><strong>College:</strong> <span id="college"></span></p>
-        <p><strong>DOB:</strong> <span id="dob"></span></p>
-        <p><strong>Year:</strong> <span id="year"></span></p>
-    </div>
+  <div class="popup" id="userPopup">
+    <h4 id="welcomeMsg"></h4>
+    <img id="userPhoto" class="popup-photo mb-3" src="" alt="User Photo" />
+    <p><strong>Name:</strong> <span id="name"></span></p>
+    <p><strong>Reg No:</strong> <span id="regNo"></span></p>
+    <p><strong>Program:</strong> <span id="program"></span></p>
+    <p><strong>Dept:</strong> <span id="department"></span></p>
+    <p><strong>Gender:</strong> <span id="gender"></span></p>
+    <p><strong>College:</strong> <span id="college"></span></p>
+    <p><strong>Year:</strong> <span id="year"></span></p>
+    <p><strong>Time In:</strong> <span id="timein"></span></p>
+    <p><strong>Time Out:</strong> <span id="timeOut"></span></p>
+  </div>
 
-    <script>
-        document.getElementById("scanner").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                let barcode = event.target.value;
-                fetch(`/api/user/${barcode}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            document.getElementById("welcomeMsg").innerText = `WELCOME ${data.name} TO OUR LIBRARY`;
-                            document.getElementById("name").innerText = data.name;
-                            document.getElementById("regNo").innerText = data.reg_no;
-                            document.getElementById("program").innerText = data.program;
-                            document.getElementById("department").innerText = data.department;
-                            document.getElementById("gender").innerText = data.gender;
-                            document.getElementById("college").innerText = data.college;
-                            document.getElementById("dob").innerText = data.dob;
-                            document.getElementById("year").innerText = data.year;
+  <script>
+    document.getElementById("scanner").addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        const reg_no = event.target.value.trim();
+        if (!reg_no) return;
 
-                            document.getElementById("userPopup").classList.add("active");
+        fetch(`/user/fetch-user?reg=${reg_no}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Populate popup
+              document.getElementById("welcomeMsg").innerText = `WELCOME ${data.name} TO OUR LIBRARY`;
+              document.getElementById("name").innerText = data.name;
+              document.getElementById("regNo").innerText = data.reg_no;
+              document.getElementById("program").innerText = data.program;
+              document.getElementById("department").innerText = data.department;
+              document.getElementById("gender").innerText = data.gender;
+              document.getElementById("college").innerText = data.college;
+              document.getElementById("year").innerText = data.year;
+              document.getElementById("dob").innerText = data.dob;
+              // Show popup
+              const popup = document.getElementById("userPopup");
+              popup.classList.add("active");
 
-                            // Send attendance message to librarian
-                            fetch("/api/attendance", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ reg_no: data.reg_no })
-                            });
+                const userPhoto = document.getElementById("userPhoto");
+                userPhoto.src = data.photo || "/images/default-user.png"; // fallback image
 
-                            // Redirect to homepage after 5 seconds
-                            setTimeout(() => {
-                                window.location.href = "/user/home";
-                            }, 5000);
-                        } else {
-                            alert("Invalid Barcode! Try Again.");
-                        }
-                    });
-                event.target.value = "";
+              // Log attendance
+              fetch("/api/attendance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ reg_no: data.reg_no })
+              });
+
+              // Fade to white & redirect
+              setTimeout(() => {
+                document.body.classList.add("fadeout-white");
+                setTimeout(() => {
+                  window.location.href = "/user/home";
+                }, 1000);
+              }, 2000);
+            } else {
+              alert("User Not Found.");
             }
-        });
-    </script>
+          })
+          .catch(error => {
+            console.error("Error fetching user data:", error);
+            alert("Server error. Please try again.");
+          });
+
+        event.target.value = "";
+      }
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
 </body>
 </html>
