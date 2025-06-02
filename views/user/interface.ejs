@@ -128,6 +128,7 @@
     <p><strong>Gender:</strong> <span id="gender"></span></p>
     <p><strong>College:</strong> <span id="college"></span></p>
     <p><strong>Year:</strong> <span id="year"></span></p>
+    <p><strong>Role:</strong> <span id="role">Student</span></p>
     <p><strong>Time In:</strong> <span id="timein"></span></p>
     <p><strong>Time Out:</strong> <span id="timeOut"></span></p>
   </div>
@@ -151,7 +152,9 @@
               document.getElementById("gender").innerText = data.gender;
               document.getElementById("college").innerText = data.college;
               document.getElementById("year").innerText = data.year;
-              document.getElementById("dob").innerText = data.dob;
+              document.getElementById("role").innerText = data.role;
+              document.getElementById("timein").innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              document.getElementById("timeOut").innerText = "Not yet logged out"; // Placeholder for time out
               // Show popup
               const popup = document.getElementById("userPopup");
               popup.classList.add("active");
@@ -159,32 +162,41 @@
                 const userPhoto = document.getElementById("userPhoto");
                 userPhoto.src = data.photo || "/images/default-user.png"; // fallback image
 
-              // Log attendance
-              fetch("/api/attendance", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ reg_no: data.reg_no })
-              });
+               // Log attendance
+            fetch("/api/attendance", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ reg_no: data.reg_no })
+            });
 
-              // Fade to white & redirect
-              setTimeout(() => {
-                document.body.classList.add("fadeout-white");
-                setTimeout(() => {
-                  window.location.href = "/user/home";
-                }, 1000);
-              }, 2000);
-            } else {
-              alert("User Not Found.");
+            // Determine route based on role
+            let redirectPath = "/user/home";
+            if (data.role === "ADMIN") {
+              redirectPath = "/admin/dashboard";
+            } else if (data.role === "LIBRARIAN") {
+              redirectPath = "/librarian/librarian_home";
             }
-          })
-          .catch(error => {
-            console.error("Error fetching user data:", error);
-            alert("Server error. Please try again.");
-          });
 
-        event.target.value = "";
-      }
-    });
+            // Fade and redirect
+            setTimeout(() => {
+              document.body.classList.add("fadeout-white");
+              setTimeout(() => {
+                window.location.href = redirectPath;
+              }, 1000);
+            }, 2000);
+
+          } else {
+            alert("User Not Found.");
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching user data:", error);
+          alert("Server error. Please try again.");
+        });
+
+      event.target.value = "";
+    }
+  });
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

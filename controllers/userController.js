@@ -134,6 +134,7 @@ exports.getUserByReg_no = async (req, res) => {
       gender: user.gender,
       college: user.college,
       year: user.year,
+      role: user.role,
       Time_In: user.time_in,
       Time_Out: user.time_out,
       image: user.image 
