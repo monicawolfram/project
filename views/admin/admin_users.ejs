@@ -43,8 +43,13 @@
           <tr>
             <th>Photo</th>
             <th>Name</th>
-            <th>Email</th>
+            <th>Reg_no</th>
+            <th>Department</th>
+            <th>Program</th>
+            <th>year</th>
             <th>Role</th>
+            <th>Gender</th>
+            <th>Phone_no</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -58,21 +63,27 @@
 <div class="modal fade" id="addUserModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form id="addUserForm">
-        <div class="modal-header">
-          <h5 class="modal-title">Add New User</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <input type="text" class="form-control mb-2" placeholder="Name" id="addName" required />
-          <input type="email" class="form-control mb-2" placeholder="Email" id="addEmail" required />
-          <input type="text" class="form-control mb-2" placeholder="Role" id="addRole" required />
-          <input type="file" class="form-control" id="addPhoto" />
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Add User</button>
-        </div>
-      </form>
+     <form id="addUserForm">
+  <div class="modal-header">
+    <h5 class="modal-title">Add New User</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  </div>
+  <div class="modal-body">
+    <input type="text" class="form-control mb-2" placeholder="Name" id="addName" name="name" required />
+    <input type="text" class="form-control mb-2" placeholder="Reg_no" id="addReg_no" name="reg_no" required />
+    <input type="text" class="form-control mb-2" placeholder="Department" id="addDepartment" name="department" required />
+    <input type="text" class="form-control mb-2" placeholder="Program" id="addProgram" name="program" required />
+    <input type="text" class="form-control mb-2" placeholder="Year" id="addYear" name="year" required />
+    <input type="text" class="form-control mb-2" placeholder="Role" id="addRole" name="role" required />
+    <input type="text" class="form-control mb-2" placeholder="Gender" id="addGender" name="gender" required />
+    <input type="text" class="form-control mb-2" placeholder="Phone_no" id="addPhone_no" name="phone_no" required />
+    <input type="file" class="form-control" id="addPhoto" name="photo" />
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-success">Add User</button>
+  </div>
+</form>
+
     </div>
   </div>
 </div>
@@ -89,8 +100,13 @@
         <div class="modal-body">
           <input type="hidden" id="editIndex" />
           <input type="text" class="form-control mb-2" placeholder="Name" id="editName" required />
-          <input type="email" class="form-control mb-2" placeholder="Email" id="editEmail" required />
+          <input type="text" class="form-control mb-2" placeholder="Reg_no" id="editReg_no" required />
+          <input type="text" class="form-control mb-2" placeholder="Department" id="editDepartment" required />
+          <input type="text" class="form-control mb-2" placeholder="Program" id="editProgram" required />
+          <input type="text" class="form-control mb-2" placeholder="Year" id="editYear" required />
           <input type="text" class="form-control mb-2" placeholder="Role" id="editRole" required />
+          <input type="text" class="form-control mb-2" placeholder="Gender" id="editGender" required />
+          <input type="text" class="form-control mb-2" placeholder="Phone_no" id="editPhone_no" required />
           <input type="file" class="form-control" id="editPhoto" />
         </div>
         <div class="modal-footer">
@@ -112,28 +128,65 @@
       <div class="modal-body text-center">
         <img id="viewPhoto" class="user-photo mb-3" />
         <h5 id="viewName"></h5>
-        <p id="viewEmail"></p>
+        <p id="viewReg_no"></p>
+        <p id="viewDepartment"></p>
+        <p id="viewProgram"></p>
+        <p id="viewYear"></p>
+        <p id="viewGender"></p>
+        <p id="viewPhone_no"></p>
         <p><strong>Role:</strong> <span id="viewRole"></span></p>
+
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  const users = [
-    {
-      name: "Alice John",
-      email: "alice@example.com",
-      role: "Student",
-      photo: ""
-    },
-    {
-      name: "Bob Mark",
-      email: "bob@example.com",
-      role: "Librarian",
-      photo: ""
+  const users = [];
+
+document.getElementById('addUserForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const form = e.target;
+  const formData = new FormData(form);
+
+  // Ensure backend sends JSON instead of redirecting
+  formData.append('toJson', 'true');
+
+  fetch('/admin/add-user', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.error) {
+      alert('Error: ' + data.error);
+    } else {
+      alert('User added successfully');
+      const photo = formData.get("photo");
+      const photoUrl = photo ? URL.createObjectURL(photo) : '';
+
+      users.push({
+        name: formData.get("name"),
+        reg_no: formData.get("reg_no"),
+        department: formData.get("department"),
+        program: formData.get("program"),
+        year: formData.get("year"),
+        role: formData.get("role"),
+        gender: formData.get("gender"),
+        phone_no: formData.get("phone_no"),
+        photo: photoUrl
+      });
+
+      renderUsers();
+      form.reset();
+      bootstrap.Modal.getInstance(document.getElementById("addUserModal")).hide();
     }
-  ];
+  })
+  .catch(err => {
+    console.error(err);
+    alert('An error occurred');
+  });
+});
 
   function renderUsers() {
     const tbody = document.getElementById("userTableBody");
@@ -143,8 +196,13 @@
       row.innerHTML = `
         <td><img src="${user.photo || 'https://via.placeholder.com/60'}" class="user-photo" /></td>
         <td>${user.name}</td>
-        <td>${user.email}</td>
+        <td>${user.reg_no}</td>
+        <td>${user.department}</td>
+        <td>${user.program}</td>
+        <td>${user.year}</td>
         <td>${user.role}</td>
+        <td>${user.gender}</td>
+        <td>${user.phone_no}</td>
         <td>
           <button class="btn btn-sm btn-info text-white" onclick="viewUser(${index})">View</button>
           <button class="btn btn-sm btn-warning" onclick="openEditModal(${index})">Edit</button>
@@ -155,26 +213,17 @@
     });
   }
 
-  document.getElementById("addUserForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const name = document.getElementById("addName").value;
-    const email = document.getElementById("addEmail").value;
-    const role = document.getElementById("addRole").value;
-    const photoInput = document.getElementById("addPhoto");
-    const photo = photoInput.files[0] ? URL.createObjectURL(photoInput.files[0]) : "";
-
-    users.push({ name, email, role, photo });
-    renderUsers();
-    this.reset();
-    bootstrap.Modal.getInstance(document.getElementById("addUserModal")).hide();
-  });
-
   function openEditModal(index) {
     const user = users[index];
     document.getElementById("editIndex").value = index;
     document.getElementById("editName").value = user.name;
-    document.getElementById("editEmail").value = user.email;
+    document.getElementById("editReg_no").value = user.reg_no;
+    document.getElementById("editDepartment").value = user.department;
+    document.getElementById("editProgram").value = user.program;
+    document.getElementById("editYear").value = user.year;
     document.getElementById("editRole").value = user.role;
+    document.getElementById("editGender").value = user.gender;
+    document.getElementById("editPhone_no").value = user.phone_no;
     document.getElementById("editPhoto").value = "";
     new bootstrap.Modal(document.getElementById("editUserModal")).show();
   }
@@ -183,13 +232,26 @@
     e.preventDefault();
     const index = document.getElementById("editIndex").value;
     const name = document.getElementById("editName").value;
-    const email = document.getElementById("editEmail").value;
+    const reg_no = document.getElementById("editReg_no").value;
+    const department = document.getElementById("editDepartment").value;
+    const program = document.getElementById("editProgram").value;
+    const year = document.getElementById("editYear").value;
     const role = document.getElementById("editRole").value;
+    const gender = document.getElementById("editGender").value;
+    const phone_no = document.getElementById("editPhone_no").value;
     const photoInput = document.getElementById("editPhoto");
 
-    users[index].name = name;
-    users[index].email = email;
-    users[index].role = role;
+    users[index] = {
+      name,
+      reg_no,
+      department,
+      program,
+      year,
+      role,
+      gender,
+      phone_no,
+      photo: users[index].photo
+    };
 
     if (photoInput.files[0]) {
       users[index].photo = URL.createObjectURL(photoInput.files[0]);
@@ -210,13 +272,20 @@
     const user = users[index];
     document.getElementById("viewPhoto").src = user.photo || 'https://via.placeholder.com/60';
     document.getElementById("viewName").textContent = user.name;
-    document.getElementById("viewEmail").textContent = user.email;
+    document.getElementById("viewReg_no").textContent = `Reg No: ${user.reg_no}`;
+    document.getElementById("viewDepartment").textContent = `Department: ${user.department}`;
+    document.getElementById("viewProgram").textContent = `Program: ${user.program}`;
+    document.getElementById("viewYear").textContent = `Year: ${user.year}`;
+    document.getElementById("viewGender").textContent = `Gender: ${user.gender}`;
+    document.getElementById("viewPhone_no").textContent = `Phone: ${user.phone_no}`;
     document.getElementById("viewRole").textContent = user.role;
     new bootstrap.Modal(document.getElementById("viewUserModal")).show();
   }
 
   renderUsers();
 </script>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

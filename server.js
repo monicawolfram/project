@@ -12,7 +12,7 @@ app.use(express.static('public'));
 app.use(session({ secret: 'your-secret', resave: false, saveUninitialized: false }));
 app.use(flash());
 app.use('/uploads/books', express.static(path.join(__dirname, 'public/uploads/books')));
-
+app.use('/uploads', express.static('uploads'));
 
 
 app.use(session({
@@ -27,7 +27,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
 
 
 
