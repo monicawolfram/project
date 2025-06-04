@@ -15,7 +15,7 @@ router.get('/dashboard', authenticateAdmin, adminController.dashboard);
 router.post('/create-user', authenticateAdmin, adminController.createUser);
 router.get('/view-users', adminController.getAllUsers);
 router.post('/add-user', upload.single('photo'), adminController.addUser);
-//router.put('/update-user/:id', upload.single('photo'), adminController.updateUser);
+router.put('/update-user/:id', upload.single('photo'), adminController.updateUser);
 router.delete('/delete-user/:id', adminController.deleteUser);
 
 //

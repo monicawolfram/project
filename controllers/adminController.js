@@ -9,9 +9,20 @@ exports.dashboard = (req, res) => {
 exports.admin_account = (req, res) => {
  res.render('admin/admin_account');
 };
-exports.admin_users = (req, res) => {
- res.render('admin/admin_users');
+
+
+exports.admin_users = async (req, res) => {
+  try {
+    const [users] = await db.execute('SELECT * FROM users ORDER BY id DESC');
+    res.render('admin/admin_users', { users });
+  } catch (err) {
+    console.error('❌ Error fetching users:', err);
+    res.render('admin/admin_users', { users: [], error: 'Failed to load users' });
+  }
 };
+
+
+
 exports.admin_resourcestatus = (req, res) => {
  res.render('admin/admin_resourcestatus');
 };
@@ -52,80 +63,66 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.addUser = async (req, res) => {
-  const {
-    name, reg_no, department, program,
-    year, role, gender, phone_no, toJson
-  } = req.body;
-
-  const photoFilename = req.file ? req.file.filename : 'default-user.png';
-  const isJson = toJson === 'true';
-
-  const sql = `
-    INSERT INTO users 
-    (name, reg_no, department, program, year, role, gender, phone_no, photo) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  const values = [
-    name,
-    reg_no,
-    department,
-    program,
-    year,
-    role,
-    gender,
-    phone_no,
-    photoFilename
-  ];
-
   try {
-    const [result] = await db.execute(sql, values);
+    const {
+      name,
+      reg_no,
+      department,
+      program,
+      college,
+      year,
+      role,
+      gender,
+      phone_no
+    } = req.body;
 
-    if (isJson) {
-      return res.status(201).json({
-        status: 'success',
-        message: 'User added successfully!',
-        userId: result.insertId,
-        photo: photoFilename
-      });
-    } else {
-      return res.redirect('/admin/admin_users');
+    const photoFilename = req.file ? req.file.filename : null;
+
+    if (!name || !reg_no || !department || !program || !college || !year || !role || !gender || !phone_no) {
+      return res.status(400).json({ error: 'Missing required user fields' });
     }
+
+    const sql = `
+      INSERT INTO users 
+      (name, reg_no, department, program, college, year, role, gender, phone_no, photo) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      name,
+      reg_no,
+      department,
+      program,
+      college,
+      year,
+      role,
+      gender,
+      phone_no,
+      photoFilename
+    ];
+
+    console.log('📦 Inserting values:', values);
+
+    await db.execute(sql, values); // `db` is already a promise pool
+    res.json({ message: 'User added successfully' });
 
   } catch (err) {
-    console.error('❌ Database Insert Error:', err.sqlMessage || err);
-
-    let errorMessage = 'Something went wrong while saving the user. Please try again later.';
-    if (err.code === 'ER_BAD_NULL_ERROR') {
-      errorMessage = 'Please fill all required fields.';
-    } else if (err.code === 'ER_DUP_ENTRY') {
-      errorMessage = 'A user with the same registration number already exists.';
-    }
-
-    if (isJson) {
-      return res.status(400).json({ status: 'error', error: errorMessage });
-    } else {
-      return res.redirect('/admin/admin_users');
-    }
+    console.error('❌ Database Insert Error:', err);
+    res.status(500).json({ error: 'Something went wrong while saving the user. Please try again later.' });
   }
 };
-
-
-
-
-
-
-
-
-
 exports.updateUser = (req, res) => {
-  const { name, reg_no, department, program, year, role, gender, phone_no } = req.body;
+  if (!req.body) {
+    return res.status(400).json({ error: 'Missing request body' });
+  }
+
+  const { name, reg_no, department, program, college, year, role, gender, phone_no } = req.body;
   const photo = req.file ? `/uploads/${req.file.filename}` : null;
   const id = req.params.id;
 
-  const sql = `UPDATE users SET name = ?, reg_no = ?, department = ?, program = ?, year = ?, role = ?, gender = ?, phone_no = ?${photo ? ', photo = ?' : ''} WHERE id = ?`;
+  const sql = `UPDATE users SET name = ?, reg_no = ?, department = ?, program = ?, college = ?, year = ?, role = ?, gender = ?, phone_no = ?${photo ? ', photo = ?' : ''} WHERE id = ?`;
 
-  const params = [name, reg_no, department, program, year, role, gender, phone_no];
+  const params = [name, reg_no, department, program, college, year, role, gender, phone_no];
   if (photo) params.push(photo);
   params.push(id);
 
@@ -134,7 +131,6 @@ exports.updateUser = (req, res) => {
     res.json({ message: 'User updated successfully' });
   });
 };
-
 exports.deleteUser = async (req, res) => {
   try {
     const id = req.params.id;

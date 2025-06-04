@@ -46,6 +46,7 @@
             <th>Reg_no</th>
             <th>Department</th>
             <th>Program</th>
+            <th>college</th>
             <th>year</th>
             <th>Role</th>
             <th>Gender</th>
@@ -53,7 +54,36 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="userTableBody"></tbody>
+
+<tbody id="userTableBody">
+  <% users.forEach(user => { %>
+    <tr>
+      <td>
+        <% if (user.photo) { %>
+          <img src="/uploads/<%= user.photo %>" width="50" height="50" />
+        <% } else { %>
+          <span>No photo</span>
+        <% } %>
+      </td>
+      <td><%= user.name %></td>
+      <td><%= user.reg_no %></td>
+      <td><%= user.department %></td>
+      <td><%= user.program %></td>
+      <td><%= user.college %></td>
+      <td><%= user.year %></td>
+      <td><%= user.role %></td>
+      <td><%= user.gender %></td>
+      <td><%= user.phone_no %></td>
+      <td>
+        <button class="btn btn-sm btn-info" onclick="viewUser('<%= user.id %>')">View</button>
+        <button class="btn btn-sm btn-warning" onclick="openEditModal('<%= user.id %>')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteUser('<%= user.id %>')">Delete</button>
+      </td>
+    </tr>
+  <% }); %>
+</tbody>
+
+
       </table>
     </div>
   </div>
@@ -73,6 +103,7 @@
     <input type="text" class="form-control mb-2" placeholder="Reg_no" id="addReg_no" name="reg_no" required />
     <input type="text" class="form-control mb-2" placeholder="Department" id="addDepartment" name="department" required />
     <input type="text" class="form-control mb-2" placeholder="Program" id="addProgram" name="program" required />
+    <input type="text" class="form-control mb-2" placeholder="College" id="addCollege" name="college" required />
     <input type="text" class="form-control mb-2" placeholder="Year" id="addYear" name="year" required />
     <input type="text" class="form-control mb-2" placeholder="Role" id="addRole" name="role" required />
     <input type="text" class="form-control mb-2" placeholder="Gender" id="addGender" name="gender" required />
@@ -103,6 +134,7 @@
           <input type="text" class="form-control mb-2" placeholder="Reg_no" id="editReg_no" required />
           <input type="text" class="form-control mb-2" placeholder="Department" id="editDepartment" required />
           <input type="text" class="form-control mb-2" placeholder="Program" id="editProgram" required />
+          <input type="text" class="form-control mb-2" placeholder="College" id="editCollege" required />
           <input type="text" class="form-control mb-2" placeholder="Year" id="editYear" required />
           <input type="text" class="form-control mb-2" placeholder="Role" id="editRole" required />
           <input type="text" class="form-control mb-2" placeholder="Gender" id="editGender" required />
@@ -131,6 +163,7 @@
         <p id="viewReg_no"></p>
         <p id="viewDepartment"></p>
         <p id="viewProgram"></p>
+        <p id="viewCollege"></p>
         <p id="viewYear"></p>
         <p id="viewGender"></p>
         <p id="viewPhone_no"></p>
@@ -142,6 +175,7 @@
 </div>
 
 <script>
+  
   const users = [];
 
 document.getElementById('addUserForm').addEventListener('submit', function (e) {
@@ -149,7 +183,6 @@ document.getElementById('addUserForm').addEventListener('submit', function (e) {
   const form = e.target;
   const formData = new FormData(form);
 
-  // Ensure backend sends JSON instead of redirecting
   formData.append('toJson', 'true');
 
   fetch('/admin/add-user', {
@@ -162,24 +195,29 @@ document.getElementById('addUserForm').addEventListener('submit', function (e) {
       alert('Error: ' + data.error);
     } else {
       alert('User added successfully');
-      const photo = formData.get("photo");
-      const photoUrl = photo ? URL.createObjectURL(photo) : '';
-
-      users.push({
-        name: formData.get("name"),
-        reg_no: formData.get("reg_no"),
-        department: formData.get("department"),
-        program: formData.get("program"),
-        year: formData.get("year"),
-        role: formData.get("role"),
-        gender: formData.get("gender"),
-        phone_no: formData.get("phone_no"),
-        photo: photoUrl
-      });
-
-      renderUsers();
       form.reset();
       bootstrap.Modal.getInstance(document.getElementById("addUserModal")).hide();
+
+      // After adding user, fetch all users fresh from the server
+      fetch('/admin/view-users')
+        .then(res => res.json())
+        .then(usersData => {
+          if (Array.isArray(usersData)) {
+            users.length = 0;  // clear current users array
+            usersData.forEach(user => {
+              // Fix photo path for each user
+              user.photo = user.photo ? user.photo.replace(/^\/?uploads\/?/, '') : '';
+            });
+            users.push(...usersData);
+            renderUsers();
+          } else {
+            alert('Failed to load updated users list');
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching users:', err);
+          alert('Error fetching updated users');
+        });
     }
   })
   .catch(err => {
@@ -188,30 +226,66 @@ document.getElementById('addUserForm').addEventListener('submit', function (e) {
   });
 });
 
-  function renderUsers() {
-    const tbody = document.getElementById("userTableBody");
-    tbody.innerHTML = "";
-    users.forEach((user, index) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td><img src="${user.photo || 'https://via.placeholder.com/60'}" class="user-photo" /></td>
-        <td>${user.name}</td>
-        <td>${user.reg_no}</td>
-        <td>${user.department}</td>
-        <td>${user.program}</td>
-        <td>${user.year}</td>
-        <td>${user.role}</td>
-        <td>${user.gender}</td>
-        <td>${user.phone_no}</td>
-        <td>
-          <button class="btn btn-sm btn-info text-white" onclick="viewUser(${index})">View</button>
-          <button class="btn btn-sm btn-warning" onclick="openEditModal(${index})">Edit</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteUser(${index})">Delete</button>
-        </td>
-      `;
-      tbody.appendChild(row);
+
+window.addEventListener('DOMContentLoaded', () => {
+  fetch('/admin/view-users')
+    .then(res => res.json())
+    .then(data => {
+
+      console.log('Fetched users:', data);
+      if (Array.isArray(data)) {
+        users.length = 0; // clear array if needed
+        data.forEach(user => {
+          // Prepend /uploads/ if photo exists
+    user.photo = user.photo ? user.photo : 'https://via.placeholder.com/60';
+        });
+        users.push(...data);
+        renderUsers();
+      } else {
+        console.error('Unexpected response:', data);
+        alert('Failed to load users');
+      }
+    })
+    .catch(err => {
+      console.error('Fetch error:', err);
+      alert('Error fetching users');
     });
-  }
+});
+
+
+  function renderUsers() {
+  const tbody = document.getElementById("userTableBody");
+  tbody.innerHTML = "";
+
+  users.forEach((user, index) => {
+const photoUrl = user.photo
+  ? `/uploads/books/${user.photo}`
+  : 'https://via.placeholder.com/60';
+
+
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td><img src="${photoUrl}" class="user-photo" /></td>
+      <td>${user.name}</td>
+      <td>${user.reg_no}</td>
+      <td>${user.department}</td>
+      <td>${user.program}</td>
+      <td>${user.college}</td>
+      <td>${user.year}</td>
+      <td>${user.role}</td>
+      <td>${user.gender}</td>
+      <td>${user.phone_no}</td>
+      <td>
+        <button class="btn btn-sm btn-warning" onclick="openEditModal(${index})">Edit</button>
+        <button class="btn btn-sm btn-info text-white" onclick="viewUser(${index})">View</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteUser(${index})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
 
   function openEditModal(index) {
     const user = users[index];
@@ -220,6 +294,7 @@ document.getElementById('addUserForm').addEventListener('submit', function (e) {
     document.getElementById("editReg_no").value = user.reg_no;
     document.getElementById("editDepartment").value = user.department;
     document.getElementById("editProgram").value = user.program;
+    document.getElementById("editCollege").value = user.collage;
     document.getElementById("editYear").value = user.year;
     document.getElementById("editRole").value = user.role;
     document.getElementById("editGender").value = user.gender;
@@ -235,6 +310,7 @@ document.getElementById('addUserForm').addEventListener('submit', function (e) {
     const reg_no = document.getElementById("editReg_no").value;
     const department = document.getElementById("editDepartment").value;
     const program = document.getElementById("editProgram").value;
+    const collage = document.getElementById("editCollege").value;
     const year = document.getElementById("editYear").value;
     const role = document.getElementById("editRole").value;
     const gender = document.getElementById("editGender").value;
@@ -246,6 +322,7 @@ document.getElementById('addUserForm').addEventListener('submit', function (e) {
       reg_no,
       department,
       program,
+      college,
       year,
       role,
       gender,
@@ -275,6 +352,7 @@ document.getElementById('addUserForm').addEventListener('submit', function (e) {
     document.getElementById("viewReg_no").textContent = `Reg No: ${user.reg_no}`;
     document.getElementById("viewDepartment").textContent = `Department: ${user.department}`;
     document.getElementById("viewProgram").textContent = `Program: ${user.program}`;
+    document.getElementById("viewCollege").textContent = `College: ${user.collage}`;
     document.getElementById("viewYear").textContent = `Year: ${user.year}`;
     document.getElementById("viewGender").textContent = `Gender: ${user.gender}`;
     document.getElementById("viewPhone_no").textContent = `Phone: ${user.phone_no}`;
@@ -284,6 +362,8 @@ document.getElementById('addUserForm').addEventListener('submit', function (e) {
 
   renderUsers();
 </script>
+
+
 
 
 
