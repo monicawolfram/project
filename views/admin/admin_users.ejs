@@ -393,7 +393,12 @@ document.getElementById("editUserForm").addEventListener("submit", async functio
 
   function viewUser(index) {
     const user = users[index];
-    document.getElementById("viewPhoto").src = user.photo || 'https://via.placeholder.com/60';
+   const photoUrl = user.photo
+  ? `/uploads/books/${user.photo}`
+  : 'https://via.placeholder.com/60';
+
+document.getElementById("viewPhoto").src = photoUrl;
+
     document.getElementById("viewName").textContent = user.name;
     document.getElementById("viewReg_no").textContent = `Reg No: ${user.reg_no}`;
     document.getElementById("viewDepartment").textContent = `Department: ${user.department}`;
