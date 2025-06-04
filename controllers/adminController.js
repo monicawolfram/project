@@ -111,26 +111,53 @@ exports.addUser = async (req, res) => {
     res.status(500).json({ error: 'Something went wrong while saving the user. Please try again later.' });
   }
 };
-exports.updateUser = (req, res) => {
-  if (!req.body) {
-    return res.status(400).json({ error: 'Missing request body' });
-  }
+exports.updateUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const {
+      name,
+      reg_no,
+      department,
+      program,
+      college,
+      year,
+      role,
+      gender,
+      phone_no
+    } = req.body;
 
-  const { name, reg_no, department, program, college, year, role, gender, phone_no } = req.body;
-  const photo = req.file ? `/uploads/${req.file.filename}` : null;
-  const id = req.params.id;
+    const photoFilename = req.file ? req.file.filename : null;
 
-  const sql = `UPDATE users SET name = ?, reg_no = ?, department = ?, program = ?, college = ?, year = ?, role = ?, gender = ?, phone_no = ?${photo ? ', photo = ?' : ''} WHERE id = ?`;
+    if (!name || !reg_no || !department || !program || !college || !year || !role || !gender || !phone_no) {
+      return res.status(400).json({ error: 'Missing required user fields' });
+    }
 
-  const params = [name, reg_no, department, program, college, year, role, gender, phone_no];
-  if (photo) params.push(photo);
-  params.push(id);
+    let sql = `
+      UPDATE users SET 
+        name = ?, reg_no = ?, department = ?, program = ?, college = ?, 
+        year = ?, role = ?, gender = ?, phone_no = ?
+        ${photoFilename ? ', photo = ?' : ''}
+      WHERE id = ?
+    `;
 
-  db.query(sql, params, (err) => {
-    if (err) return res.status(500).json({ error: err.message });
+    const values = photoFilename
+      ? [name, reg_no, department, program, college, year, role, gender, phone_no, photoFilename, userId]
+      : [name, reg_no, department, program, college, year, role, gender, phone_no, userId];
+
+    console.log('📝 Update values:', values);
+
+    await db.execute(sql, values); // use Promise-based pool
+
     res.json({ message: 'User updated successfully' });
-  });
+
+  } catch (err) {
+    console.error('❌ Update Error:', err);
+    res.status(500).json({ error: 'Something went wrong while updating the user. Please try again later.' });
+  }
 };
+
+
+
 exports.deleteUser = async (req, res) => {
   try {
     const id = req.params.id;

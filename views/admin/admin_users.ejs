@@ -144,7 +144,15 @@
           <input type="text" class="form-control mb-2" placeholder="Program" id="editProgram" required />
           <input type="text" class="form-control mb-2" placeholder="College" id="editCollege" required />
           <input type="text" class="form-control mb-2" placeholder="Year" id="editYear" required />
-          <input type="text" class="form-control mb-2" placeholder="Role" id="editRole" required />
+          <select class="form-control mb-2" id="editRole" required>
+            <option value="">Role</option>
+            <option value="STUDENT">STUDENT</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="LIBRARIAN">LIBRARIAN</option>
+            <option value="STAFF">STAFF</option>
+            <option value="USER">USER</option>
+            </select>
+
           <input type="text" class="form-control mb-2" placeholder="Gender" id="editGender" required />
           <input type="text" class="form-control mb-2" placeholder="Phone_no" id="editPhone_no" required />
           <input type="file" class="form-control" id="editPhoto" />
@@ -187,7 +195,9 @@
   const users = [];
 
 document.getElementById('addUserForm').addEventListener('submit', function (e) {
+  console.log("Edit form submitted"); 
   e.preventDefault();
+  
   const form = e.target;
   const formData = new FormData(form);
 
@@ -294,57 +304,85 @@ const photoUrl = user.photo
   });
 }
 
+function openEditModal(index) {
+  const user = users[index];
+  document.getElementById("editIndex").value = index;
+  document.getElementById("editName").value = user.name;
+  document.getElementById("editReg_no").value = user.reg_no;
+  document.getElementById("editDepartment").value = user.department;
+  document.getElementById("editProgram").value = user.program;
+  document.getElementById("editCollege").value = user.college; 
+  document.getElementById("editYear").value = user.year;
+  document.getElementById("editRole").value = user.role;
+  document.getElementById("editGender").value = user.gender;
+  document.getElementById("editPhone_no").value = user.phone_no;
+  document.getElementById("editPhoto").value = "";
 
-  function openEditModal(index) {
-    const user = users[index];
-    document.getElementById("editIndex").value = index;
-    document.getElementById("editName").value = user.name;
-    document.getElementById("editReg_no").value = user.reg_no;
-    document.getElementById("editDepartment").value = user.department;
-    document.getElementById("editProgram").value = user.program;
-    document.getElementById("editCollege").value = user.collage;
-    document.getElementById("editYear").value = user.year;
-    document.getElementById("editRole").value = user.role;
-    document.getElementById("editGender").value = user.gender;
-    document.getElementById("editPhone_no").value = user.phone_no;
-    document.getElementById("editPhoto").value = "";
-    new bootstrap.Modal(document.getElementById("editUserModal")).show();
+  new bootstrap.Modal(document.getElementById("editUserModal")).show();
+}
+
+document.getElementById("editUserForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const index = document.getElementById("editIndex").value;
+  const user = users[index];
+  if (!user) return alert("User not found.");
+
+  const id = user.id;
+
+  const formData = new FormData();
+  formData.append("name", document.getElementById("editName").value);
+  formData.append("reg_no", document.getElementById("editReg_no").value);
+  formData.append("department", document.getElementById("editDepartment").value);
+  formData.append("program", document.getElementById("editProgram").value);
+  formData.append("college", document.getElementById("editCollege").value);
+  formData.append("year", document.getElementById("editYear").value);
+  formData.append("role", document.getElementById("editRole").value);
+  formData.append("gender", document.getElementById("editGender").value);
+  formData.append("phone_no", document.getElementById("editPhone_no").value);
+
+  const photoInput = document.getElementById("editPhoto");
+  if (photoInput.files.length > 0) {
+    formData.append("photo", photoInput.files[0]);
   }
 
-  document.getElementById("editUserForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const index = document.getElementById("editIndex").value;
-    const name = document.getElementById("editName").value;
-    const reg_no = document.getElementById("editReg_no").value;
-    const department = document.getElementById("editDepartment").value;
-    const program = document.getElementById("editProgram").value;
-    const collage = document.getElementById("editCollege").value;
-    const year = document.getElementById("editYear").value;
-    const role = document.getElementById("editRole").value;
-    const gender = document.getElementById("editGender").value;
-    const phone_no = document.getElementById("editPhone_no").value;
-    const photoInput = document.getElementById("editPhoto");
+  try {
+    const response = await fetch(`/admin/update-user/${id}`, {
+      method: "PUT",
+      body: formData
+    });
 
-    users[index] = {
-      name,
-      reg_no,
-      department,
-      program,
-      college,
-      year,
-      role,
-      gender,
-      phone_no,
-      photo: users[index].photo
-    };
+    const data = await response.json();
 
-    if (photoInput.files[0]) {
-      users[index].photo = URL.createObjectURL(photoInput.files[0]);
+    if (data.error) {
+      alert('Error: ' + data.error);
+    } else {
+      alert('User updated successfully');
+      form.reset();
+      bootstrap.Modal.getInstance(document.getElementById("editUserModal")).hide();
+
+      // Refresh user list from DB
+      const res = await fetch('/admin/view-users');
+      const usersData = await res.json();
+
+      if (Array.isArray(usersData)) {
+        users.length = 0;
+        usersData.forEach(user => {
+          user.photo = user.photo ? user.photo.replace(/^\/?uploads\/?/, '') : '';
+        });
+        users.push(...usersData);
+        renderUsers();
+      } else {
+        alert('Failed to load updated users list');
+      }
     }
+  } catch (err) {
+    console.error('Error during update:', err);
+    alert('An error occurred while updating the user');
+  }
+});
 
-    renderUsers();
-    bootstrap.Modal.getInstance(document.getElementById("editUserModal")).hide();
-  });
 
   function deleteUser(index) {
     if (confirm("Are you sure you want to delete this user?")) {
