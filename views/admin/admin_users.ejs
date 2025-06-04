@@ -105,7 +105,15 @@
     <input type="text" class="form-control mb-2" placeholder="Program" id="addProgram" name="program" required />
     <input type="text" class="form-control mb-2" placeholder="College" id="addCollege" name="college" required />
     <input type="text" class="form-control mb-2" placeholder="Year" id="addYear" name="year" required />
-    <input type="text" class="form-control mb-2" placeholder="Role" id="addRole" name="role" required />
+    <select class="form-control mb-2" id="addRole" name="role" required>
+  <option value=""> Role</option>
+  <option value="STUDENT">STUDENT</option>
+  <option value="ADMIN">ADMIN</option>
+  <option value="LIBRARIAN">LIBRARIAN</option>
+  <option value="STAFF">STAFF</option>
+  <option value="USER">USER</option>
+</select>
+
     <input type="text" class="form-control mb-2" placeholder="Gender" id="addGender" name="gender" required />
     <input type="text" class="form-control mb-2" placeholder="Phone_no" id="addPhone_no" name="phone_no" required />
     <input type="file" class="form-control" id="addPhoto" name="photo" />
