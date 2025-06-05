@@ -53,7 +53,6 @@
           <th>Check-In</th>
           <th>Check-Out</th>
           <th>Attachments</th>
-          <th>Admin Actions</th>
         </tr>
         </thead>
         <tbody id="librarianTable"></tbody>
@@ -61,19 +60,7 @@
     </div>
   </div>
 
-  <!-- Messages Section -->
-  <div class="card mt-4">
-    <div class="card-header bg-info text-white">
-      <strong>Librarian Messages</strong>
-    </div>
-    <div class="card-body">
-      <label for="librarianSelect" class="form-label">Select Librarian:</label>
-      <select class="form-select mb-3" id="librarianSelect" onchange="renderMessages()"></select>
-      <ul class="list-group" id="messageList"></ul>
-    </div>
-  </div>
-</div>
-
+ 
 <!-- Comment Modal -->
 <div class="modal fade" id="commentModal" tabindex="-1">
   <div class="modal-dialog">
@@ -112,108 +99,66 @@
 
 <!-- JavaScript -->
 <script>
-  let currentIndex = -1;
+ 
+  
+fetch('http://localhost:3000/librarian/librarians')
+  .then(res => res.json())
+  .then(data => {
+    librarians = data;
+    renderTable();
+  });
+let librarians = []; // global to hold data
+let currentIndex = -1;
 
-  const librarians = [
-    {
-      name: "James M.",
-      email: "james@sjcet.ac.ke",
-      role: "Senior Librarian",
-      task: "Organized journals & responded to queries",
-      checkin: "08:15 AM",
-      checkout: "04:30 PM",
-      attachments: ["journal_report.pdf"],
-      comment: "Well done",
-      status: "Pending"
-    },
-    {
-      name: "Agnes O.",
-      email: "agnes@sjcet.ac.ke",
-      role: "Assistant Librarian",
-      task: "Helped students access eBooks",
-      checkin: "09:00 AM",
-      checkout: "05:00 PM",
-      attachments: [],
-      comment: "",
-      status: "Pending"
-    }
-  ];
+function renderTable() {
+  const tbody = document.getElementById('librarianTable');
+  tbody.innerHTML = ''; // clear previous rows
 
-  const adminMessages = [
-    { to: "James M.", message: "Meeting at 3 PM today.", date: "2025-04-16" },
-    { to: "James M.", message: "Submit inventory update report.", date: "2025-04-17" },
-    { to: "Agnes O.", message: "Update the overdue list by end of day.", date: "2025-04-16" }
-  ];
-
-  function renderTable() {
-    const tbody = document.getElementById("librarianTable");
-    tbody.innerHTML = "";
-
-    librarians.forEach((lib, index) => {
-      const attachments = lib.attachments.map((att, i) => `
-        <div>
-          <span class="attachment-link">${att}</span>
-          <div class="attachment-controls text-muted">
-            <a href="remove.ejs" onclick="removeAttachment(${index}, ${i})">Remove</a>
-            |
-            <a href="uodate.ejs" onclick="updateAttachment(${index}, ${i})">Update</a>
+  librarians.forEach((librarian, index) => {
+    // Prepare attachments HTML
+    const attachmentsHtml = librarian.attachments && librarian.attachments.length > 0
+      ? librarian.attachments.map((att, i) => `
+          <div class="d-flex justify-content-between attachment-controls" style="max-width: 200px;">
+            <a href="#" class="attachment-link">${att.filename}</a>
+            <div>
+              <button class="btn btn-sm btn-link text-danger" onclick="removeAttachment(${index}, ${i})" title="Remove attachment">
+                <i class="fa fa-trash"></i>
+              </button>
+              <button class="btn btn-sm btn-link text-primary" onclick="updateAttachment(${index}, ${i})" title="Rename attachment">
+                <i class="fa fa-edit"></i>
+              </button>
+            </div>
           </div>
-        </div>
-      `).join("");
+        `).join('')
+      : '<em>No attachments</em>';
 
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${lib.name}</td>
-        <td>${lib.email}</td>
-        <td>${lib.role}</td>
-        <td>${lib.task}</td>
-        <td>${lib.checkin}</td>
-        <td>${lib.checkout}</td>
-        <td>
-          ${attachments}
-          <button class="btn btn-sm btn-outline-primary mt-2" onclick="openAttachmentModal(${index})">Add</button>
-        </td>
-        <td>
-          <button class="btn btn-sm btn-success btn-action" onclick="approveTask(${index})">Approve</button>
-          <button class="btn btn-sm btn-secondary btn-action" onclick="rejectTask(${index})">Reject</button>
-          <button class="btn btn-sm btn-warning btn-action" onclick="editTask(${index})">Update</button>
-          <button class="btn btn-sm btn-danger btn-action" onclick="deleteTask(${index})">Delete</button>
-          <button class="btn btn-sm btn-primary btn-action" onclick="openCommentModal(${index})">Comment</button>
-        </td>
-      `;
-      tbody.appendChild(row);
-    });
+    const row = document.createElement('tr');
 
-    // Populate dropdown
-    const select = document.getElementById("librarianSelect");
-    select.innerHTML = "";
-    librarians.forEach(lib => {
-      const opt = document.createElement("option");
-      opt.value = lib.name;
-      opt.textContent = lib.name;
-      select.appendChild(opt);
-    });
-    renderMessages();
-  }
+    row.innerHTML = `
+      <td>${librarian.name || ''}</td>
+      <td>${librarian.email || ''}</td>
+      <td>${librarian.role || ''}</td>
+      <td>
+        ${librarian.task || ''}
+        <button class="btn btn-sm btn-outline-secondary btn-action" onclick="editTask(${index})" title="Edit task">
+          <i class="fa fa-edit"></i>
+        </button>
+      </td>
+      <td>${librarian.checkin || ''}</td>
+      <td>${librarian.checkout || ''}</td>
+      <td>
+        ${attachmentsHtml}
+        <button class="btn btn-sm btn-primary btn-action" onclick="openAttachmentModal(${index})">
+          <i class="fa fa-plus"></i> Add
+        </button>
+      </td>
+    `;
 
-  function renderMessages() {
-    const selected = document.getElementById("librarianSelect").value;
-    const list = document.getElementById("messageList");
-    list.innerHTML = "";
+    tbody.appendChild(row);
+  });
+}
 
-    const filtered = adminMessages.filter(msg => msg.to === selected);
-    if (filtered.length === 0) {
-      list.innerHTML = `<li class="list-group-item text-muted">No messages found.</li>`;
-      return;
-    }
-
-    filtered.forEach(msg => {
-      const li = document.createElement("li");
-      li.classList.add("list-group-item");
-      li.innerHTML = `<strong>Date:</strong> ${msg.date}<br><strong>Message:</strong> ${msg.message}`;
-      list.appendChild(li);
-    });
-  }
+ 
 
   function openAttachmentModal(index) {
     currentIndex = index;
@@ -272,13 +217,38 @@
     renderTable();
   }
 
-  function editTask(index) {
-    const newTask = prompt("Update today's task:", librarians[index].task);
-    if (newTask) {
-      librarians[index].task = newTask;
-      renderTable();
-    }
+ function editTask(index) {
+  const newTask = prompt("Update today's task:", librarians[index].task);
+  if (newTask) {
+    fetch(`http://localhost:3000/librarian/task/${librarians[index].id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ task: newTask })
+    })
+    .then(response => response.json())
+    .then(result => {
+      if (result.message) {
+        alert("Task updated successfully.");
+        // Option 2: Fetch latest data and re-render
+        fetch('http://localhost:3000/librarian/librarians')
+          .then(res => res.json())
+          .then(data => {
+            librarians = data;
+            renderTable();
+          });
+      } else {
+        alert("Failed to update task.");
+      }
+    })
+    .catch(err => {
+      console.error("Error updating task:", err);
+      alert("An error occurred while updating the task.");
+    });
   }
+}
+
 
   function deleteTask(index) {
     if (confirm("Delete this task completely?")) {

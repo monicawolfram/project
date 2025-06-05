@@ -203,9 +203,6 @@ exports.addBook = async (req, res) => {
     }
   }
 };
-
-
-
 exports.searchBooks = async (req, res) => {
     const q = req.query.q;
 
@@ -220,7 +217,6 @@ exports.searchBooks = async (req, res) => {
        res.status(500).json({ success: false, message: "Server error" });
     }
 };
-
 exports.removeBook = async (req, res) => {
    const bookId = req.params.id;
     try {
@@ -287,9 +283,6 @@ exports.getDepartmentsCatalogs = async (req, res) => {
   }
 };
 
-
-
-
 exports.deleteBook = async (req, res) => {
     const bookId = req.params.id;
     try {
@@ -334,7 +327,6 @@ exports.getDeletedBooks = async (req, res) => {
   }
 };
 
-
 exports.updateBook = [
   validateBook,
   param('id').isInt().withMessage('ID must be an integer'),
@@ -377,3 +369,105 @@ exports.deleteBook = [
 exports.librarian_interface = (req, res) => {
  res.render('librarian/librarian_interface');
 }; 
+
+
+
+exports.getAllLibrarians = async (req, res) => {
+  const sql = `
+    SELECT 
+      l.id AS librarian_id, l.*, 
+      u.name, u.email, u.role,
+      GROUP_CONCAT(a.id, ':', a.filename) AS attachments_raw
+    FROM librarians l
+    JOIN users u ON l.user_id = u.id
+    LEFT JOIN attachments a ON l.id = a.librarian_id
+    GROUP BY l.id
+  `;
+
+  try {
+    const [results] = await db.query(sql); // use await instead of callback
+
+    results.forEach(l => {
+      l.attachments = [];
+      if (l.attachments_raw) {
+        const files = l.attachments_raw.split(',');
+        l.attachments = files.map(f => {
+          const [id, filename] = f.split(':');
+          return { id: Number(id), filename };
+        });
+      }
+      delete l.attachments_raw;
+    });
+
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+exports.updateTask = (req, res) => {
+  const { task } = req.body;
+  const { id } = req.params;
+
+  if (!task) {
+    return res.status(400).json({ error: 'Task is required' });
+  }
+
+  db.query('UPDATE librarians SET task = ? WHERE id = ?', [task, id], (err, result) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json({ message: 'Task updated.' });
+  });
+};
+
+
+
+
+exports.updateStatus = (req, res) => {
+  const { status } = req.body;
+  const { id } = req.params;
+  db.query('UPDATE librarians SET status = ? WHERE id = ?', [status, id], (err) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json({ message: 'Status updated.' });
+  });
+};
+
+exports.updateComment = (req, res) => {
+  const { comment } = req.body;
+  const { id } = req.params;
+  db.query('UPDATE librarians SET comment = ? WHERE id = ?', [comment, id], (err) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json({ message: 'Comment saved.' });
+  });
+};
+
+exports.addAttachment = (req, res) => {
+  const { filename } = req.body; // <-- this needs req.body to be defined!
+  const { id } = req.params;
+
+  db.query(
+    'INSERT INTO attachments (librarian_id, filename) VALUES (?, ?)',
+    [id, filename],
+    (err) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json({ message: 'Attachment added.' });
+    }
+  );
+};
+
+exports.removeAttachment = (req, res) => {
+  const { attachmentId } = req.params;
+  db.query('DELETE FROM attachments WHERE id = ?', [attachmentId], (err) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json({ message: 'Attachment deleted.' });
+  });
+};
+
+exports.renameAttachment = (req, res) => {
+  const { attachmentId } = req.params;
+  const { filename } = req.body;
+  db.query('UPDATE attachments SET filename = ? WHERE id = ?', [filename, attachmentId], (err) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json({ message: 'Attachment renamed.' });
+  });
+};

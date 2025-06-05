@@ -27,6 +27,29 @@ router.delete('/remove/book/:id', authenticateLibrarian, librarianController.rem
 router.get('/borrowed/books', authenticateLibrarian, librarianController.getBorrowedBooks);
 router.get('/departments/catalogs', librarianController.getDepartmentsCatalogs)
 
+router.get('/librarians', librarianController.getAllLibrarians);
+
+router.put('/task/:id', librarianController.updateTask);
+
+// APPROVE/REJECT task
+//router.put('/status/:id', librarianController.updateStatus);
+
+// ADD or UPDATE comment
+//router.put('/comment/:id', librarianController.updateComment);
+
+// ATTACHMENTS
+router.post('/attachment/:id', librarianController.addAttachment);
+router.delete('/attachment/:id/:attachmentId', librarianController.removeAttachment);
+router.put('/attachment/:id/:attachmentId', librarianController.renameAttachment);
+
+
+
+
+
+
+
+
+
 
 
 // This will serve interface.html when visiting /api/librarian/
