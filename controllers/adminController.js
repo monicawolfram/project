@@ -169,16 +169,17 @@ exports.deleteUser = async (req, res) => {
 };
 exports.getLibrarianActivities = async (req, res) => {
   try {
-    const [activities] = await db.execute(`
+    const [rows] = await db.execute(`
       SELECT la.id, u.name, la.action, la.details, la.timestamp
       FROM librarian_activities la
-      JOIN users u ON la.user_id = u.id
+      LEFT JOIN users u ON la.user_id = u.id
       ORDER BY la.timestamp DESC
     `);
-
-    res.json(activities);
+    res.json(rows);
   } catch (err) {
-    console.error('❌ Error fetching librarian activities:', err);
-    res.status(500).json({ error: 'Failed to load librarian activities' });
+    console.error('❌ Failed to fetch activities:', err.message);
+    res.status(500).json({ error: 'Failed to fetch librarian activities.' });
   }
 };
+
+

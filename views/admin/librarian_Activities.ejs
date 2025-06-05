@@ -53,7 +53,7 @@
             <th>Options</th>
           </tr>
         </thead>
-        <tbody id="activityTable">
+       <tbody id="activityTable">
           <!-- Rows injected via JS -->
         </tbody>
       </table>
@@ -79,71 +79,80 @@
   </div>
 
   <script>
-    const activities = [
-      { id: 1, name: "John Doe", action: "ADDED", details: "Added new book: 'JavaScript Basics'", timestamp: "2025-06-04 10:15" },
-      { id: 2, name: "Alice Smith", action: "UPDATED", details: "Updated book info: 'CSS Mastery'", timestamp: "2025-06-04 10:20" },
-      { id: 3, name: "John Doe", action: "DELETED", details: "Deleted book: 'Old HTML Guide'", timestamp: "2025-06-04 10:30" },
-    ];
+  let activities = [];
 
-    function renderTable(data) {
-      const table = document.getElementById("activityTable");
-      table.innerHTML = "";
-      data.forEach((act, idx) => {
-        table.innerHTML += `
-          <tr>
-            <td>${idx + 1}</td>
-            <td>${act.name}</td>
-            <td><span class="badge bg-${getActionColor(act.action)} badge-action">${act.action}</span></td>
-            <td>${act.details.slice(0, 40)}...</td>
-            <td>${act.timestamp}</td>
-            <td>
-              <button class="btn btn-sm btn-primary" onclick="viewDetails(${act.id})">View</button>
-            </td>
-          </tr>
-        `;
-      });
+  async function loadActivities() {
+    try {
+      const res = await fetch('/admin/librarian-activities'); // Adjust path as needed
+      if (!res.ok) throw new Error('Failed to fetch data');
+      activities = await res.json();
+      renderTable(activities);
+    } catch (err) {
+      console.error('❌ Error loading activities:', err);
+      document.getElementById("activityTable").innerHTML = `<tr><td colspan="6" class="text-danger">Failed to load activities</td></tr>`;
     }
+  }
 
-    function getActionColor(action) {
-      return {
-        ADDED: 'success',
-        UPDATED: 'warning',
-        DELETED: 'danger'
-      }[action] || 'secondary';
-    }
+  function renderTable(data) {
+    const table = document.getElementById("activityTable");
+    table.innerHTML = "";
+    data.forEach((act, idx) => {
+      table.innerHTML += `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${act.name}</td>
+          <td><span class="badge bg-${getActionColor(act.action)}">${act.action}</span></td>
+          <td>${act.details.slice(0, 40)}...</td>
+          <td>${act.timestamp}</td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="viewDetails(${act.id})">View</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
 
-    function viewDetails(id) {
-      const act = activities.find(a => a.id === id);
-      if (!act) return;
+  function getActionColor(action) {
+    return {
+      ADDED: 'success',
+      UPDATED: 'warning',
+      DELETED: 'danger'
+    }[action] || 'secondary';
+  }
 
-      document.getElementById("viewLibrarian").textContent = act.name;
-      document.getElementById("viewAction").textContent = act.action;
-      document.getElementById("viewAction").className = `badge bg-${getActionColor(act.action)}`;
-      document.getElementById("viewDetails").textContent = act.details;
-      document.getElementById("viewTimestamp").textContent = act.timestamp;
+  function viewDetails(id) {
+    const act = activities.find(a => a.id === id);
+    if (!act) return;
 
-      new bootstrap.Modal(document.getElementById("viewModal")).show();
-    }
+    document.getElementById("viewLibrarian").textContent = act.name;
+    document.getElementById("viewAction").textContent = act.action;
+    document.getElementById("viewAction").className = `badge bg-${getActionColor(act.action)}`;
+    document.getElementById("viewDetails").textContent = act.details;
+    document.getElementById("viewTimestamp").textContent = act.timestamp;
 
-    // Filters
-    document.getElementById("searchInput").addEventListener("input", filterData);
-    document.getElementById("filterAction").addEventListener("change", filterData);
+    new bootstrap.Modal(document.getElementById("viewModal")).show();
+  }
 
-    function filterData() {
-      const search = document.getElementById("searchInput").value.toLowerCase();
-      const filterAction = document.getElementById("filterAction").value;
+  // Filters
+  document.getElementById("searchInput").addEventListener("input", filterData);
+  document.getElementById("filterAction").addEventListener("change", filterData);
 
-      const filtered = activities.filter(a =>
-        (a.name.toLowerCase().includes(search) || a.details.toLowerCase().includes(search)) &&
-        (filterAction === "" || a.action === filterAction)
-      );
+  function filterData() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    const filterAction = document.getElementById("filterAction").value;
 
-      renderTable(filtered);
-    }
+    const filtered = activities.filter(a =>
+      (a.name.toLowerCase().includes(search) || a.details.toLowerCase().includes(search)) &&
+      (filterAction === "" || a.action === filterAction)
+    );
 
-    // Initial load
-    renderTable(activities);
-  </script>
+    renderTable(filtered);
+  }
+
+  // Initial load
+  loadActivities();
+</script>
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
