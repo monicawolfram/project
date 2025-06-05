@@ -35,9 +35,11 @@ exports.admin_itsupport = (req, res) => {
 exports.admin_massage = (req, res) => {
  res.render('admin/admin_massage');
 };
-exports.admin_librarian = (req, res) => {
- res.render('admin/admin_librarian');
+exports.librarian_Activities = (req, res) => {
+ res.render('admin/librarian_Activities');   
 };
+
+
 
 // Function to create a new user      
 exports.createUser = (req, res) => {
@@ -163,5 +165,20 @@ exports.deleteUser = async (req, res) => {
     res.json({ message: 'User deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+exports.getLibrarianActivities = async (req, res) => {
+  try {
+    const [activities] = await db.execute(`
+      SELECT la.id, u.name, la.action, la.details, la.timestamp
+      FROM librarian_activities la
+      JOIN users u ON la.user_id = u.id
+      ORDER BY la.timestamp DESC
+    `);
+
+    res.json(activities);
+  } catch (err) {
+    console.error('❌ Error fetching librarian activities:', err);
+    res.status(500).json({ error: 'Failed to load librarian activities' });
   }
 };

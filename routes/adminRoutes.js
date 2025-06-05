@@ -17,6 +17,7 @@ router.get('/view-users', adminController.getAllUsers);
 router.post('/add-user', upload.single('photo'), adminController.addUser);
 router.put('/update-user/:id', upload.single('photo'), adminController.updateUser);
 router.delete('/delete-user/:id', adminController.deleteUser);
+router.get('/librarian-activities', adminController.getLibrarianActivities);
 
 //
 router.get('/admin_account', adminController.admin_account);
@@ -25,7 +26,7 @@ router.get('/admin_resourcestatus', adminController.admin_resourcestatus);
 router.get('/admin_report', adminController.admin_report);
 router.get('/admin_itsupport', adminController.admin_itsupport);
 router.get('/admin_massage', adminController.admin_massage);
-router.get('/admin_librarian', adminController.admin_librarian);
+router.get('/librarian_Activities', adminController.librarian_Activities);
 
 
 module.exports = router;
