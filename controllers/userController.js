@@ -61,8 +61,8 @@ exports.mech = (req, res) => {
 exports.isne = (req, res) => {
  res.render('user/isne');
 };
-exports.mechatronics = (req, res) => {
- res.render('user/mechatronics');
+exports.mechactronics = (req, res) => {
+ res.render('user/mechactronics');
 };
 exports.papers = (req, res) => {
  res.render('user/papers');
