@@ -149,8 +149,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // User identifier (should be dynamic, e.g., from session or login)
-        const regNo = "23IT013"; // Hardcoded for now, replace with dynamic value
+       const regNo = localStorage.getItem('user_regNo');
+
+if (!regNo) {
+    alert("User not logged in. Redirecting to login...");
+    window.location.href = "/login.html"; // Adjust path if needed
+}
+
 
         // Function to render the payment history in the table
         function renderPaymentHistory(payments) {

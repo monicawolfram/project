@@ -6,6 +6,10 @@ router.get('/dashboard', userController.dashboard);
 router.get('/notifications', userController.getNotifications);
 router.post('/send-feedback', userController.sendFeedback);
 router.get('/fetch-user', userController.getUserByReg_no);
+router.get('/attendance/:regNo', userController.getAttendanceByMonthYear);
+router.get('/borrowed-resources/:id', userController.getBorrowedResources);
+router.post('/pay-fine', userController.payFine);
+router.get('/payments/:regNo', userController.getPaymentHistoryByRegNo);
 
 
 //

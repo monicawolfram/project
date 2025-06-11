@@ -137,11 +137,150 @@ exports.getUserByReg_no = async (req, res) => {
       role: user.role,
       Time_In: user.time_in,
       Time_Out: user.time_out,
-      image: user.image 
+      image: user.photo
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+exports.getAttendanceByMonthYear = async (req, res) => {
+  try {
+    const { regNo } = req.params;
+    const { month, year } = req.query;
+
+    if (!month || !year) {
+      return res.status(400).json({ error: 'Month and year query parameters are required' });
+    }
+
+    // 1. Fetch user info (name) by regNo
+    const [userRows] = await db.execute(
+      `SELECT name FROM users WHERE reg_no = ? LIMIT 1`,
+      [regNo]
+    );
+
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const userName = userRows[0].name;
+
+    // 2. Fetch attendance records
+    const query = `
+      SELECT DATE_FORMAT(date, '%Y-%m-%d') AS date,
+             DAYNAME(date) AS day,
+             TIME_FORMAT(time_in, '%H:%i') AS time_in,
+             TIME_FORMAT(time_out, '%H:%i') AS time_out
+      FROM attendance
+      WHERE reg_no = ?
+        AND MONTH(date) = ?
+        AND YEAR(date) = ?
+      ORDER BY date ASC
+    `;
+
+    const [rows] = await db.execute(query, [regNo, month, year]);
+
+    const attendanceMap = {};
+
+    rows.forEach(record => {
+      const { date, day, time_in, time_out } = record;
+      const dayKey = day.toLowerCase();
+
+      if (!attendanceMap[date]) {
+        attendanceMap[date] = {
+          date,
+          monday: null,
+          tuesday: null,
+          wednesday: null,
+          thursday: null,
+          friday: null
+        };
+      }
+
+      if (['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].includes(dayKey)) {
+        attendanceMap[date][dayKey] = {
+          time_in: time_in || '-',
+          time_out: time_out || '-'
+        };
+      }
+    });
+
+    const attendanceArray = Object.values(attendanceMap);
+
+    // 3. Send response with user name and attendance
+    res.json({
+      name: userName,
+      attendance: attendanceArray
+    });
+
+  } catch (error) {
+    console.error('Error fetching attendance:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+exports.getBorrowedResources = (req, res) => {
+    const userId = req.params.id;
+
+    const sql = `
+        SELECT borrower_id, borrower_name, resource_type, borrow_date, return_date, fine_amount, payment_status, receipt_method
+        FROM borrowed_resources
+        WHERE borrower_id = ?
+    `;
+
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching borrowed resources:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(results);
+    });
+};
+
+exports.payFine = (req, res) => {
+    const { borrowerID, resourceType, paymentMethod } = req.body;
+
+    const sql = `
+        UPDATE borrowed_resources 
+        SET payment_status = 'Paid', receipt_method = ?
+        WHERE borrower_id = ? AND resource_type = ?
+    `;
+
+    db.query(sql, [paymentMethod, borrowerID, resourceType], (err, result) => {
+        if (err) {
+            console.error('Error updating fine payment:', err);
+            return res.status(500).json({ error: 'Payment update failed' });
+        }
+        res.json({ success: true });
+    });
+};
+
+exports.getPaymentHistoryByRegNo = (req, res) => {
+    const regNo = req.params.regNo;
+
+    const query = `
+        SELECT 
+            users.reg_no AS studentId,
+            users.full_name AS studentName,
+            payments.payment_date AS date,
+            payments.amount,
+            payments.payment_method AS method,
+            payments.status
+        FROM payments
+        JOIN users ON payments.user_id = users.id
+        WHERE users.reg_no = ?
+        ORDER BY payments.payment_date DESC
+    `;
+
+    db.query(query, [regNo], (err, results) => {
+        if (err) {
+            console.error("Error fetching payments:", err);
+            return res.status(500).json({ error: "Database error" });
+        }
+
+        res.json(results);
+    });
+};
+
 
 

@@ -111,7 +111,7 @@
   <div class="container mt-5">
     <div class="container-box">
       <img src="/images/sjcet.png" alt="SJUCET Logo" class="logo" />
-      <h2>WELCOME TO SJUCET LIBRARY</h2>
+      <h2>WELCOME TO SJCET LIBRARY</h2>
       <i class="fa-solid fa-user fa-4x my-3"></i>
       <h4 class="mb-3">Scan Your ID to Login</h4>
       <input type="text" id="scanner" class="scanner-input" autofocus />
@@ -138,79 +138,125 @@
   
 <script>
   document.getElementById("scanner").addEventListener("keypress", function (event) {
-    if (event.key === "Enter") {
-      const reg_no = event.target.value.trim();
-      if (!reg_no) return;
+  if (event.key === "Enter") {
+    const reg_no = event.target.value.trim();
+    if (!reg_no) return;
 
-      fetch(`/user/fetch-user?reg=${reg_no}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            // Populate popup
-            document.getElementById("welcomeMsg").innerText = `WELCOME ${data.name} TO OUR LIBRARY`;
-            document.getElementById("name").innerText = data.name;
-            document.getElementById("regNo").innerText = data.reg_no;
-            document.getElementById("gender").innerText = data.gender;
-            document.getElementById("college").innerText = data.college;
-            document.getElementById("role").innerText = data.role;
-            document.getElementById("timein").innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            document.getElementById("timeOut").innerText = "Not yet logged out";
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
 
-            // Set photo
-            const userPhoto = document.getElementById("userPhoto");
-            userPhoto.src = data.image || "/images/default-user.png";
+    fetch(`/user/fetch-user?reg=${reg_no}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Populate popup
+          document.getElementById("welcomeMsg").innerText = `WELCOME ${data.name} TO OUR LIBRARY`;
+          document.getElementById("name").innerText = data.name;
+          document.getElementById("regNo").innerText = data.reg_no;
+          document.getElementById("gender").innerText = data.gender;
+          document.getElementById("college").innerText = data.college;
+          document.getElementById("role").innerText = data.role;
+          document.getElementById("timein").innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          document.getElementById("timeOut").innerText = "Not yet logged out";
 
-            // Show or hide program/department/year based on role
-            const isStudent = data.role.toUpperCase() === "STUDENT";
-            document.getElementById("programRow").style.display = isStudent ? "block" : "none";
-            document.getElementById("departmentRow").style.display = isStudent ? "block" : "none";
-            document.getElementById("yearRow").style.display = isStudent ? "block" : "none";
+          // Set photo with fallback
+          const userPhoto = document.getElementById("userPhoto");
+          userPhoto.src = data.image ? `/uploads/books/${data.image}` : "/images/default_user.png";
 
-            if (isStudent) {
-              document.getElementById("program").innerText = data.program;
-              document.getElementById("department").innerText = data.department;
-              document.getElementById("year").innerText = data.year;
-            }
+          // Show or hide program/department/year based on role
+          const isStudent = data.role.toUpperCase() === "STUDENT";
+          document.getElementById("programRow").style.display = isStudent ? "block" : "none";
+          document.getElementById("departmentRow").style.display = isStudent ? "block" : "none";
+          document.getElementById("yearRow").style.display = isStudent ? "block" : "none";
 
-            // Show popup
-            const popup = document.getElementById("userPopup");
-            popup.classList.add("active");
+          if (isStudent) {
+            document.getElementById("program").innerText = data.program;
+            document.getElementById("department").innerText = data.department;
+            document.getElementById("year").innerText = data.year;
+          }
 
-            // Log attendance
-            fetch("/api/attendance", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ reg_no: data.reg_no })
+          // Show popup
+          const popup = document.getElementById("userPopup");
+          popup.classList.add("active");
+
+          // Fetch attendance data for the user for current month/year
+          fetch(`http://localhost:3000/user/attendance/${reg_no}?month=${month}&year=${year}`)
+            .then(res => res.json())
+            .then(attendanceData => {
+              // Process attendance data (assuming latest attendance for today)
+              const today = now.toISOString().slice(0, 10); // YYYY-MM-DD
+              const todayAttendance = attendanceData.find(att => att.date === today);
+
+              // Prepare time and date info for POST attendance logging
+              const formattedDate = today;
+              const weekday = now.toLocaleDateString('en-US', { weekday: 'long' });
+              const timeNow = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+              // POST to log attendance - can be login or logout
+              fetch('/user/attendance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  reg_no: data.reg_no,
+                  date: formattedDate,
+                  day: weekday,
+                  time_in: timeNow
+                })
+              })
+                .then(res => res.json())
+                .then(response => {
+                  if (response.type === "login") {
+                    document.getElementById("timein").innerText = `${timeNow} (${formattedDate}, ${weekday})`;
+                    document.getElementById("timeOut").innerText = "Not yet logged out";
+                  } else if (response.type === "logout") {
+                    document.getElementById("timein").innerText = "Already Logged In";
+                    document.getElementById("timeOut").innerText = `${timeNow} (${formattedDate}, ${weekday})`;
+                  } else if (todayAttendance) {
+                    // If attendance exists but no new login/logout, show existing times
+                    document.getElementById("timein").innerText = todayAttendance.time_in || "Not logged in";
+                    document.getElementById("timeOut").innerText = todayAttendance.time_out || "Not yet logged out";
+                  }
+                  console.log(response.message);
+                })
+                .catch(err => {
+                  console.error("Error logging attendance:", err);
+                });
+            })
+            .catch(err => {
+              console.error("Error fetching attendance:", err);
             });
 
-            // Determine route
-            let redirectPath = "/user/home";
-            if (data.role.toUpperCase() === "ADMIN") {
-              redirectPath = "/admin/dashboard";
-            } else if (data.role.toUpperCase() === "LIBRARIAN") {
-              redirectPath = "/librarian/librarian_home";
-            }
-
-            // Redirect with fade
-            setTimeout(() => {
-              document.body.classList.add("fadeout-white");
-              setTimeout(() => {
-                window.location.href = redirectPath;
-              }, 1000);
-            }, 2000);
-
-          } else {
-            alert("User Not Found.");
+          // Determine route
+          let redirectPath = "/user/home";
+          if (data.role.toUpperCase() === "ADMIN") {
+            redirectPath = "/admin/dashboard";
+          } else if (data.role.toUpperCase() === "LIBRARIAN") {
+            redirectPath = "/librarian/librarian_home";
           }
-        })
-        .catch(error => {
-          console.error("Error fetching user data:", error);
-          alert("Server error. Please try again.");
-        });
 
-      event.target.value = "";
-    }
-  });
+          // Redirect with fade
+          setTimeout(() => {
+            document.body.classList.add("fadeout-white");
+            setTimeout(() => {
+              window.location.href = redirectPath;
+            }, 1000);
+          }, 2000);
+
+        } else {
+          alert("User Not Found.");
+        }
+      })
+      .catch(error => {
+        console.error("Error fetching user data:", error);
+        alert("Server error. Please try again.");
+      });
+
+    event.target.value = "";
+    event.target.focus();
+  }
+});
+
 </script>
 
 
