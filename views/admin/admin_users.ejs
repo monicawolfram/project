@@ -32,6 +32,11 @@
   <!-- Add User Button -->
   <div class="mb-3">
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">Add New User</button>
+    <button class="btn btn-danger" id="openDeleteUsersModalBtn">Delete All Users</button>
+    <button type="button" class="btn btn-success" onclick="openApproveUsersModal()">Approve All Pending Users</button>
+    <button class="btn btn-warning" onclick="openUpdateUsersModal()">Update All Users</button>
+    <button class="btn btn-info text-white" onclick="viewAllUsers()">View All Users</button>
+   
   </div>
 
   <!-- Users Table -->
@@ -125,6 +130,7 @@
   </div>
   <div class="modal-footer">
     <button type="submit" class="btn btn-success">Add User</button>
+    
   </div>
 </form>
 
@@ -194,6 +200,515 @@
     </div>
   </div>
 </div>
+
+<!-- Delete Users Modal -->
+<div class="modal fade" id="deleteUsersModal" tabindex="-1" aria-labelledby="deleteUsersModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteUsersModalLabel">Delete Users</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Filter Input -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <input type="text" id="deleteFilterCourse" class="form-control" placeholder="Filter by Reg. No / Year / Department" oninput="applyDeleteFilters()">
+          </div>
+          <div class="col-md-6 text-end">
+            <button class="btn btn-outline-danger" onclick="deleteAllFilteredUsers()">Delete Filtered Users</button>
+          </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th><input type="checkbox" id="selectAllDelete"></th>
+                <th>Name</th>
+                <th>Reg. No</th>
+                <th>Department</th>
+                <th>Year</th>
+              </tr>
+            </thead>
+            <tbody id="deleteUsersTableBody">
+              <!-- Users will be injected here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-danger" onclick="deleteAllFilteredUsers()">Delete Selected</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Load users into the modal when opened
+document.getElementById('openDeleteUsersModalBtn').addEventListener('click', async () => {
+  try {
+    console.log('Fetching users...');
+    const res = await fetch('/admin/view-users');
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Failed to fetch users: ${res.status} ${res.statusText} - ${text}`);
+    }
+    const users = await res.json();
+    console.log('Users fetched:', users);
+
+    const tbody = document.getElementById('deleteUsersTableBody');
+    tbody.innerHTML = '';
+
+    users.forEach(user => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="checkbox" class="deleteUserCheckbox" data-id="${user.id}"></td>
+        <td>${user.name}</td>
+        <td>${user.reg_no}</td>
+        <td>${user.department}</td>
+        <td>${user.year}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    const deleteUsersModal = new bootstrap.Modal(document.getElementById('deleteUsersModal'));
+    deleteUsersModal.show();
+
+    document.getElementById('selectAllDelete').checked = false;
+  } catch (err) {
+    alert('Failed to load users for deletion. See console for details.');
+    console.error('Error loading users:', err);
+  }
+});
+
+// Select/Deselect all checkboxes
+document.getElementById('selectAllDelete').addEventListener('change', function () {
+  const checked = this.checked;
+  document.querySelectorAll('.deleteUserCheckbox').forEach(chk => {
+    if (chk.closest('tr').style.display !== 'none') {
+      chk.checked = checked;
+    }
+  });
+});
+
+// Filter rows based on input (reg_no/year/department)
+function applyDeleteFilters() {
+  const filterText = document.getElementById('deleteFilterCourse').value.toLowerCase();
+
+  const rows = document.querySelectorAll('#deleteUsersTableBody tr');
+  rows.forEach(row => {
+    const regNo = row.children[2].textContent.toLowerCase();
+    const year = row.children[4].textContent.toLowerCase();
+    const dept = row.children[3].textContent.toLowerCase();
+
+    const match = !filterText || regNo.includes(filterText) || year.includes(filterText) || dept.includes(filterText);
+    row.style.display = match ? '' : 'none';
+  });
+
+  document.getElementById('selectAllDelete').checked = false;
+}
+
+// Delete all filtered (visible) users
+async function deleteAllFilteredUsers() {
+  try {
+    const visibleRows = Array.from(document.querySelectorAll('#deleteUsersTableBody tr'))
+      .filter(row => row.style.display !== 'none');
+
+    if (visibleRows.length === 0) {
+      alert('No users match the filter criteria to delete.');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to delete ALL (${visibleRows.length}) selected users? This action cannot be undone.`)) {
+      return;
+    }
+
+    const idsToDelete = visibleRows.map(row => {
+      const checkbox = row.querySelector('.deleteUserCheckbox');
+      return checkbox.getAttribute('data-id');
+    });
+
+    console.log('Deleting user IDs:', idsToDelete);
+
+    const res = await fetch('/admin/delete-users-bulk', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: idsToDelete })
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Delete request failed: ${res.status} ${res.statusText} - ${text}`);
+    }
+
+    const data = await res.json();
+    alert(data.message || 'Select users deleted.');
+
+    bootstrap.Modal.getInstance(document.getElementById('deleteUsersModal')).hide();
+    location.reload();
+  } catch (err) {
+    alert('Failed to delete users. See console for details.');
+    console.error('Error deleting users:', err);
+  }
+}
+
+</script>
+
+
+
+<!-- Modal for Approving Pending Users -->
+<div class="modal fade" id="approveUsersModal" tabindex="-1" aria-labelledby="approveUsersModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="approveUsersModalLabel">Pending Users</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="text" id="filterPendingUsers" class="form-control mb-3" placeholder="Filter by Name / Reg No / Department" oninput="filterPendingUsers()">
+
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped">
+            <thead class="table-light">
+              <tr>
+                <th>Name</th>
+                <th>Reg. No</th>
+                <th>Department</th>
+                <th>Year</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="pendingUsersTableBody">
+              <!-- Filled dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-success" onclick="approveAllUsers()">Approve All</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function openApproveUsersModal() {
+    try {
+      const res = await fetch('/admin/view-users');
+      if (!res.ok) throw new Error('Failed to fetch users');
+
+      const users = await res.json();
+      const tbody = document.getElementById('pendingUsersTableBody');
+      tbody.innerHTML = '';
+
+      const pendingUsers = users.filter(user => user.is_approved === 'no');
+
+      if (pendingUsers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center">No pending users found</td></tr>`;
+      } else {
+        pendingUsers.forEach(user => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${user.name}</td>
+            <td>${user.reg_no}</td>
+            <td>${user.department}</td>
+            <td>${user.year}</td>
+            <td><span class="badge bg-warning text-dark">Pending</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      const modal = new bootstrap.Modal(document.getElementById('approveUsersModal'));
+      modal.show();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to load pending users. See console.');
+    }
+  }
+
+  function filterPendingUsers() {
+    const filter = document.getElementById('filterPendingUsers').value.toLowerCase();
+    const rows = document.querySelectorAll('#pendingUsersTableBody tr');
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(filter) ? '' : 'none';
+    });
+  }
+
+  async function approveAllUsers() {
+    if (!confirm("Are you sure you want to approve all pending users?")) return;
+
+    try {
+      const res = await fetch('/admin/approve-users-bulk', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Approval failed: ${res.status} ${res.statusText} - ${text}`);
+      }
+
+      const data = await res.json();
+      alert(data.message || 'All pending users approved successfully!');
+      bootstrap.Modal.getInstance(document.getElementById('approveUsersModal')).hide();
+      location.reload();
+    } catch (err) {
+      alert('Failed to approve users. Check the console.');
+      console.error('Error:', err);
+    }
+  }
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="updateUsersModal" tabindex="-1" aria-labelledby="updateUsersModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <form id="updateAllUsersForm" onsubmit="submitUserUpdates(event)">
+      <div class="modal-content">
+        <div class="modal-header bg-warning">
+          <h5 class="modal-title" id="updateUsersModalLabel">Update All Users</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- 🔍 Filter Input -->
+          <div class="mb-3">
+            <input type="text" id="filterUpdateUsersInput" class="form-control" placeholder="Filter by Reg No" oninput="filterUpdateUsersTable()">
+          </div>
+
+          <!-- 👤 Users Table -->
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead class="table-light">
+                <tr>
+                  <th>Reg No</th>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Year</th>
+                </tr>
+              </thead>
+              <tbody id="updateUsersTableBody">
+                <!-- Filled dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning">Submit Updates</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let cachedUsers = []; // Used for filtering
+
+  async function openUpdateUsersModal() {
+    try {
+      const res = await fetch('/admin/view-users');
+      cachedUsers = await res.json(); // cache for filtering
+
+      renderUpdateUsersTable(cachedUsers);
+
+      const modal = new bootstrap.Modal(document.getElementById('updateUsersModal'));
+      modal.show();
+    } catch (err) {
+      console.error('Error loading users:', err);
+      alert('Failed to load users.');
+    }
+  }
+
+  // 🔁 Render table rows dynamically based on user list
+  function renderUpdateUsersTable(users) {
+    const tbody = document.getElementById('updateUsersTableBody');
+    tbody.innerHTML = '';
+
+    users.forEach(user => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><input type="hidden" name="ids[]" value="${user.id}">${user.reg_no}</td>
+        <td>${user.name}</td>
+        <td><input type="text" name="department_${user.id}" class="form-control" value="${user.department}"></td>
+        <td><input type="text" name="year_${user.id}" class="form-control" value="${user.year}"></td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    if (users.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="text-center">No users found.</td></tr>`;
+    }
+  }
+
+  // 🔍 Filter users by reg_no (case-insensitive)
+  function filterUpdateUsersTable() {
+    const filter = document.getElementById('filterUpdateUsersInput').value.toLowerCase();
+
+    const filteredUsers = cachedUsers.filter(user =>
+      user.reg_no.toLowerCase().includes(filter)
+    );
+
+    renderUpdateUsersTable(filteredUsers);
+  }
+
+  async function submitUserUpdates(event) {
+    event.preventDefault();
+
+    const form = document.getElementById('updateAllUsersForm');
+    const formData = new FormData(form);
+    const ids = formData.getAll('ids[]');
+
+    const updates = ids.map(id => ({
+      id,
+      department: formData.get(`department_${id}`),
+      year: formData.get(`year_${id}`)
+    }));
+
+    try {
+      const res = await fetch('/admin/update-users-bulk', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Update failed.');
+
+      alert(data.message);
+      bootstrap.Modal.getInstance(document.getElementById('updateUsersModal')).hide();
+      location.reload();
+    } catch (err) {
+      console.error('Update error:', err);
+      alert('Failed to update users. See console.');
+    }
+  }
+</script>
+
+<!-- View Users Modal -->
+<div class="modal fade" id="viewUsersModal" tabindex="-1" aria-labelledby="viewUsersModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="viewUsersModalLabel">All Registered Users</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- 🔍 Filter -->
+        <input type="text" id="filterAllUsersInput" class="form-control mb-3" placeholder="Search by name, reg_no, department, role..." oninput="filterAllUsersTable()">
+
+        <!-- 👥 Users Table -->
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Photo</th>
+                <th>Name</th>
+                <th>Reg No</th>
+                <th>Department</th>
+                <th>Program</th>
+                <th>College</th>
+                <th>Year</th>
+                <th>Role</th>
+                <th>Gender</th>
+                <th>Phone</th>
+              </tr>
+            </thead>
+            <tbody id="allUsersTableBody">
+              <!-- Filled dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+ <script>
+  let allUsersCache = [];
+
+  async function viewAllUsers() {
+    try {
+      const res = await fetch('/admin/view-users');
+      const users = await res.json();
+      allUsersCache = users;
+      renderAllUsersTable(users);
+
+      const modal = new bootstrap.Modal(document.getElementById('viewUsersModal'));
+      modal.show();
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      alert('Failed to load users.');
+    }
+  }
+
+  function renderAllUsersTable(users) {
+    const tbody = document.getElementById('allUsersTableBody');
+    tbody.innerHTML = '';
+
+    if (users.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10" class="text-center">No users found.</td></tr>`;
+      return;
+    }
+
+    users.forEach(user => {
+      const photoUrl = user.photo ? `/uploads/books/${user.photo}` : 'https://via.placeholder.com/40';
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><img src="${photoUrl}" alt="Photo" width="40" height="40" class="rounded-circle"></td>
+        <td>${user.name}</td>
+        <td>${user.reg_no}</td>
+        <td>${user.department}</td>
+        <td>${user.program}</td>
+        <td>${user.college}</td>
+        <td>${user.year}</td>
+        <td>${user.role}</td>
+        <td>${user.gender}</td>
+        <td>${user.phone_no}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function filterAllUsersTable() {
+    const query = document.getElementById('filterAllUsersInput').value.toLowerCase();
+    const filtered = allUsersCache.filter(user =>
+      user.name.toLowerCase().includes(query) ||
+      user.reg_no.toLowerCase().includes(query) ||
+      user.department.toLowerCase().includes(query) ||
+      user.role.toLowerCase().includes(query)
+    );
+    renderAllUsersTable(filtered);
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
 
 <script>
   
@@ -465,7 +980,82 @@ async function approveUser(id) {
   }
 }
 
+// When clicking the Delete All Users button, open the modal and load users
+document.getElementById('openDeleteUsersModalBtn').addEventListener('click', async () => {
+  try {
+    const res = await fetch('/admin/view-users'); // Or your endpoint that returns all users
+    const users = await res.json();
 
+    const tbody = document.getElementById('deleteUsersTableBody');
+    tbody.innerHTML = ''; // Clear previous rows
+
+    users.forEach(user => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="checkbox" class="deleteUserCheckbox" data-id="${user.id}"></td>
+        <td>${user.name}</td>
+        <td>${user.reg_no}</td>
+        <td>${user.department}</td>
+        <td>${user.year}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Show modal
+    const deleteUsersModal = new bootstrap.Modal(document.getElementById('deleteUsersModal'));
+    deleteUsersModal.show();
+  } catch (err) {
+    alert('Failed to load users for deletion.');
+    console.error(err);
+  }
+});
+
+// Select All checkbox functionality
+document.getElementById('selectAllDelete').addEventListener('change', function() {
+  const checked = this.checked;
+  document.querySelectorAll('.deleteUserCheckbox').forEach(chk => {
+    chk.checked = checked;
+  });
+});
+
+// Confirm delete selected users
+document.getElementById('openDeleteUsersModalBtn').addEventListener('click', async () => {
+  try {
+    const res = await fetch('/admin/view-users'); // Your endpoint that returns all users
+    if (!res.ok) throw new Error('Failed to fetch users');
+    const users = await res.json();
+
+    const tbody = document.getElementById('deleteUsersTableBody');
+    tbody.innerHTML = ''; // Clear previous rows
+
+    users.forEach(user => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="checkbox" class="deleteUserCheckbox" data-id="${user.id}"></td>
+        <td>${user.name}</td>
+        <td>${user.reg_no}</td>
+        <td>${user.department}</td>
+        <td>${user.year}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Show modal
+    const deleteUsersModal = new bootstrap.Modal(document.getElementById('deleteUsersModal'));
+    deleteUsersModal.show();
+  } catch (err) {
+    alert('Failed to load users for deletion.');
+    console.error(err);
+  }
+});
+
+// Select All checkbox functionality
+document.getElementById('selectAllDelete').addEventListener('change', function() {
+  const checked = this.checked;
+  document.querySelectorAll('.deleteUserCheckbox').forEach(chk => {
+    chk.checked = checked;
+  });
+});
 
   renderUsers();
 </script>

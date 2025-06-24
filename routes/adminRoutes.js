@@ -19,8 +19,11 @@ router.put('/update-user/:id', upload.single('photo'), adminController.updateUse
 router.delete('/delete-user/:id', adminController.deleteUser);
 router.get('/librarian-activities', adminController.getLibrarianActivities);
 router.put('/approve-user/:id', adminController.approveUser);
-
-
+router.get('/view-users', adminController.viewUsers);
+router.delete('/delete-users-bulk', adminController.deleteUsersBulk);
+router.patch('/approve-users-bulk', adminController.approvePendingUsers);
+router.put('/update-users-bulk', adminController.updateUsersBulk);
+router.get('/view-users', adminController.viewAllUsers);
 //
 router.get('/admin_account', adminController.admin_account);
 router.get('/admin_users', adminController.admin_users);

@@ -178,6 +178,95 @@ exports.approveUser = async (req, res) => {
   }
 };
 
+
+
+
+exports.viewUsers = async (req, res) => {
+  try {
+    const [users] = await db.query('SELECT id, name, reg_no, department, year FROM users');
+    res.json(users); // Must return a JSON array
+  } catch (err) {
+    console.error('Database error fetching users:', err);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+};
+exports.deleteUsersBulk = async (req, res) => {
+  const { ids } = req.body;
+
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: 'No user IDs provided for deletion' });
+  }
+
+  try {
+    const placeholders = ids.map(() => '?').join(',');
+    await db.query(`DELETE FROM users WHERE id IN (${placeholders})`, ids);
+    res.json({ message: `${ids.length} user(s) deleted successfully` });
+  } catch (err) {
+    console.error('Error deleting users:', err);
+    res.status(500).json({ error: 'Server error deleting users' });
+  }
+};
+exports.approvePendingUsers = async (req, res) => {
+  try {
+    // Approve all users where is_approved = 'no'
+    const [result] = await db.query("UPDATE users SET is_approved = 'yes' WHERE is_approved = 'no'");
+
+    res.json({
+      success: true,
+      message: `${result.affectedRows} user(s) approved successfully.`
+    });
+  } catch (error) {
+    console.error('Error approving users:', error);
+    res.status(500).json({ success: false, message: 'Failed to approve users.' });
+  }
+};
+exports.updateUsersBulk = async (req, res) => {
+  try {
+    const updates = req.body.updates; // [{ id, department, year }, ...]
+
+    if (!Array.isArray(updates) || updates.length === 0) {
+      return res.status(400).json({ message: 'No updates provided.' });
+    }
+
+    const updatePromises = updates.map(user => {
+      return db.query(
+        'UPDATE users SET department = ?, year = ? WHERE id = ?',
+        [user.department, user.year, user.id]
+      );
+    });
+
+    await Promise.all(updatePromises);
+
+    res.json({ success: true, message: `${updates.length} user(s) updated successfully.` });
+  } catch (err) {
+    console.error('Error updating users:', err);
+    res.status(500).json({ success: false, message: 'Server error while updating users.' });
+  }
+};
+exports.viewAllUsers = async (req, res) => {
+  try {
+    const [users] = await db.query(`
+      SELECT id, name, reg_no, department, program, college, year, role, gender, phone_no, photo
+      FROM users
+    `);
+    res.json(users);
+  } catch (err) {
+    console.error('Error loading users:', err);
+    res.status(500).json({ error: 'Failed to load users' });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
 exports.getLibrarianActivities = async (req, res) => {
   try {
     const [rows] = await db.execute(`
