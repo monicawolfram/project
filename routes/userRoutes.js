@@ -1,6 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const path = require('path');
+
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, '../public/uploads/books');
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage });
+
+module.exports = upload;
+
 
 router.get('/dashboard', userController.dashboard);
 router.get('/notifications', userController.getNotifications);
@@ -10,7 +28,7 @@ router.get('/attendance/:regNo', userController.getAttendanceByMonthYear);
 router.get('/borrowed-resources/:id', userController.getBorrowedResources);
 router.post('/pay-fine', userController.payFine);
 router.get('/payments/:regNo', userController.getPaymentHistoryByRegNo);
-
+router.post('/register', upload.single('photo'), userController.registerUser);
 
 //
 router.get('/interface', userController.interface);
@@ -40,4 +58,5 @@ router.get('/payment', userController.payment);
 router.get('/profile', userController.profile);
 router.get('/AboutUs', userController.AboutUs);
 router.get('/help', userController.help);
+router.get('/register', userController.register);
 module.exports = router;

@@ -94,6 +94,10 @@ exports.AboutUs = (req, res) => {
 exports.help = (req, res) => {
  res.render('user/help');
 };
+exports.register = (req, res) => {
+ res.render('user/register');     
+};
+
 
 exports.sendFeedback = (req, res) => {
   const { user_id, subject, message } = req.body;
@@ -281,6 +285,83 @@ exports.getPaymentHistoryByRegNo = (req, res) => {
         res.json(results);
     });
 };
+
+exports.registerUser = async (req, res) => {
+  try {
+    const {
+      name,
+      reg_no,
+      department,
+      program,
+      college,
+      year,
+      role,
+      gender,
+      phone_no
+    } = req.body;
+
+    const photoFilename = req.file ? req.file.filename : null;
+
+    // Collect missing fields dynamically
+    const missingFields = [];
+    if (!name) missingFields.push('name');
+    if (!reg_no) missingFields.push('reg_no');
+    if (!department) missingFields.push('department');
+    if (!program) missingFields.push('program');
+    if (!college) missingFields.push('college');
+    if (!year) missingFields.push('year');
+    if (!role) missingFields.push('role');
+    if (!gender) missingFields.push('gender');
+    if (!phone_no) missingFields.push('phone_no');
+    if (!photoFilename) missingFields.push('photo');
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        error: 'Missing required registration fields',
+        missingFields
+      });
+    }
+
+    const sql = `
+      INSERT INTO users 
+      (name, reg_no, department, program, college, year, role, gender, phone_no, photo) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      name,
+      reg_no,
+      department,
+      program,
+      college,
+      year,
+      role,
+      gender,
+      phone_no,
+      photoFilename
+    ];
+
+    console.log('📦 Inserting user:', values);
+
+    await db.execute(sql, values);
+
+    res.json({
+      success: true,
+      message: 'User registered successfully'
+    });
+
+  } catch (err) {
+    console.error('❌ Registration error:', err);
+    res.status(500).json({ error: 'Something went wrong while registering the user.' });
+  }
+};
+
+
+
+
+
+
+
 
 
 

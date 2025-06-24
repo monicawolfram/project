@@ -63,7 +63,7 @@ router.get('/manageusers', librarianController.manageusers);
 router.get('/admin_account', librarianController.admin_account);
 router.get('/booknotification', librarianController.booknotification);
 router.get('/generatereport', librarianController.generatereport);
-router.get('/Itsupport.html', librarianController.Itsupport);
+router.get('/Itsupport', librarianController.Itsupport);
 router.get('/librarian_account', librarianController.librarian_account);
 router.get('/massageandfeedback', librarianController.massageandfeedback);
 router.get('/profile', librarianController.profile);
