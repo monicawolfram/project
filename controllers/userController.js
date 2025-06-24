@@ -324,8 +324,8 @@ exports.registerUser = async (req, res) => {
 
     const sql = `
       INSERT INTO users 
-      (name, reg_no, department, program, college, year, role, gender, phone_no, photo) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (name, reg_no, department, program, college, year, role, gender, phone_no, photo, is_approved) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -338,7 +338,8 @@ exports.registerUser = async (req, res) => {
       role,
       gender,
       phone_no,
-      photoFilename
+      photoFilename,
+      'no' // default value for is_approved
     ];
 
     console.log('📦 Inserting user:', values);
@@ -355,6 +356,7 @@ exports.registerUser = async (req, res) => {
     res.status(500).json({ error: 'Something went wrong while registering the user.' });
   }
 };
+
 
 
 
