@@ -75,9 +75,14 @@
       <td><%= user.gender %></td>
       <td><%= user.phone_no %></td>
       <td>
-        <button class="btn btn-sm btn-info" onclick="viewUser('<%= user.id %>')">View</button>
-        <button class="btn btn-sm btn-warning" onclick="openEditModal('<%= user.id %>')">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteUser('<%= user.id %>')">Delete</button>
+        <button class="btn btn-sm btn-info " onclick="viewUser('<%= user.id %>')">View</button>
+        <button class="btn btn-sm btn-warning " onclick="openEditModal('<%= user.id %>')">Edit</button>
+        <button class="btn btn-sm btn-danger " onclick="deleteUser('<%= user.id %>')">Delete</button>
+        <% if (user.is_approved === 'no' || !user.is_approved) { %>
+    <button class="btn btn-sm btn-success " onclick="approveUser('<%= user.id %>')">Approve</button>
+  <% } else { %>
+    <span class="badge bg-success">Approved</span>
+  <% } %>
       </td>
     </tr>
   <% }); %>
@@ -294,11 +299,16 @@ const photoUrl = user.photo
       <td>${user.role}</td>
       <td>${user.gender}</td>
       <td>${user.phone_no}</td>
-      <td>
-        <button class="btn btn-sm btn-warning" onclick="openEditModal(${index})">Edit</button>
-        <button class="btn btn-sm btn-info text-white" onclick="viewUser(${index})">View</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteUser(${index})">Delete</button>
-      </td>
+      <td class="d-grid gap-1">
+  <button class="btn btn-sm btn-warning w-100" onclick="openEditModal(${index})">Edit</button>
+  <button class="btn btn-sm btn-info text-white w-100" onclick="viewUser(${index})">View</button>
+  <button class="btn btn-sm btn-danger w-100" onclick="deleteUser(${index})">Delete</button>
+  ${!user.is_approved || user.is_approved === 'no'
+    ? `<button class="btn btn-sm btn-success w-100" onclick="approveUser(${user.id})">Approve</button>`
+    : `<span class="badge bg-success w-100">Approved</span>`
+  }
+</td>
+
     `;
     tbody.appendChild(row);
   });
@@ -430,6 +440,32 @@ document.getElementById("viewPhoto").src = photoUrl;
     document.getElementById("viewRole").textContent = user.role;
     new bootstrap.Modal(document.getElementById("viewUserModal")).show();
   }
+
+
+async function approveUser(id) {
+  if (!confirm("Are you sure you want to approve this user?")) return;
+
+  try {
+    const res = await fetch(`/admin/approve-user/${id}`, {
+      method: 'PUT'
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert(data.message || "User approved successfully");
+      // Refresh list
+      location.reload();
+    } else {
+      alert(data.error || "Approval failed");
+    }
+  } catch (err) {
+    console.error("Error approving user:", err);
+    alert("Something went wrong while approving");
+  }
+}
+
+
 
   renderUsers();
 </script>

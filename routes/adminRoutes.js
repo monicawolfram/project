@@ -18,6 +18,8 @@ router.post('/add-user', upload.single('photo'), adminController.addUser);
 router.put('/update-user/:id', upload.single('photo'), adminController.updateUser);
 router.delete('/delete-user/:id', adminController.deleteUser);
 router.get('/librarian-activities', adminController.getLibrarianActivities);
+router.put('/approve-user/:id', adminController.approveUser);
+
 
 //
 router.get('/admin_account', adminController.admin_account);

@@ -14,14 +14,13 @@ exports.admin_account = (req, res) => {
 exports.admin_users = async (req, res) => {
   try {
     const [users] = await db.execute('SELECT * FROM users ORDER BY id DESC');
+    //return json
     res.render('admin/admin_users', { users });
   } catch (err) {
     console.error('❌ Error fetching users:', err);
     res.render('admin/admin_users', { users: [], error: 'Failed to load users' });
   }
 };
-
-
 
 exports.admin_resourcestatus = (req, res) => {
  res.render('admin/admin_resourcestatus');
@@ -167,6 +166,18 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.approveUser = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    await db.execute('UPDATE users SET is_approved = ? WHERE id = ?', ['yes', userId]);
+    res.json({ message: 'User approved successfully' });
+  } catch (err) {
+    console.error('❌ Error approving user:', err);
+    res.status(500).json({ error: 'Failed to approve user' });
+  }
+};
+
 exports.getLibrarianActivities = async (req, res) => {
   try {
     const [rows] = await db.execute(`
