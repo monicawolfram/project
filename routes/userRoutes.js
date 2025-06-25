@@ -66,5 +66,5 @@ router.get('/register', userController.register);
 router.get('/books', userController.books);
 router.get('/books/departments', userController.getDepartments);
 router.get('/books/:department', userController.getBooksByDepartment);
-router.get('/:department', userController.viewBooksByDepartment);
+router.get('/show-books/:department', userController.getBooksByDepartment);
 module.exports = router;

@@ -369,18 +369,42 @@ exports.getDepartments = async (req, res) => {
   }
 };
 
-exports.getBooksByDepartment = (req, res) => {
+exports.getBooksByDepartment = async (req, res) => {
   const dept = req.params.department;
-  const query = 'SELECT title, author, image, file_path FROM books WHERE department = ?';
-  db.query(query, [dept], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Failed to fetch books' });
-    res.render('user/book_list', { books: results, department: dept });
-  });
+
+  try {
+    const [books] = await db.execute(
+      "SELECT * FROM books WHERE department = ? AND is_deleted = 'no' ORDER BY title ASC",
+      [dept]
+    );
+
+    if (books.length === 0) {
+      return res.render('user/book_list', { books: [], department: dept, message: 'No books found.' });
+    }
+
+    // Render the EJS page with the books data
+    res.render('user/book_list', {
+      books: books,
+      department: dept,
+      message: null
+    });
+  } catch (err) {
+    console.error('❌ Error fetching books:', err);
+    res.status(500).render('user/book_list', {
+      books: [],
+      department: dept,
+      message: 'Failed to fetch books.'
+    });
+  }
 };
+
+
+
+
 
 exports.viewBooksByDepartment = (req, res) => {
   const dept = req.params.department;
-  res.redirect(`/api/books/${dept}`);
+  res.redirect(`/user/books/${dept}`);
 };
 
 
