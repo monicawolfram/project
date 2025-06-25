@@ -19,7 +19,7 @@ const upload = multer({ storage });
 
 module.exports = upload;
 
-
+router.get('/home', userController.home);
 router.get('/dashboard', userController.dashboard);
 router.get('/notifications', userController.getNotifications);
 router.post('/send-feedback', userController.sendFeedback);
@@ -29,12 +29,18 @@ router.get('/borrowed-resources/:id', userController.getBorrowedResources);
 router.post('/pay-fine', userController.payFine);
 router.get('/payments/:regNo', userController.getPaymentHistoryByRegNo);
 router.post('/register', upload.single('photo'), userController.registerUser);
+router.get('/books', userController.books);
+router.get('/books/departments', userController.getDepartments);
+router.get('/books/:department', userController.getBooksByDepartment);
+router.get('/:department', userController.viewBooksByDepartment);
+
+
 
 //
 router.get('/interface', userController.interface);
-router.get('/home', userController.home);
+
 router.get('/rules_and_regulation', userController.rules_and_regulation);
-router.get('/books', userController.books);
+
 router.get('/cs', userController.cs);
 router.get('/yearone', userController.yearone);
 router.get('/yeartwo', userController.yeartwo);

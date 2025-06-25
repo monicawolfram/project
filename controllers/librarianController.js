@@ -165,28 +165,52 @@ exports.addBook = async (req, res) => {
   const book_image = req.file ? req.file.filename : null;
   const isJson = toJson === 'true';
 
-  const sql = `
-    INSERT INTO books 
-    (title, author, department, date_added, book_code, shelf_no, draw_no, year, image, status, is_deleted, is_borrowed) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no', 'no')
-  `;
-
-  const values = [
-    title, author, department, date_added,
-    book_code, shelf_no, draw_no, year, book_image
-  ];
+  const conn = await db.getConnection();
 
   try {
-    const [result] = await db.execute(sql, values);
+    await conn.beginTransaction();
+
+    // 1. Insert department only if it doesn't exist
+    const checkDeptSQL = `SELECT * FROM departments WHERE name = ?`;
+    const [deptRows] = await conn.execute(checkDeptSQL, [department]);
+
+    if (deptRows.length === 0) {
+      const insertDeptSQL = `
+        INSERT INTO departments (name, image, page)
+        VALUES (?, ?, ?)
+      `;
+
+      const imagePath = `/uploads/books/${book_image}`; // use book's uploaded image
+      const page = department.toLowerCase(); // assume you have routes for these
+
+      await conn.execute(insertDeptSQL, [department, imagePath, page]);
+    }
+
+    // 2. Insert book
+    const insertBookSQL = `
+      INSERT INTO books 
+      (title, author, department, date_added, book_code, shelf_no, draw_no, year, image, status, is_deleted, is_borrowed) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no', 'no')
+    `;
+
+    const bookValues = [
+      title, author, department, date_added,
+      book_code, shelf_no, draw_no, year, book_image
+    ];
+
+    await conn.execute(insertBookSQL, bookValues);
+
+    await conn.commit();
 
     if (isJson) {
-      return res.json({ status: 'success', message: 'Book added successfully!' });
+      return res.json({ status: 'success', message: 'Book and department added successfully!' });
     } else {
       return res.redirect('/librarian/viewandaddbook');
     }
 
   } catch (err) {
-    console.error('❌ Database Insert Error:', err.sqlMessage);
+    await conn.rollback();
+    console.error('❌ Transaction Error:', err.sqlMessage);
 
     let errorMessage = 'Something went wrong while saving the book. Please try again later.';
 
@@ -201,8 +225,13 @@ exports.addBook = async (req, res) => {
     } else {
       return res.redirect('/librarian/viewandaddbook');
     }
+
+  } finally {
+    conn.release();
   }
 };
+
+
 exports.searchBooks = async (req, res) => {
     const q = req.query.q;
 
