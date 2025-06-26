@@ -115,7 +115,6 @@
                             <th>Return Date</th>
                             <th>Fines</th>
                             <th>Payment Status</th>
-                            <th>Receipt</th>
                         </tr>
                     </thead>
                     <tbody id="borrowList">
@@ -139,52 +138,44 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    function fetchBorrowedResources() {
-        fetch(`/user/borrowed-resources/${currentUserId}`)
-            .then(res => res.json())
-            .then(data => {
-                borrowList.innerHTML = '';
 
-                if (!data.length) {
-                  borrowList.innerHTML = `<tr><td colspan="8" class="text-center">No borrowed resources found.</td></tr>`;
-                  return;
-                }
+  function fetchBorrowedResources() {
+    console.log("User ID (reg_no):", currentUserId);
 
-                data.forEach(record => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${record.borrower_id}</td>
-                        <td>${record.borrower_name}</td>
-                        <td>${capitalize(record.resource_type)}: ${record.resource_title || 'N/A'}</td>
-                        <td>${new Date(record.borrow_date).toLocaleDateString()}</td>
-                        <td>${new Date(record.return_date).toLocaleDateString()}</td>
-                        <td>${record.fine_amount > 0 ? 'Yes' : 'No'}</td>
-                        <td>
-                            ${record.payment_status === 'Unpaid' ? 
-                                `<button class="btn btn-warning" onclick="payFine('${record.borrower_id}', '${record.resource_type}', ${record.resource_id})">Pay Fine</button>` : 
-                                `<span class="text-success">Paid</span>`
-                            }
-                        </td>
-                        <td>
-                            ${record.payment_status === 'Paid' ? 
-                                `<div class="receipt">
-                                    <h4>Payment Receipt</h4>
-                                    <p>Resource: ${capitalize(record.resource_type)} - ${record.resource_title}</p>
-                                    <p>Amount: KSh ${record.fine_amount}</p>
-                                    <p>Payment Method: ${record.receipt_method}</p>
-                                </div>` : 
-                                ''
-                            }
-                        </td>
-                    `;
-                    borrowList.appendChild(tr);
-                });
-            })
-            .catch(err => {
-                console.error('Error fetching borrowed resources:', err);
-                borrowList.innerHTML = `<tr><td colspan="8" class="text-danger text-center">Failed to load borrowed resources.</td></tr>`;
+    fetch(`/user/borrowed-resources/${currentUserId}`)
+        .then(res => res.json())
+        .then(data => {
+            borrowList.innerHTML = '';
+
+            if (!data.length) {
+              borrowList.innerHTML = `<tr><td colspan="7" class="text-center">No borrowed resources found.</td></tr>`;
+              return;
+            }
+
+            data.forEach(record => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${record.borrower_id}</td>
+                    <td>${record.borrower_name}</td>
+                    <td>${capitalize(record.resource_type)}</td>
+                    <td>${new Date(record.borrow_date).toLocaleDateString()}</td>
+                    <td>${new Date(record.return_date).toLocaleDateString()}</td>
+                    <td>${record.fine_amount > 0 ? 'Yes' : 'No'}</td>
+                    <td>
+                        ${record.status === 'Pending' ? 
+                           `<span class="badge bg-warning text-dark rounded-pill px-3 py-1">Pending</span>` : 
+                             `<span class="badge bg-success rounded-pill px-3 py-1">Paid</span>`
+                        }
+                    </td>
+                `;
+                borrowList.appendChild(tr);
             });
-    }
+        })
+        .catch(err => {
+            console.error('Error fetching borrowed resources:', err);
+            borrowList.innerHTML = `<tr><td colspan="7" class="text-danger text-center">Failed to load borrowed resources.</td></tr>`;
+        });
+}
 
     function payFine(borrowerID, resourceType, resourceId) {
         const paymentMethod = prompt('Choose Payment Method: Airtel or Mpesa');

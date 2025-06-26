@@ -226,24 +226,28 @@ exports.getAttendanceByMonthYear = async (req, res) => {
   }
 }
 
+
 exports.getBorrowedResources = async (req, res) => {
-  const userId = req.params.userId;
+  const regNo = req.params.userId;
+
+  if (!regNo) {
+    return res.status(400).json({ message: 'Missing user registration number' });
+  }
 
   try {
-    // Query to get borrowing transactions joined with resource details
-    // Assuming you have tables: borrowing_transactions, users, books, papers, projects
     const [rows] = await db.execute(`
-      SELECT bt.id, bt.borrower_id, u.name AS borrower_name, bt.resource_type, bt.resource_id,
-             bt.borrow_date, bt.return_date, bt.fine_amount, bt.payment_status, bt.receipt_method,
-             COALESCE(b.title, p.title, pr.title) AS resource_title
-      FROM borrowing_transactions bt
-      JOIN users u ON u.id = bt.borrower_id
-      LEFT JOIN books b ON (bt.resource_type = 'book' AND bt.resource_id = b.id)
-      LEFT JOIN papers p ON (bt.resource_type = 'paper' AND bt.resource_id = p.id)
-      LEFT JOIN projects pr ON (bt.resource_type = 'project' AND bt.resource_id = pr.id)
-      WHERE bt.borrower_id = ?
-      ORDER BY bt.borrow_date DESC
-    `, [userId]);
+      SELECT 
+        br.id,
+        br.borrower_id,
+        br.borrower_name,
+        br.resource_type,
+        br.borrow_date,
+        br.return_date,
+        br.status
+      FROM borrow_requests br
+      WHERE br.borrower_id = ?
+      ORDER BY br.borrow_date DESC
+    `, [regNo]);
 
     res.json(rows);
   } catch (error) {
@@ -251,6 +255,10 @@ exports.getBorrowedResources = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+
+
+
 exports.payFine = async (req, res) => {
   const { borrowerID, resourceType, resourceId, paymentMethod } = req.body;
 

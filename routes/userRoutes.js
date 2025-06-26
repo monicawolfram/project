@@ -25,7 +25,7 @@ router.get('/notifications', userController.getNotifications);
 router.post('/send-feedback', userController.sendFeedback);
 router.get('/fetch-user', userController.getUserByReg_no);
 router.get('/attendance/:regNo', userController.getAttendanceByMonthYear);
-router.get('/borrowed-resources/:id', userController.getBorrowedResources);
+router.get('/borrowed-resources/:userId', userController.getBorrowedResources);
 router.post('/pay-fine', userController.payFine);
 router.get('/payments/:regNo', userController.getPaymentHistoryByRegNo);
 router.post('/register', upload.single('photo'), userController.registerUser);

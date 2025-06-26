@@ -151,6 +151,10 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
+          // Store reg_no in sessionStorage and localStorage
+          sessionStorage.setItem('userId', data.reg_no);
+          localStorage.setItem('userId', data.reg_no);
+
           // Populate popup
           document.getElementById("welcomeMsg").innerText = `WELCOME ${data.name} TO OUR LIBRARY`;
           document.getElementById("name").innerText = data.name;
