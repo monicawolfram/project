@@ -382,7 +382,7 @@ exports.getBookDepartments = async (req, res) => {
 
     const data = rows.map(book => ({
       department: book.department,
-      image: book.image_url,
+      image: book.image,
       page: book.department.toLowerCase().replace(/\s+/g, '-')
     }));
 
