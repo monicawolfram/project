@@ -502,7 +502,7 @@ exports.renameAttachment = (req, res) => {
 };
 
 
-// Add a new paper
+
 exports.addPaper = (req, res) => {
   const {
     title,
@@ -532,8 +532,6 @@ exports.addPaper = (req, res) => {
     }
   );
 };
-
-// Get paper by code or title
 exports.getPaperByCodeOrTitle = (req, res) => {
   const searchValue = req.params.search;
 
@@ -551,8 +549,6 @@ exports.getPaperByCodeOrTitle = (req, res) => {
     res.json(results[0]);
   });
 };
-
-// Delete a paper by code or title
 exports.deletePaper = (req, res) => {
   const searchValue = req.params.search;
 
@@ -569,4 +565,118 @@ exports.deletePaper = (req, res) => {
 
     res.json({ message: 'Paper removed successfully' });
   });
+};
+
+exports.addProject = async (req, res) => {
+  try {
+    const {
+      title, author, department, date_added,
+      project_code, shelf_no, draw_no, year
+    } = req.body;
+
+    // Basic field validation (optional but helpful)
+    if (!title || !author || !department || !date_added || !project_code || !shelf_no || !draw_no || !year) {
+      return res.status(400).json({ message: 'Please fill in all required fields.' });
+    }
+
+    const project_image = req.file ? req.file.filename : 'default.jpg';
+
+    const sql = `
+      INSERT INTO projects 
+        (title, author, department, date_added, project_code, shelf_no, draw_no, year, image) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    await db.execute(sql, [
+      title, author, department, date_added,
+      project_code, shelf_no, draw_no, year, project_image
+    ]);
+
+    res.json({ message: 'Project added successfully!' });
+  } catch (err) {
+    console.error("Error in addProject:", err);
+    res.status(500).json({ message: 'Error adding project' });
+  }
+};
+exports.getProjectByCodeOrTitle = async (req, res) => {
+  try {
+    const keyword = req.params.code_or_title;
+
+    const [rows] = await db.execute(
+      `SELECT * FROM projects WHERE project_code = ? OR title = ? LIMIT 1`,
+      [keyword, keyword]
+    );
+
+    if (rows.length === 0) {
+      return res.json({ message: 'Project not found.' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Error in getProjectByCodeOrTitle:", err);
+    res.status(500).json({ message: 'Error fetching project' });
+  }
+};
+exports.deleteProject = async (req, res) => {
+  try {
+    const keyword = req.params.code_or_title;
+
+    const [result] = await db.execute(
+      `DELETE FROM projects WHERE project_code = ? OR title = ?`,
+      [keyword, keyword]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.json({ message: 'Project not found or already deleted.' });
+    }
+
+    res.json({ message: 'Project deleted successfully.' });
+  } catch (err) {
+    console.error("Error in deleteProject:", err);
+    res.status(500).json({ message: 'Error deleting project' });
+  }
+};
+exports.getAvailableProjects = async (req, res) => {
+  try {
+    const sql = `
+      SELECT title, author, year, image_url, file_url 
+      FROM projects 
+      WHERE is_deleted = 0 AND is_borrowed = 0
+      ORDER BY date_added DESC
+    `;
+
+    const [projects] = await db.execute(sql);
+
+    console.log('Projects fetched:', projects); // <-- Add this to debug
+
+    res.json(projects);
+  } catch (err) {
+    console.error('Error fetching available projects:', err);
+    res.status(500).json({ message: 'Error fetching available projects' });
+  }
+};
+
+exports.getAllRequests = (req, res) => {
+  const sql = 'SELECT * FROM requests ORDER BY id DESC';
+  db.query(sql, (err, result) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(result);
+  });
+};
+
+exports.addRequest = (req, res) => {
+  const { name, resource, title } = req.body;
+  const sql = 'INSERT INTO requests (name, resource, title, date) VALUES (?, ?, ?, CURDATE())';
+  db.query(sql, [name, resource, title], (err, result) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json({ success: true, insertedId: result.insertId });
+  });
+};
+exports.updateRequestStatus = (req, res) => {
+    const { id, status } = req.body;
+    const sql = 'UPDATE requests SET status = ? WHERE id = ?';
+    db.query(sql, [status, id], (err, result) => {
+        if (err) return res.status(500).json({ success: false, error: err });
+        res.json({ success: true });
+    });
 };

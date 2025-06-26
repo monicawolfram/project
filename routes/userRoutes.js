@@ -33,10 +33,13 @@ router.post('/register', upload.single('photo'), userController.registerUser);
 router.get('/papers', userController.papers); // optional static view
 router.get('/papers/departments', userController.getPaperDepartments);
 router.get('/show-papers/:department', userController.getPapersByDepartment);
+
 router.get('/projects', userController.projects);
 router.get('/projects/departments', userController.getProjectDepartments);
-router.get('/show-projects/:department', userController.getProjectsByDepartment);
+router.get('/show-projects/:department', userController.showProjectsByDepartment);
+router.get('/projects/:department', userController.getProjectsByDepartment);
 
+router.post('/borrow', userController.submitBorrow);
 
 
 
@@ -64,6 +67,7 @@ router.get('/Attendance', userController.Attendance);
 router.get('/borrowing', userController.borrowing);
 router.get('/paying', userController.paying);
 router.get('/resources', userController.resources);
+router.get('/borrow', userController.borrow);
 router.get('/payment', userController.payment);
 router.get('/profile', userController.profile);
 router.get('/AboutUs', userController.AboutUs);

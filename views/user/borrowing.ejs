@@ -144,18 +144,24 @@
             .then(res => res.json())
             .then(data => {
                 borrowList.innerHTML = '';
+
+                if (!data.length) {
+                  borrowList.innerHTML = `<tr><td colspan="8" class="text-center">No borrowed resources found.</td></tr>`;
+                  return;
+                }
+
                 data.forEach(record => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${record.borrower_id}</td>
                         <td>${record.borrower_name}</td>
-                        <td>${capitalize(record.resource_type)}</td>
-                        <td>${record.borrow_date}</td>
-                        <td>${record.return_date}</td>
+                        <td>${capitalize(record.resource_type)}: ${record.resource_title || 'N/A'}</td>
+                        <td>${new Date(record.borrow_date).toLocaleDateString()}</td>
+                        <td>${new Date(record.return_date).toLocaleDateString()}</td>
                         <td>${record.fine_amount > 0 ? 'Yes' : 'No'}</td>
                         <td>
                             ${record.payment_status === 'Unpaid' ? 
-                                `<button class="btn btn-warning" onclick="payFine('${record.borrower_id}', '${record.resource_type}')">Pay Fine</button>` : 
+                                `<button class="btn btn-warning" onclick="payFine('${record.borrower_id}', '${record.resource_type}', ${record.resource_id})">Pay Fine</button>` : 
                                 `<span class="text-success">Paid</span>`
                             }
                         </td>
@@ -163,7 +169,7 @@
                             ${record.payment_status === 'Paid' ? 
                                 `<div class="receipt">
                                     <h4>Payment Receipt</h4>
-                                    <p>Resource: ${capitalize(record.resource_type)}</p>
+                                    <p>Resource: ${capitalize(record.resource_type)} - ${record.resource_title}</p>
                                     <p>Amount: KSh ${record.fine_amount}</p>
                                     <p>Payment Method: ${record.receipt_method}</p>
                                 </div>` : 
@@ -174,11 +180,15 @@
                     borrowList.appendChild(tr);
                 });
             })
-            .catch(err => console.error('Error fetching borrowed resources:', err));
+            .catch(err => {
+                console.error('Error fetching borrowed resources:', err);
+                borrowList.innerHTML = `<tr><td colspan="8" class="text-danger text-center">Failed to load borrowed resources.</td></tr>`;
+            });
     }
 
-    function payFine(borrowerID, resourceType) {
-        const paymentMethod = prompt('Choose Payment Method: Airtel or Mpesa').toLowerCase();
+    function payFine(borrowerID, resourceType, resourceId) {
+        const paymentMethod = prompt('Choose Payment Method: Airtel or Mpesa');
+        if (!paymentMethod) return alert('Payment cancelled');
 
         fetch('/user/pay-fine', {
             method: 'POST',
@@ -186,16 +196,19 @@
             body: JSON.stringify({
                 borrowerID,
                 resourceType,
-                paymentMethod
+                resourceId,
+                paymentMethod: paymentMethod.toLowerCase()
             })
         })
         .then(res => res.json())
-        .then(() => fetchBorrowedResources());
+        .then(() => fetchBorrowedResources())
+        .catch(err => alert('Payment failed: ' + err.message));
     }
 
-    // On load
+    // Load borrowed resources on page load
     fetchBorrowedResources();
 </script>
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

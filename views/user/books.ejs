@@ -171,13 +171,13 @@
 
       limitedDepartments.forEach(dept => {
         const card = `
-          <div class="book-card">
-            <p><strong>${dept.department}</strong></p>
-            <img src="${dept.image ? '/uploads/books/' + dept.image : 'https://via.placeholder.com/150'}" alt="${dept.department}">
+  <div class="book-card">
+    <p><strong>${dept.department}</strong></p>
+    <img src="${dept.image ? '/uploads/books/' + dept.image : '/uploads/books/default.jpg'}" alt="${dept.department} Department" class="img-fluid rounded">
+    <a href="/user/show-books/${dept.page}" class="btn btn-sm btn-light mt-2">View</a>
+  </div>
+`;
 
-            <a href="/user/show-books/${dept.page}" class="btn btn-sm btn-light mt-2">View</a>
-          </div>
-        `;
         container.innerHTML += card;
       });
     } catch (error) {

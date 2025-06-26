@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Borrow Resource - SJCET Library</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    body {
+      background-size: cover;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .borrow-box {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .borrow-box h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #007bff;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .logo {
+      width: 100px;
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    #returnDateError {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="borrow-box">
+  <img src="/images/sjcet.png" alt="Logo" class="logo">
+  <h2>Borrow Resource</h2>
+  <form id="borrowForm" novalidate>
+    <div class="mb-3">
+      <label for="borrowerId" class="form-label">Borrower ID</label>
+      <input type="text" id="borrowerId" name="borrower_id" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label for="borrowerName" class="form-label">Borrower Name</label>
+      <input type="text" id="borrowerName" name="borrower_name" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label for="resourceType" class="form-label">Resource Type</label>
+      <select id="resourceType" name="resource_type" class="form-select" required>
+        <option value="">Select Type</option>
+        <option value="book">Book</option>
+        <option value="paper">Paper</option>
+        <option value="project">Project</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="borrowDate" class="form-label">Borrow Date</label>
+      <input type="date" id="borrowDate" name="borrow_date" class="form-control" readonly required />
+    </div>
+    <div class="mb-3">
+      <label for="returnDate" class="form-label">Return Date (max 5 days)</label>
+      <input type="date" id="returnDate" name="return_date" class="form-control" required />
+      <div id="returnDateError" class="text-danger small mt-1">
+        Return date must be within 5 days of borrow date.
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">
+      <i class="fa fa-book me-2"></i>Submit Borrow Request
+    </button>
+    <div id="formMsg" class="mt-3"></div>
+  </form>
+</div>
+
+<script>
+  // Set default borrow date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("borrowDate").value = today;
+
+  const borrowForm = document.getElementById("borrowForm");
+
+  borrowForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const borrowDate = new Date(document.getElementById("borrowDate").value);
+    const returnDate = new Date(document.getElementById("returnDate").value);
+
+    // Validate return date within 5 days
+    const timeDiff = (returnDate - borrowDate) / (1000 * 60 * 60 * 24);
+    if (timeDiff < 1 || timeDiff > 5) {
+      document.getElementById("returnDateError").style.display = "block";
+      return;
+    } else {
+      document.getElementById("returnDateError").style.display = "none";
+    }
+
+    const data = {
+      borrower_id: document.getElementById("borrowerId").value.trim(),
+      borrower_name: document.getElementById("borrowerName").value.trim(),
+      resource_type: document.getElementById("resourceType").value,
+      borrow_date: document.getElementById("borrowDate").value,
+      return_date: document.getElementById("returnDate").value,
+    };
+
+    try {
+      const res = await fetch("/user/borrow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+      const msgBox = document.getElementById("formMsg");
+
+      if (result.success) {
+        msgBox.innerHTML = `<div class="alert alert-success">Borrow request submitted successfully!</div>`;
+        borrowForm.reset();
+        document.getElementById("borrowDate").value = today;
+
+        // Redirect to borrowed resources page
+        setTimeout(() => {
+          window.location.href = `/user/borrowed-resources/${data.borrower_id}`;
+        }, 1000);
+      } else {
+        msgBox.innerHTML = `<div class="alert alert-danger">Failed: ${result.error || "Unknown error."}</div>`;
+      }
+
+    } catch (err) {
+      console.error("Error submitting borrow request:", err);
+      document.getElementById("formMsg").innerHTML = `<div class="alert alert-danger">An error occurred while submitting.</div>`;
+    }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

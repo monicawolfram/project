@@ -175,73 +175,115 @@
         <div class="table-container">
             <table class="table table-striped">
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Resource</th>
-                        <th>Title</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="request-list">
-                    <!-- Dynamic Content from JavaScript -->
-                </tbody>
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Resource</th>
+    <th>Title</th>
+    <th>Date</th>
+    <th>Status</th>
+    <th>Action</th>
+  </tr>
+</thead>
+<tbody id="request-list">
+  <!-- Dynamic Content -->
+</tbody>
+
             </table>
         </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    let requests = [
-        { id: "221710", name: "Juma Sh...", resource: "Book", title: "Genuine", date: "12-03-2025", status: "Pending" },
-        { id: "221711", name: "Ali K.", resource: "Paper", title: "Research", date: "12-04-2025", status: "Approved" },
-        { id: "221712", name: "Fatima N.", resource: "Project", title: "AI Tech", date: "12-05-2025", status: "Rejected" }
-    ];
-
-    function loadRequests() {
-        displayRequests(requests);
+async function loadRequests() {
+    try {
+        const res = await fetch('/librarian/requests/all');
+        const data = await res.json();
+        displayRequests(data);
+    } catch (err) {
+        console.error('Failed to fetch requests:', err);
     }
+}
 
-    function displayRequests(data) {
-        let tbody = document.getElementById("request-list");
-        tbody.innerHTML = "";
-        data.forEach((request, index) => {
-            tbody.innerHTML += `<tr>
-                <td>${request.id}</td>
-                <td>${request.name}</td>
-                <td>${request.resource}</td>
-                <td>${request.title}</td>
-                <td>${request.date}</td>
-                <td>${request.status}</td>
-            </tr>`;
-        });
-    }
+function displayRequests(data) {
+    const tbody = document.getElementById("request-list");
+    tbody.innerHTML = "";
 
-    function addRequest() {
-        const name = document.getElementById("requestName").value;
-        const resource = document.getElementById("requestResource").value;
-        const title = document.getElementById("requestTitle").value;
-        const newRequest = { id: Date.now(), name, resource, title, date: new Date().toLocaleDateString(), status: "Pending" };
-        requests.push(newRequest);
+    data.forEach((req) => {
+        const row = document.createElement("tr");
+
+        const badgeColor = {
+            pending: "warning",
+            approved: "success",
+            rejected: "danger"
+        }[req.status.toLowerCase()] || "secondary";
+
+        row.innerHTML = `
+            <td>${req.id}</td>
+            <td>${req.name}</td>
+            <td>${req.resource}</td>
+            <td>${req.title}</td>
+            <td>${new Date(req.date).toLocaleDateString()}</td>
+            <td><span class="badge bg-${badgeColor}">${req.status}</span></td>
+            <td>
+                ${req.status.toLowerCase() === "pending"
+                    ? `<button class="btn btn-sm btn-success me-2" onclick="updateStatus(${req.id}, 'Approved')">Approve</button>
+                       <button class="btn btn-sm btn-danger" onclick="updateStatus(${req.id}, 'Rejected')">Reject</button>`
+                    : `<span class="text-muted">No Action</span>`
+                }
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+async function addRequest() {
+    const name = document.getElementById("requestName").value;
+    const resource = document.getElementById("requestResource").value;
+    const title = document.getElementById("requestTitle").value;
+
+    if (!name || !resource || !title) return alert("Please fill all fields");
+
+    const res = await fetch('/librarian/requests/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, resource, title })
+    });
+
+    const result = await res.json();
+    if (result.success) {
         loadRequests();
+    } else {
+        console.error('Error adding request');
     }
+}
 
-    function filterRequests(status) {
-        let filteredRequests = status === 'all' ? requests : requests.filter(request => request.status.toLowerCase() === status);
-        displayRequests(filteredRequests);
+async function updateStatus(id, status) {
+    const res = await fetch('/librarian/requests/update-status', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status })
+    });
+
+    const result = await res.json();
+    if (result.success) {
+        loadRequests();
+    } else {
+        alert("Failed to update status");
     }
+}
 
-    document.addEventListener('DOMContentLoaded', loadRequests);
+function filterRequests(status) {
+    fetch('/librarian/requests/all')
+        .then(res => res.json())
+        .then(data => {
+            const filtered = status === 'all' ? data : data.filter(r => r.status.toLowerCase() === status);
+            displayRequests(filtered);
+        });
+}
 
-
-
-    const socket = io('http://localhost:3000'); // Connect to socket.io server
-
-socket.on('newRequest', (request) => {
-  // Update UI dynamically
-  addRequestToTable(request);
-});
+document.addEventListener('DOMContentLoaded', loadRequests);
 </script>
 
 </body>

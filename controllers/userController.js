@@ -82,6 +82,9 @@ exports.paying = (req, res) => {
 exports.resources = (req, res) => {
  res.render('user/resources');
 };
+exports.borrow = (req, res) => {
+ res.render('user/borrow'); 
+}
 exports.payment = (req, res) => {
  res.render('user/payment');
 };
@@ -223,40 +226,46 @@ exports.getAttendanceByMonthYear = async (req, res) => {
   }
 }
 
-exports.getBorrowedResources = (req, res) => {
-    const userId = req.params.id;
+exports.getBorrowedResources = async (req, res) => {
+  const userId = req.params.userId;
 
-    const sql = `
-        SELECT borrower_id, borrower_name, resource_type, borrow_date, return_date, fine_amount, payment_status, receipt_method
-        FROM borrowed_resources
-        WHERE borrower_id = ?
-    `;
+  try {
+    // Query to get borrowing transactions joined with resource details
+    // Assuming you have tables: borrowing_transactions, users, books, papers, projects
+    const [rows] = await db.execute(`
+      SELECT bt.id, bt.borrower_id, u.name AS borrower_name, bt.resource_type, bt.resource_id,
+             bt.borrow_date, bt.return_date, bt.fine_amount, bt.payment_status, bt.receipt_method,
+             COALESCE(b.title, p.title, pr.title) AS resource_title
+      FROM borrowing_transactions bt
+      JOIN users u ON u.id = bt.borrower_id
+      LEFT JOIN books b ON (bt.resource_type = 'book' AND bt.resource_id = b.id)
+      LEFT JOIN papers p ON (bt.resource_type = 'paper' AND bt.resource_id = p.id)
+      LEFT JOIN projects pr ON (bt.resource_type = 'project' AND bt.resource_id = pr.id)
+      WHERE bt.borrower_id = ?
+      ORDER BY bt.borrow_date DESC
+    `, [userId]);
 
-    db.query(sql, [userId], (err, results) => {
-        if (err) {
-            console.error('Error fetching borrowed resources:', err);
-            return res.status(500).json({ error: 'Database error' });
-        }
-        res.json(results);
-    });
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching borrowed resources:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
+exports.payFine = async (req, res) => {
+  const { borrowerID, resourceType, resourceId, paymentMethod } = req.body;
 
-exports.payFine = (req, res) => {
-    const { borrowerID, resourceType, paymentMethod } = req.body;
+  try {
+    await db.execute(`
+      UPDATE borrowing_transactions
+      SET payment_status = 'Paid', receipt_method = ?
+      WHERE borrower_id = ? AND resource_type = ? AND resource_id = ? AND payment_status = 'Unpaid'
+    `, [paymentMethod, borrowerID, resourceType, resourceId]);
 
-    const sql = `
-        UPDATE borrowed_resources 
-        SET payment_status = 'Paid', receipt_method = ?
-        WHERE borrower_id = ? AND resource_type = ?
-    `;
-
-    db.query(sql, [paymentMethod, borrowerID, resourceType], (err, result) => {
-        if (err) {
-            console.error('Error updating fine payment:', err);
-            return res.status(500).json({ error: 'Payment update failed' });
-        }
-        res.json({ success: true });
-    });
+    res.json({ message: 'Payment successful' });
+  } catch (error) {
+    console.error('Error updating payment:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.getPaymentHistoryByRegNo = (req, res) => {
@@ -467,55 +476,107 @@ exports.viewPapersByDepartment = (req, res) => {
   res.redirect(`/user/show-papers/${dept}`);
 };
 
-// Fetch all departments from the departments table (optional)
+
 exports.getProjectDepartments = async (req, res) => {
   try {
     const [rows] = await db.execute(`
-      SELECT p1.*
-      FROM projects p1
-      INNER JOIN (
-        SELECT department, MIN(id) as min_id
-        FROM projects
-        WHERE is_deleted = 'no'
-        GROUP BY department
-      ) p2 ON p1.id = p2.min_id
-      ORDER BY p1.department ASC
+      SELECT DISTINCT department FROM projects WHERE is_deleted = 'no' ORDER BY department ASC
     `);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to load departments' });
+  }
+};
+// userController.js
+exports.showProjectsByDepartment = async (req, res) => {
+  try {
+    const department = req.params.department;
 
-    const data = rows.map(project => ({
-      department: project.department,
-      image: project.image_url,
-      page: project.department.toLowerCase().replace(/\s+/g, '-')
+    const [projects] = await db.execute(`
+      SELECT id, image, title, author, year, file_url
+      FROM projects
+      WHERE department = ? AND is_deleted = 'no'
+      ORDER BY date_added DESC
+    `, [department]);
+
+    // Map DB column `image` to `image_url` for EJS template
+    const mappedProjects = projects.map(p => ({
+      ...p,
+      image_url: p.image,  // so your template works with image_url
     }));
 
-    res.json(data);
-  } catch (err) {
-    console.error('❌ Error fetching project departments:', err);
-    res.status(500).json({ error: 'Failed to load project departments' });
-  }
-};
-
-
-exports.getProjectsByDepartment = async (req, res) => {
-  const department = req.params.department;
-
-  try {
-    const [projects] = await db.query('SELECT * FROM projects WHERE department = ?', [department]);
-
-    if (projects.length === 0) {
-      return res.render('user/project_list', { projects: [], department, message: 'No projects available for this department.' });
+    if (mappedProjects.length === 0) {
+      return res.render('user/project_list', {
+        department,
+        projects: [],
+        message: 'No projects found for this department.'
+      });
     }
 
-    res.render('user/project_list', { projects, department });
+    res.render('user/project_list', {
+      department,
+      projects: mappedProjects,
+      message: null
+    });
   } catch (error) {
-    console.error(error);
-    res.render('user/project_list', { projects: [], department, message: 'Failed to load projects.' });
+    console.error('Error fetching projects by department:', error);
+    res.render('user/project_list', {
+      department: req.params.department,
+      projects: [],
+      message: 'Error loading projects. Please try again later.'
+    });
   }
 };
+
 exports.viewProjectsByDepartment = (req, res) => {
   const dept = req.params.department;
   res.redirect(`/user/show-projects/${dept}`);
 };
+// controllers/userController.js
+exports.getProjectsByDepartment = async (req, res) => {
+  try {
+    const department = req.params.department;
+    if (!department) {
+      return res.status(400).json({ message: 'Department required' });
+    }
+    const [rows] = await db.execute(`
+      SELECT id, image, title, author, status, year, project_code, date_added 
+      FROM projects WHERE department = ? AND is_deleted = 'no' ORDER BY date_added DESC
+    `, [department]);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error loading projects' });
+  }
+};
+
+// controller/userController.js
+exports.submitBorrow = (req, res) => {
+  const { borrower_id, borrower_name, resource_type, borrow_date, return_date } = req.body;
+
+  if (!borrower_id || !borrower_name || !resource_type || !borrow_date || !return_date) {
+    return res.json({ success: false, error: 'All fields are required' });
+  }
+
+  const query = `
+    INSERT INTO borrow_requests (borrower_id, borrower_name, resource_type, borrow_date, return_date, status)
+    VALUES (?, ?, ?, ?, ?, 'Pending')
+  `;
+
+  db.query(query, [borrower_id, borrower_name, resource_type, borrow_date, return_date], (err) => {
+    if (err) {
+      console.error('DB Insert Error:', err);
+      return res.json({ success: false, error: 'Database error' });
+    }
+
+    // Optional: notify librarian (e.g., via another table or flag)
+    // e.g., INSERT INTO notifications (type, message, target_role) ...
+
+    res.json({ success: true, redirect: '/user/borrowed-resources' }); // <-- Redirect after success
+  });
+};
+
 
 
 

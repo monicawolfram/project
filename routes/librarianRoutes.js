@@ -44,13 +44,17 @@ router.put('/attachment/:id/:attachmentId', librarianController.renameAttachment
 
 
 router.post('/librarian/papers/add', upload.single('paper_image'), librarianController.addPaper);
-router.get('/api/papers/:search', librarianController.getPaperByCodeOrTitle);
-router.delete('/api/papers/:search', librarianController.deletePaper);
+router.get('/papers/:search', librarianController.getPaperByCodeOrTitle);
+router.delete('/papers/:search', librarianController.deletePaper);
 
+router.post('/projects/add', upload.single('project_image'), librarianController.addProject);
+router.get('/projects/:code_or_title', librarianController.getProjectByCodeOrTitle);
+router.delete('/projects/:code_or_title', librarianController.deleteProject);
+router.get('/projects/available', librarianController.getAvailableProjects);
 
-
-
-
+router.get('/all', librarianController.getAllRequests);
+router.post('/add', librarianController.addRequest);
+router.put('/update-status', librarianController.updateRequestStatus);
 
 
 
