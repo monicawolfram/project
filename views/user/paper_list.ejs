@@ -1,122 +1,34 @@
-<!-- views/user/paper_list.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Papers</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://kit.fontawesome.com/your-fontawesome-key.js" crossorigin="anonymous"></script>
-  <style>
-    body {
-      background-size: cover;
-      color: white;
-      font-family: 'Poppins', sans-serif;
-    }
-    .navbar {
-      background: rgba(0, 0, 0, 0.8);
-      padding: 15px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    }
-    .nav-link {
-      color: white !important;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-    .nav-link:hover {
-      color: #ffdd57 !important;
-      transform: scale(1.1);
-    }
-    .books-container {
-      background: rgba(0, 0, 0, 0.8);
-      border-radius: 15px;
-      padding: 5px;
-      color: #f4f5f4;
-      text-align: center;
-    }
-    .book-card {
-      width: 140px;
-      text-align: center;
-      padding: 5px;
-      background: rgb(49, 49, 49);
-      border-radius: 5px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .book-card img {
-      width: 100%;
-      border-radius: 8px;
-    }
-    .footer-btns .btn {
-      border-radius: 25px;
-      padding: 10px 20px;
-      font-size: 16px;
-      transition: all 0.3s ease;
-      margin: 5px;
-    }
-    .footer-btns .btn:hover {
-      transform: scale(1.1);
-      background: #27ae60;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Papers for <%= department %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
   <div class="container mt-4">
-    <nav class="navbar d-flex justify-content-around">
-      <a href="/user/home" class="nav-link"><i class="fas fa-home"></i> Home</a>
-      <div class="dropdown">
-        <a class="nav-link dropdown-toggle" href="/user/resources" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="fas fa-book"></i> Resources
-        </a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="/user/books">Books</a></li>
-          <li><a class="dropdown-item" href="/user/papers">Papers</a></li>
-          <li><a class="dropdown-item" href="/user/projects">Projects</a></li>
-        </ul>
-      </div>
-      <a href="/user/attendance" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
-    </nav>
+    <h2 class="text-center mb-4">Papers for <%= department %> Department</h2>
 
-    <!-- Papers Section -->
-    <div class="books-container mt-4">
-      <h5>📝 Available Past Papers</h5>
-      <div class="book-scroll d-flex gap-3 flex-nowrap overflow-auto">
-        <!-- Filled via JS -->
-      </div>
-    </div>
+    <% if (message) { %>
+      <div class="alert alert-warning text-center"><%= message %></div>
+    <% } %>
 
-    <div class="footer-btns text-center mt-3">
-      <a href="/user/AboutUs" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
-      <a href="/user/help" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
+    <div class="row">
+      <% papers.forEach(paper => { %>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100">
+            <img src="/<%= paper.image_url || 'images/papers/default.jpg' %>" class="card-img-top" alt="Paper Image">
+            <div class="card-body">
+              <h5 class="card-title"><%= paper.title %></h5>
+              <p class="card-text"><strong>Author:</strong> <%= paper.author %></p>
+              <p class="card-text"><strong>Year:</strong> <%= paper.year %></p>
+              <a href="<%= paper.file_url %>" class="btn btn-primary" target="_blank">View PDF</a>
+            </div>
+          </div>
+        </div>
+      <% }); %>
     </div>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    window.onload = async () => {
-      const container = document.querySelector('.book-scroll');
-      container.innerHTML = '';
-
-      try {
-        const res = await fetch('/user/papers/departments');
-        const departments = await res.json();
-
-        departments.forEach(dept => {
-          const card = `
-            <div class="book-card">
-              <p>${dept.department}</p>
-              <img src="${dept.image}" alt="${dept.department}">
-              <a href="/user/show-papers/${dept.page}" class="btn btn-dark btn-sm">View</a>
-            </div>
-          `;
-          container.innerHTML += card;
-        });
-      } catch (error) {
-        console.error('Error fetching papers:', error);
-        container.innerHTML = '<p class="text-danger">Failed to load departments.</p>';
-      }
-    };
-  </script>
 </body>
 </html>

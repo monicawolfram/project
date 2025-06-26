@@ -420,45 +420,46 @@ exports.viewBooksByDepartment = (req, res) => {
 
 // Get all departments from the "departments" table
 exports.getPaperDepartments = async (req, res) => {
-  const query = 'SELECT name AS department, image, page FROM departments';
-
   try {
-    const [results] = await db.query(query);
-    res.json(results); // Used by frontend to generate department cards/links
+    const [rows] = await db.execute(`
+      SELECT p1.*
+      FROM papers p1
+      INNER JOIN (
+        SELECT department, MIN(id) as min_id
+        FROM papers
+        WHERE is_deleted = 'no'
+        GROUP BY department
+      ) p2 ON p1.id = p2.min_id
+      ORDER BY p1.department ASC
+    `);
+
+    const data = rows.map(paper => ({
+      department: paper.department,
+      image: paper.image_url,
+      page: paper.department.toLowerCase().replace(/\s+/g, '-')
+    }));
+
+    res.json(data);
   } catch (err) {
-    console.error('❌ Failed to fetch paper departments:', err);
-    res.status(500).json({ error: 'Failed to fetch departments' });
+    console.error('❌ Error fetching paper departments:', err);
+    res.status(500).json({ error: 'Failed to load paper departments' });
   }
 };
+
 exports.getPapersByDepartment = async (req, res) => {
-  const dept = req.params.department;
+  const department = req.params.department;
 
   try {
-    const [papers] = await db.execute(
-      "SELECT * FROM papers WHERE department = ? AND is_deleted = 'no' ORDER BY title ASC",
-      [dept]
-    );
+    const [papers] = await db.query('SELECT * FROM papers WHERE department = ?', [department]);
 
     if (papers.length === 0) {
-      return res.render('user/paper_list', {
-        papers: [],
-        department: dept,
-        message: 'No papers found.'
-      });
+      return res.render('user/paper_list', { papers: [], department, message: 'No papers available for this department.' });
     }
 
-    res.render('user/paper_list', {
-      papers: papers,
-      department: dept,
-      message: null
-    });
-  } catch (err) {
-    console.error('❌ Error fetching papers:', err);
-    res.status(500).render('user/paper_list', {
-      papers: [],
-      department: dept,
-      message: 'Failed to fetch papers.'
-    });
+    res.render('user/paper_list', { papers, department });
+  } catch (error) {
+    console.error(error);
+    res.render('user/paper_list', { papers: [], department, message: 'Failed to load papers.' });
   }
 };
 exports.viewPapersByDepartment = (req, res) => {
@@ -468,45 +469,47 @@ exports.viewPapersByDepartment = (req, res) => {
 
 // Fetch all departments from the departments table (optional)
 exports.getProjectDepartments = async (req, res) => {
-  const query = 'SELECT name AS department, image, page FROM departments';
-
   try {
-    const [results] = await db.query(query);
-    res.json(results); // Used for frontend dropdowns or cards
+    const [rows] = await db.execute(`
+      SELECT p1.*
+      FROM projects p1
+      INNER JOIN (
+        SELECT department, MIN(id) as min_id
+        FROM projects
+        WHERE is_deleted = 'no'
+        GROUP BY department
+      ) p2 ON p1.id = p2.min_id
+      ORDER BY p1.department ASC
+    `);
+
+    const data = rows.map(project => ({
+      department: project.department,
+      image: project.image_url,
+      page: project.department.toLowerCase().replace(/\s+/g, '-')
+    }));
+
+    res.json(data);
   } catch (err) {
-    console.error('❌ Failed to fetch project departments:', err);
-    res.status(500).json({ error: 'Failed to fetch departments' });
+    console.error('❌ Error fetching project departments:', err);
+    res.status(500).json({ error: 'Failed to load project departments' });
   }
 };
+
+
 exports.getProjectsByDepartment = async (req, res) => {
-  const dept = req.params.department;
+  const department = req.params.department;
 
   try {
-    const [projects] = await db.execute(
-      "SELECT * FROM projects WHERE department = ? AND is_deleted = 'no' ORDER BY year DESC",
-      [dept]
-    );
+    const [projects] = await db.query('SELECT * FROM projects WHERE department = ?', [department]);
 
     if (projects.length === 0) {
-      return res.render('user/project_list', {
-        projects: [],
-        department: dept,
-        message: 'No projects found.'
-      });
+      return res.render('user/project_list', { projects: [], department, message: 'No projects available for this department.' });
     }
 
-    res.render('user/project_list', {
-      projects,
-      department: dept,
-      message: null
-    });
-  } catch (err) {
-    console.error('❌ Error fetching projects:', err);
-    res.status(500).render('user/project_list', {
-      projects: [],
-      department: dept,
-      message: 'Failed to fetch projects.'
-    });
+    res.render('user/project_list', { projects, department });
+  } catch (error) {
+    console.error(error);
+    res.render('user/project_list', { projects: [], department, message: 'Failed to load projects.' });
   }
 };
 exports.viewProjectsByDepartment = (req, res) => {
