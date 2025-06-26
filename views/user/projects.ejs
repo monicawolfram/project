@@ -1,190 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>project</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projects</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-    <!-- FontAwesome for Icons -->
-    <script src="https://kit.fontawesome.com/your-fontawesome-key.js" crossorigin="anonymous"></script>
+  <!-- FontAwesome for Icons -->
+  <script src="https://kit.fontawesome.com/your-fontawesome-key.js" crossorigin="anonymous"></script>
 
-    <style>
-         /* Background Image for Entire Page */
-         body {
-            background-size: cover;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        /* Navbar Styling */
-        .navbar {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-        .nav-link {
-            color: white !important;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .nav-link:hover {
-            color: #ffdd57 !important;
-            transform: scale(1.1);
-        }
-
-        .dropdown-menu {
-            background: #444;
-        }
-        .dropdown-menu a {
-            color: white;
-        }
-        .dropdown-menu a:hover {
-            background: #555;
-        }
-        .books-container {
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            padding: 5px;
-            color: #f4f5f4;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .book-card {
-            width: 100px;
-            text-align: center;
-            padding: 5px;
-            background: rgb(49, 49, 49);
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .book-card img {
-            width: 100%;
-            border-radius: 8px;
-        }
-        /* Button Styling */
-        .footer-btns .btn {
-            border-radius: 25px;
-            padding: 10px 20px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            margin: 5px;
-        }
-        .footer-btns .btn:hover {
-            transform: scale(1.1);
-            background: #27ae60;
-        }
-    </style>
+  <style>
+    body {
+      background-size: cover;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+    }
+    .navbar {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+    .nav-link {
+      color: white !important;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .nav-link:hover {
+      color: #ffdd57 !important;
+      transform: scale(1.1);
+    }
+    .dropdown-menu {
+      background: #444;
+    }
+    .dropdown-menu a {
+      color: white;
+    }
+    .dropdown-menu a:hover {
+      background: #555;
+    }
+    .projects-container {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 15px;
+      padding: 10px;
+      color: #f4f5f4;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .project-card {
+      width: 160px;
+      text-align: center;
+      padding: 5px;
+      background: rgb(49, 49, 49);
+      border-radius: 5px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .project-card img {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .footer-btns .btn {
+      border-radius: 25px;
+      padding: 10px 20px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+    .footer-btns .btn:hover {
+      transform: scale(1.1);
+      background: #27ae60;
+    }
+  </style>
 </head>
-<body>
 
-<div class="container mt-4">
+<body>
+  <div class="container mt-4">
+    <!-- Navbar -->
     <nav class="navbar d-flex justify-content-around">
-        <a href="/user/home " class="nav-link"><i class="fas fa-home"></i> Home</a>
-        <div class="dropdown">
-            <a class="nav-link dropdown-toggle" href="/user/Resources " role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-book"></i> Resources
-            </a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/user/books ">Books</a></li>
-                <li><a class="dropdown-item" href="/user/papers ">Papers</a></li>
-                <li><a class="dropdown-item" href="/user/projects ">Projects</a></li>
-            </ul>
-        </div>
-        <a href="/user/attendance " class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
-        <div class="dropdown">
-            <a class="nav-link dropdown-toggle" href="/user/transcation " role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-exchange-alt"></i> Transaction
-            </a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/user/borrowing ">Borrowing</a></li>
-                <li><a class="dropdown-item" href="/user/paying ">Paying Fine</a></li>
-            </ul>
-        </div>
-        <div class="dropdown">
-            <a class="nav-link dropdown-toggle" href="/user/viewstatus " role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-eye"></i> Viewstatus
-            </a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/user/resources ">Resources</a></li>
-                <li><a class="dropdown-item" href="/user/payment ">Payment </a></li>
-                <li><a class="dropdown-item" href="/user/profile ">Profile </a></li>
-            </ul>
-        </div>
+      <a href="/user/home" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <div class="dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+          <i class="fas fa-book"></i> Resources
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/user/books">Books</a></li>
+          <li><a class="dropdown-item" href="/user/papers">Papers</a></li>
+          <li><a class="dropdown-item" href="/user/projects">Projects</a></li>
+        </ul>
+      </div>
+      <a href="/user/attendance" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
+      <div class="dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+          <i class="fas fa-exchange-alt"></i> Transaction
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/user/borrowing">Borrowing</a></li>
+          <li><a class="dropdown-item" href="/user/paying">Paying Fine</a></li>
+        </ul>
+      </div>
+      <div class="dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+          <i class="fas fa-eye"></i> Viewstatus
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/user/resources">Resources</a></li>
+          <li><a class="dropdown-item" href="/user/payment">Payment</a></li>
+          <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
+        </ul>
+      </div>
     </nav>
 
-    <!-- Books Section -->
-    <div class="books-container mt-4">
-        <h5>📚 Available Books 📚</h5>
-        <div class="d-flex justify-content-center gap-4 flex-wrap">
-            <div class="book-card">
-                <p>CSE</p>
-                <img src="/images/CSE/cse1.jpg" alt="Artificial Intelligence">
-                <a href="/user/cse " class="btn btn-dark btn-sm">View</a>
-            </div>
-            <div class="book-card">
-                <p>CS</p>
-                <img src="/images/CS/cs1.jpg" alt="Radio Receiver Technology">
-                <a href="/user/cs " class="btn btn-dark btn-sm">View</a>
-            </div>
-            <div class="book-card">
-                <p>EEE</p>
-                <img src="/images/EEE/eee1.jpg" alt="Electrical Engineering">
-                <a href="/user/eee " class="btn btn-dark btn-sm">View</a>
-            </div>
-            <div class="book-card">
-                <p>MECH</p>
-                <img src="/images/MECH/mechanical1.jpg" alt="Mechanical Engineering Design">
-                <a href="/user/mech " class="btn btn-dark btn-sm">View</a>
-            </div>
-
-            <div class="book-card">
-                <p>CIVIL</p>
-                <img src="/images/MECH/mechanical1.jpg" alt="Mechanical Engineering Design">
-                <a href="/user/civil " class="btn btn-dark btn-sm">View</a>
-            </div>
-
-            <div class="book-card">
-                <p>EDUCATION</p>
-                <img src="/images/MECH/mechanical1.jpg" alt="Mechanical Engineering Design">
-                <a href="/user/education " class="btn btn-dark btn-sm">View</a>
-            </div>
-
-            <div class="book-card">
-                <p>ISNE</p>
-                <img src="/images/MECH/mechanical1.jpg" alt="Mechanical Engineering Design">
-                <a href="/user/isne " class="btn btn-dark btn-sm">View</a>
-            </div>
-
-            <div class="book-card">
-                <p>IT</p>
-                <img src="/images/MECH/mechanical1.jpg" alt="Mechanical Engineering Design">
-                <a href="/user/It " class="btn btn-dark btn-sm">View</a>
-            </div>
-
-            <div class="book-card">
-                <p>MECHACTRONICS</p>
-                <img src="/images/MECH/mechanical1.jpg" alt="Mechanical Engineering Design">
-                <a href="/user/mechactronics " class="btn btn-dark btn-sm">View</a>
-            </div>
-        </div>
+    <!-- Dynamic Project Cards -->
+    <div class="projects-container mt-4">
+      <h5>🧠 Available Projects by Department</h5>
+      <div class="d-flex justify-content-center gap-4 flex-wrap" id="projectCards">
+        <p>Loading projects...</p>
+      </div>
     </div>
 
     <!-- Footer -->
     <div class="footer-btns text-center mt-3">
-        <a href="/user/AboutUs " class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
-        <a href="/user/help " class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
+      <a href="/user/AboutUs" class="btn btn-success"><i class="fas fa-info-circle"></i> About Us</a>
+      <a href="/user/help" class="btn btn-success"><i class="fas fa-question-circle"></i> Help</a>
     </div>
-</div>
+  </div>
 
-<!-- Bootstrap Bundle with Popper (Required for Dropdowns) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+  <!-- Fetch and render project departments -->
+  <script>
+    window.onload = async () => {
+      const container = document.getElementById('projectCards');
+      container.innerHTML = '';
+
+      try {
+        const res = await fetch('/user/projects/departments');
+        const departments = await res.json();
+
+        if (departments.length === 0) {
+          container.innerHTML = '<p class="text-warning">No project departments found.</p>';
+          return;
+        }
+
+        departments.forEach(dept => {
+          const card = `
+            <div class="project-card">
+              <p>${dept.department}</p>
+              <img src="${dept.image}" alt="${dept.department}">
+              <a href="/user/show-projects/${dept.page}" class="btn btn-dark btn-sm mt-2">View</a>
+            </div>
+          `;
+          container.innerHTML += card;
+        });
+      } catch (error) {
+        console.error('Error loading projects:', error);
+        container.innerHTML = '<p class="text-danger">Failed to load project departments.</p>';
+      }
+    };
+  </script>
 </body>
 </html>

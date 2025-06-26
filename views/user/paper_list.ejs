@@ -1,76 +1,52 @@
+<!-- views/user/paper_list.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Papers</title>
-
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-  <!-- FontAwesome for Icons -->
   <script src="https://kit.fontawesome.com/your-fontawesome-key.js" crossorigin="anonymous"></script>
-
   <style>
     body {
       background-size: cover;
       color: white;
       font-family: 'Poppins', sans-serif;
     }
-
     .navbar {
       background: rgba(0, 0, 0, 0.8);
       padding: 15px;
       border-radius: 15px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     }
-
     .nav-link {
       color: white !important;
       font-weight: 500;
       transition: all 0.3s ease;
     }
-
     .nav-link:hover {
       color: #ffdd57 !important;
       transform: scale(1.1);
     }
-
-    .dropdown-menu {
-      background: #444;
-    }
-
-    .dropdown-menu a {
-      color: white;
-    }
-
-    .dropdown-menu a:hover {
-      background: #555;
-    }
-
-    .papers-container {
+    .books-container {
       background: rgba(0, 0, 0, 0.8);
       border-radius: 15px;
-      padding: 10px;
+      padding: 5px;
       color: #f4f5f4;
       text-align: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
-
-    .paper-card {
-      width: 160px;
+    .book-card {
+      width: 140px;
       text-align: center;
       padding: 5px;
       background: rgb(49, 49, 49);
       border-radius: 5px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-
-    .paper-card img {
+    .book-card img {
       width: 100%;
       border-radius: 8px;
     }
-
     .footer-btns .btn {
       border-radius: 25px;
       padding: 10px 20px;
@@ -78,7 +54,6 @@
       transition: all 0.3s ease;
       margin: 5px;
     }
-
     .footer-btns .btn:hover {
       transform: scale(1.1);
       background: #27ae60;
@@ -88,11 +63,10 @@
 
 <body>
   <div class="container mt-4">
-    <!-- Navbar -->
-    <nav class="navbar d-flex justify-content-around flex-wrap">
+    <nav class="navbar d-flex justify-content-around">
       <a href="/user/home" class="nav-link"><i class="fas fa-home"></i> Home</a>
       <div class="dropdown">
-        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+        <a class="nav-link dropdown-toggle" href="/user/resources" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="fas fa-book"></i> Resources
         </a>
         <ul class="dropdown-menu">
@@ -102,73 +76,45 @@
         </ul>
       </div>
       <a href="/user/attendance" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
-      <div class="dropdown">
-        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-          <i class="fas fa-exchange-alt"></i> Transaction
-        </a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="/user/borrowing">Borrowing</a></li>
-          <li><a class="dropdown-item" href="/user/paying">Paying Fine</a></li>
-        </ul>
-      </div>
-      <div class="dropdown">
-        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-          <i class="fas fa-eye"></i> Viewstatus
-        </a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="/user/resources">Resources</a></li>
-          <li><a class="dropdown-item" href="/user/payment">Payment</a></li>
-          <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
-        </ul>
-      </div>
     </nav>
 
-    <!-- Dynamic Paper Cards -->
-    <div class="papers-container mt-4">
-      <h5>📄 Available Papers by Department</h5>
-      <div class="d-flex justify-content-center gap-4 flex-wrap" id="paperCards">
-        <p>Loading papers...</p>
+    <!-- Papers Section -->
+    <div class="books-container mt-4">
+      <h5>📝 Available Past Papers</h5>
+      <div class="book-scroll d-flex gap-3 flex-nowrap overflow-auto">
+        <!-- Filled via JS -->
       </div>
     </div>
 
-    <!-- Footer -->
     <div class="footer-btns text-center mt-3">
-      <a href="/user/AboutUs" class="btn btn-success"><i class="fas fa-info-circle"></i> About Us</a>
-      <a href="/user/help" class="btn btn-success"><i class="fas fa-question-circle"></i> Help</a>
+      <a href="/user/AboutUs" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
+      <a href="/user/help" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
     </div>
   </div>
 
-  <!-- Bootstrap Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Fetch and Render Papers -->
   <script>
     window.onload = async () => {
-      const container = document.getElementById('paperCards');
+      const container = document.querySelector('.book-scroll');
       container.innerHTML = '';
 
       try {
-        const res = await fetch('/user/papers/departments'); // Backend should respond with array of papers
+        const res = await fetch('/user/papers/departments');
         const departments = await res.json();
-
-        if (!departments.length) {
-          container.innerHTML = '<p class="text-warning">No paper departments found.</p>';
-          return;
-        }
 
         departments.forEach(dept => {
           const card = `
-            <div class="paper-card">
+            <div class="book-card">
               <p>${dept.department}</p>
               <img src="${dept.image}" alt="${dept.department}">
-              <a href="/user/show-papers/${dept.page}" class="btn btn-dark btn-sm mt-2">View</a>
+              <a href="/user/show-papers/${dept.page}" class="btn btn-dark btn-sm">View</a>
             </div>
           `;
           container.innerHTML += card;
         });
       } catch (error) {
-        console.error('Error loading papers:', error);
-        container.innerHTML = '<p class="text-danger">Failed to load paper departments.</p>';
+        console.error('Error fetching papers:', error);
+        container.innerHTML = '<p class="text-danger">Failed to load departments.</p>';
       }
     };
   </script>

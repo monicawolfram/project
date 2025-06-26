@@ -1,307 +1,625 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Librarian</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body {
-            background: url('library-bg.jpg') no-repeat center center fixed;
-            background-size: cover;
-            font-family: Arial, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Librarian - Manage Projects</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      background: url('library-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
 
-        .sidebar {
-            background-color: white;
-            min-height: 100vh;
-            padding: 20px;
-            border-radius: 15px;
-        }
+    .sidebar {
+      background-color: white;
+      min-height: 100vh;
+      padding: 20px;
+      border-radius: 15px;
+    }
 
-        .sidebar img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-        }
-        .sidebar .nav-link {
-            color: black;
-            font-size: 18px;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
+    .sidebar img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
 
-        .sidebar .nav-link:hover {
-            background-color: green;
-            color: white;
-            border-radius: 8px;
-        }
+    .sidebar .nav-link {
+      color: black;
+      font-size: 18px;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
 
-       
+    .sidebar .nav-link:hover {
+      background-color: green;
+      color: white;
+      border-radius: 8px;
+    }
 
-        .sidebar .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+    .sidebar .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
-        .nav-link {
-            color: rgb(19, 19, 19);
-            font-size: 18px;
-            padding: 10px 15px;
-            text-align: left;
-        }
+    .nav-link {
+      color: rgb(19, 19, 19);
+      font-size: 18px;
+      padding: 10px 15px;
+      text-align: left;
+    }
 
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
 
-        .content-container {
-            background: rgba(161, 247, 122, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
+    .content-container {
+      background: rgba(161, 247, 122, 0.9);
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
 
-        .tab-content {
-            padding: 15px;
-        }
+    .tab-content {
+      padding: 15px;
+    }
 
-        .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-    </style>
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background: white;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+        <div class="logo-container">
+          <img src="/images/sjcet.png" alt="SJCET Logo" />
+          <h4>SJUCET Library</h4>
+        </div>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="librarian_home.ejs"
+              ><i class="fas fa-home"></i> Home</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="librarian_category.ejs"
+              ><i class="fas fa-book"></i> Manage Catalog</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="managerequestlibrarian.ejs"
+              ><i class="fas fa-tasks"></i> Manage Requests</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="manageinventorylibrarian.ejs"
+              ><i class="fas fa-boxes"></i> Manage Inventory</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="massageandfeedback.ejs"
+              ><i class="fas fa-comments"></i> Messages & Feedback</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="generatereport.ejs"
+              ><i class="fas fa-chart-bar"></i> Generate Reports</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="Itsupport.ejs"
+              ><i class="fas fa-tools"></i> IT Support</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="manageusers.ejs"
+              ><i class="fas fa-users"></i> Manage Users</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="managefines.ejs"
+              ><i class="fas fa-money-bill-wave"></i> Manage Fines</a
+            >
+          </li>
+        </ul>
+      </nav>
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-                <div class="logo-container">
-                    <img src="/images/sjcet.png" alt="SJCET Logo"> 
-                    <h4>SJUCET Library</h4>
-                </div>
-                <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link" href="librarian_home.ejs"><i class="fas fa-home"></i> Home</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="librarian_category.ejs"><i class="fas fa-book"></i> Manage Catalog</a></li>
-                    <li class="nav-item"><a class="nav-link" href="managerequestlibrarian.ejs"><i class="fas fa-tasks"></i> Manage Requests</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manageinventorylibrarian.ejs"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
-                    <li class="nav-item"><a class="nav-link" href="massageandfeedback.ejs"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
-                    <li class="nav-item"><a class="nav-link" href="generatereport.ejs"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
-                    <li class="nav-item"><a class="nav-link" href="Itsupport.ejs"><i class="fas fa-tools"></i> IT Support</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manageusers.ejs"><i class="fas fa-users"></i> Manage Users</a></li>
-                    <li class="nav-item"><a class="nav-link" href="managefines.ejs"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
-                </ul>
-            </nav>
-     <!-- Main Content -->
-     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            
-       <!-- Top Bar -->
-       <div class="top-bar d-flex justify-content-between align-items-center">
-        <input type="text" class="form-control w-25" placeholder="Search here">
-        <div class="d-flex align-items-center">
+      <!-- Main Content -->
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <!-- Top Bar -->
+        <div class="top-bar d-flex justify-content-between align-items-center">
+          <input
+            type="text"
+            class="form-control w-25"
+            placeholder="Search here"
+            id="searchInput"
+            onkeyup="filterProjects()"
+          />
+          <div class="d-flex align-items-center">
             <!-- Notification Dropdown -->
             <div class="dropdown me-3">
-                <button class="btn btn-light dropdown-toggle" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-bell"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-                    <li><a class="dropdown-item" href="booknotification.ejs">New book added</a></li>
-                    <li><a class="dropdown-item" href="requestnotification.ejs">Request pending approval</a></li>
-                    <li><a class="dropdown-item" href="systemnotification.ejs">System maintenance scheduled</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-center" href="viewallnotification.ejs">View all</a></li>
-                </ul>
+              <button
+                class="btn btn-light dropdown-toggle"
+                type="button"
+                id="notificationDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-bell"></i>
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="notificationDropdown"
+              >
+                <li>
+                  <a class="dropdown-item" href="booknotification.ejs"
+                    >New project added</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="requestnotification.ejs"
+                    >Request pending approval</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="systemnotification.ejs"
+                    >System maintenance scheduled</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li class="text-center">
+                  <a class="dropdown-item" href="viewallnotification.ejs"
+                    >View all</a
+                  >
+                </li>
+              </ul>
             </div>
 
             <!-- User Dropdown -->
             <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-user"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item" href="librarian_account.ejs">Librarian Account</a></li>
-                    <li><a class="dropdown-item" href="admin_account.ejs">Admin Account</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="librarian_interface.ejs">Logout</a></li>
-                </ul>
+              <button
+                class="btn btn-light dropdown-toggle"
+                type="button"
+                id="userDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-user"></i>
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="userDropdown"
+              >
+                <li>
+                  <a class="dropdown-item" href="librarian_account.ejs"
+                    >Librarian Account</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="admin_account.ejs">Admin Account</a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a
+                    class="dropdown-item text-danger"
+                    href="librarian_interface.ejs"
+                    >Logout</a
+                  >
+                </li>
+              </ul>
             </div>
+          </div>
         </div>
-    </div>
-                <div class="content-container">
-                    <h2 class="text-center mb-4">Librarian Dashboard</h2>
-                    
-                    <!-- View & Add Sections -->
-                    <ul class="nav nav-tabs" id="libraryTabs">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#viewproject">View projects</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#addprojects">Add projects</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#removeprojects">Remove projects</a>
-                        </li>
-                    </ul>
 
-                    <div class="tab-content mt-3">
-                        <!-- View Section -->
-                        <div class="tab-pane fade show active" id="viewBooks">
-                            <ul class="nav nav-pills mb-3" id="viewTabs">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="pill" href="#availableprojects">Available projects</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#deletedprojects">Deleted projects</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#borrowedprojects">Borrowed projects</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#departments">Departments</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#newprojects">New projects</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#updatedprojects">Recently Updated projects</a>
-                                </li>
-                            </ul>
+        <div class="content-container">
+          <h2 class="text-center mb-4">Librarian Dashboard - Manage Projects</h2>
 
-                            <div class="tab-content">
-                                <div class="tab-pane fade show active" id="availableBooks">
-                                    <p>List of available projects will be displayed here.</p>
-                                </div>
-                                <div class="tab-pane fade" id="deletedBooks">
-                                    <p>List of deleted projects will be displayed here.</p>
-                                </div>
-                                <div class="tab-pane fade" id="borrowedBooks">
-                                    <p>List of borrowed projects and borrowers will be displayed here.</p>
-                                </div>
-                                <div class="tab-pane fade" id="departments">
-                                    <p>List of departments and project categories.</p>
-                                </div>
-                                <div class="tab-pane fade" id="newBooks">
-                                    <p>Recently added projects will be displayed here.</p>
-                                </div>
-                                <div class="tab-pane fade" id="updatedBooks">
-                                    <p>Recently updated project details will be displayed here.</p>
-                                </div>
-                            </div>
-                        </div>
+          <ul class="nav nav-tabs" id="libraryTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="viewprojects-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#viewprojects"
+                type="button"
+                role="tab"
+                aria-controls="viewprojects"
+                aria-selected="true"
+              >
+                View Projects
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="addprojects-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#addprojects"
+                type="button"
+                role="tab"
+                aria-controls="addprojects"
+                aria-selected="false"
+              >
+                Add Projects
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="removeprojects-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#removeprojects"
+                type="button"
+                role="tab"
+                aria-controls="removeprojects"
+                aria-selected="false"
+              >
+                Remove Projects
+              </button>
+            </li>
+          </ul>
 
+          <div class="tab-content mt-3" id="libraryTabsContent">
+            <!-- View Projects Tab -->
+            <div
+              class="tab-pane fade show active"
+              id="viewprojects"
+              role="tabpanel"
+              aria-labelledby="viewprojects-tab"
+            >
+              <ul
+                class="nav nav-pills mb-3"
+                id="viewProjectsTabs"
+                role="tablist"
+              >
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link active"
+                    id="availableprojects-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#availableprojects"
+                    type="button"
+                    role="tab"
+                    aria-controls="availableprojects"
+                    aria-selected="true"
+                  >
+                    Available Projects
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="deletedprojects-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#deletedprojects"
+                    type="button"
+                    role="tab"
+                    aria-controls="deletedprojects"
+                    aria-selected="false"
+                  >
+                    Deleted Projects
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="borrowedprojects-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#borrowedprojects"
+                    type="button"
+                    role="tab"
+                    aria-controls="borrowedprojects"
+                    aria-selected="false"
+                  >
+                    Borrowed Projects
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="departments-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#departments"
+                    type="button"
+                    role="tab"
+                    aria-controls="departments"
+                    aria-selected="false"
+                  >
+                    Departments
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="newprojects-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#newprojects"
+                    type="button"
+                    role="tab"
+                    aria-controls="newprojects"
+                    aria-selected="false"
+                  >
+                    New Projects
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="updatedprojects-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#updatedprojects"
+                    type="button"
+                    role="tab"
+                    aria-controls="updatedprojects"
+                    aria-selected="false"
+                  >
+                    Recently Updated Projects
+                  </button>
+                </li>
+              </ul>
 
-                        <!-- Add Section -->
-                        <div class="tab-pane fade" id="addBooks">
-                            <h4 class="text-center">Add a New project</h4>
-                            <form>
-                                <div class="mb-3">
-                                    <label class="form-label">Title</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Author</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Date</label>
-                                    <input type="date" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">projects Code</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="bookCode" readonly>
-                                        <button type="button" class="btn btn-primary" onclick="generateCode()">Generate Code</button>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-success">Submit</button>
-                            </form>
-                        </div>
-
-                          
-
-<!-- Remove Book Section -->
-<div class="tab-pane fade" id="removeBooks">
-    <h4 class="text-center">Remove a project</h4>
-    <form>
-        <div class="mb-3">
-            <label class="form-label">Enter project Code or Title</label>
-            <div class="input-group">
-                <input type="text" class="form-control" id="searchBook">
-                <button type="button" class="btn btn-secondary" onclick="searchBook()">Search</button>
-            </div>
-        </div>
-        <div id="bookDetails" class="mb-3 d-none">
-            <p><strong>Title:</strong> <span id="bookTitle"></span></p>
-            <p><strong>Author:</strong> <span id="bookAuthor"></span></p>
-            <button type="button" class="btn btn-danger" onclick="removeBook()">Remove project</button>
-        </div>
-    </form>
-</div>
-
-<script>
-    function searchBook() {
-        let searchInput = document.getElementById("searchBook").value;
-        if (!searchInput) {
-            alert("Please enter a book code or title.");
-            return;
-        }
-
-        fetch('http://localhost:3000/api/books/${searchInput}')
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    alert(data.message);
-                } else {
-                    document.getElementById("bookTitle").textContent = data.title;
-                    document.getElementById("bookAuthor").textContent = data.author;
-                    document.getElementById("bookDetails").classList.remove("d-none");
-                }
-            })
-            .catch(error => console.error("Error:", error));
-    }
-
-    function removeBook() {
-        let searchInput = document.getElementById("searchBook").value;
-        if (!confirm("Are you sure you want to remove this book?")) return;
-
-        fetch('http://localhost:3000/api/books/${searchInput}, { method: "DELETE" }')
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                document.getElementById("bookDetails").classList.add("d-none");
-                document.getElementById("searchBook").value = "";
-            })
-            .catch(error => console.error("Error:", error));
-    }
-</script>
-
-                    </div>
+              <div class="tab-content" id="viewProjectsTabsContent">
+                <div
+                  class="tab-pane fade show active"
+                  id="availableprojects"
+                  role="tabpanel"
+                  aria-labelledby="availableprojects-tab"
+                >
+                  <p>List of available projects will be displayed here.</p>
                 </div>
+                <div
+                  class="tab-pane fade"
+                  id="deletedprojects"
+                  role="tabpanel"
+                  aria-labelledby="deletedprojects-tab"
+                >
+                  <p>List of deleted projects will be displayed here.</p>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="borrowedprojects"
+                  role="tabpanel"
+                  aria-labelledby="borrowedprojects-tab"
+                >
+                  <p>List of borrowed projects and borrowers will be displayed here.</p>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="departments"
+                  role="tabpanel"
+                  aria-labelledby="departments-tab"
+                >
+                  <p>List of departments and project categories.</p>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="newprojects"
+                  role="tabpanel"
+                  aria-labelledby="newprojects-tab"
+                >
+                  <p>Recently added projects will be displayed here.</p>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="updatedprojects"
+                  role="tabpanel"
+                  aria-labelledby="updatedprojects-tab"
+                >
+                  <p>Recently updated project details will be displayed here.</p>
+                </div>
+              </div>
+            </div>
 
-            </main>
-        </div>
+            <!-- Add Projects Tab -->
+            <div
+              class="tab-pane fade"
+              id="addprojects"
+              role="tabpanel"
+              aria-labelledby="addprojects-tab"
+            >
+              <h4 class="text-center mb-3">Add a New Project</h4>
+             <form id="addProjectForm" method="POST" action="/librarian/projects/add" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Project Cover Image</label>
+    <input type="file" class="form-control" name="project_image" accept="image/*" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input type="text" class="form-control" name="title" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Author</label>
+    <input type="text" class="form-control" name="author" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Department</label>
+    <input type="text" class="form-control" name="department" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Date</label>
+    <input type="date" class="form-control" name="date_added" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Project Code</label>
+    <div class="input-group">
+      <input type="text" class="form-control" name="project_code" id="projectCode" readonly required>
+      <button type="button" class="btn btn-primary" onclick="generateProjectCode()">Generate Code</button>
     </div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Shelf Number</label>
+    <input type="number" class="form-control" name="shelf_no" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Drawer Number</label>
+    <input type="number" class="form-control" name="draw_no" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Year</label>
+    <input type="number" class="form-control" name="year" required>
+  </div>
+  <input type="hidden" name="to_json" value="true">
+  <button type="submit" class="btn btn-success">Submit</button>
+</form>
 
-    <script>
-        function generateCode() {
-            document.getElementById("bookCode").value = "BK" + Math.floor(1000 + Math.random() * 9000);
+            </div>
+
+            <!-- Remove Projects Tab -->
+            <div
+              class="tab-pane fade"
+              id="removeprojects"
+              role="tabpanel"
+              aria-labelledby="removeprojects-tab"
+            >
+              <h4 class="text-center mb-3">Remove a Project</h4>
+              <form id="removeProjectForm" onsubmit="event.preventDefault(); searchProject();">
+                <div class="mb-3">
+                  <label for="searchProjectInput" class="form-label"
+                    >Enter Project Code or Title</label
+                  >
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="searchProjectInput"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      class="btn btn-secondary"
+                    >
+                      Search
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              <div id="projectDetails" class="mb-3 d-none">
+                <p><strong>Title:</strong> <span id="projectTitleDisplay"></span></p>
+                <p><strong>Author:</strong> <span id="projectAuthorDisplay"></span></p>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  onclick="removeProject()"
+                >
+                  Remove Project
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+     function generateProjectCode() {
+    document.getElementById("projectCode").value =
+      "PR" + Math.floor(1000 + Math.random() * 9000);
+  }
+
+    async function searchProject() {
+      const searchInput = document.getElementById("searchProjectInput").value.trim();
+      if (!searchInput) {
+        alert("Please enter a project code or title.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/projects/${encodeURIComponent(searchInput)}`);
+        const data = await response.json();
+
+        if (data.message) {
+          alert(data.message);
+          document.getElementById("projectDetails").classList.add("d-none");
+        } else {
+          document.getElementById("projectTitleDisplay").textContent = data.title;
+          document.getElementById("projectAuthorDisplay").textContent = data.author;
+          document.getElementById("projectDetails").classList.remove("d-none");
         }
-    </script>
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error fetching project details.");
+      }
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    async function removeProject() {
+      const searchInput = document.getElementById("searchProjectInput").value.trim();
+      if (!confirm("Are you sure you want to remove this project?")) return;
 
+      try {
+        const response = await fetch(`http://localhost:3000/api/projects/${encodeURIComponent(searchInput)}`, {
+          method: "DELETE",
+        });
+        const data = await response.json();
+        alert(data.message);
+        document.getElementById("projectDetails").classList.add("d-none");
+        document.getElementById("searchProjectInput").value = "";
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error removing project.");
+      }
+    }
+
+    function filterProjects() {
+      // Placeholder for search/filter logic if needed
+    }
+
+    document.getElementById("addProjectForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const newProject = {
+        title: document.getElementById("projectTitle").value.trim(),
+        author: document.getElementById("projectAuthor").value.trim(),
+        date_added: document.getElementById("projectDate").value,
+        project_code: document.getElementById("projectCode").value.trim(),
+      };
+
+      // TODO: Send POST request to backend to add the project
+      // Example:
+      /*
+      try {
+        const response = await fetch("http://localhost:3000/api/projects", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newProject),
+        });
+        const data = await response.json();
+        alert(data.message || "Project added successfully!");
+        e.target.reset();
+        document.getElementById("projectCode").value = "";
+      } catch (error) {
+        console.error(error);
+        alert("Failed to add project.");
+      }
+      */
+
+      alert("Add project functionality is not implemented yet.");
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

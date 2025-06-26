@@ -43,7 +43,9 @@ router.delete('/attachment/:id/:attachmentId', librarianController.removeAttachm
 router.put('/attachment/:id/:attachmentId', librarianController.renameAttachment);
 
 
-
+router.post('/librarian/papers/add', upload.single('paper_image'), librarianController.addPaper);
+router.get('/api/papers/:search', librarianController.getPaperByCodeOrTitle);
+router.delete('/api/papers/:search', librarianController.deletePaper);
 
 
 

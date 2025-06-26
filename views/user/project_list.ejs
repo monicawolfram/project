@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= department.toUpperCase() %> Projects</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-size: cover;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+    }
+    .navbar {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+    .nav-link {
+      color: white !important;
+      font-weight: 500;
+    }
+    .nav-link:hover {
+      color: #ffdd57 !important;
+      transform: scale(1.1);
+    }
+    .projects-container {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 15px;
+      padding: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .project-card {
+      background: rgb(49, 49, 49);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .project-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .btn-custom {
+      background-color: #007bff;
+      color: white;
+    }
+    .btn-custom:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-4">
+    <nav class="navbar d-flex justify-content-around">
+      <a href="/user/home" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <a href="/user/projects" class="nav-link"><i class="fas fa-project-diagram"></i> Projects</a>
+      <a href="/user/books" class="nav-link"><i class="fas fa-book"></i> Books</a>
+      <a href="/user/papers" class="nav-link"><i class="fas fa-file-alt"></i> Papers</a>
+    </nav>
+
+    <h3 class="text-center my-3"><%= department.toUpperCase() %> Projects</h3>
+
+    <div class="row projects-container">
+      <% if (projects.length === 0) { %>
+        <p class="text-center text-warning">No projects found.</p>
+      <% } else { %>
+        <% projects.forEach(project => { %>
+          <div class="col-md-4">
+            <div class="project-card">
+              <img src="<%= project.image %>" alt="<%= project.title %>">
+              <h5 class="mt-2"><%= project.title %></h5>
+              <p><strong>Author:</strong> <%= project.author %></p>
+              <a href="<%= project.pdf_link %>" class="btn btn-custom btn-sm" target="_blank">View PDF</a>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

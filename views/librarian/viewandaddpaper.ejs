@@ -1,307 +1,629 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Librarian</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body {
-            background: url('library-bg.jpg') no-repeat center center fixed;
-            background-size: cover;
-            font-family: Arial, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Librarian - Manage Papers</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      background: url('library-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
 
-        .sidebar {
-            background-color: white;
-            min-height: 100vh;
-            padding: 20px;
-            border-radius: 15px;
-        }
+    .sidebar {
+      background-color: white;
+      min-height: 100vh;
+      padding: 20px;
+      border-radius: 15px;
+    }
 
-        .sidebar img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-        }
-        .sidebar .nav-link {
-            color: black;
-            font-size: 18px;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
+    .sidebar img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
+    .sidebar .nav-link {
+      color: black;
+      font-size: 18px;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
 
-        .sidebar .nav-link:hover {
-            background-color: green;
-            color: white;
-            border-radius: 8px;
-        }
+    .sidebar .nav-link:hover {
+      background-color: green;
+      color: white;
+      border-radius: 8px;
+    }
 
-       
+    .sidebar .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
-        .sidebar .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+    .nav-link {
+      color: rgb(19, 19, 19);
+      font-size: 18px;
+      padding: 10px 15px;
+      text-align: left;
+    }
 
-        .nav-link {
-            color: rgb(19, 19, 19);
-            font-size: 18px;
-            padding: 10px 15px;
-            text-align: left;
-        }
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
 
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
+    .content-container {
+      background: rgba(161, 247, 122, 0.9);
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
 
-        .content-container {
-            background: rgba(161, 247, 122, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
+    .tab-content {
+      padding: 15px;
+    }
 
-        .tab-content {
-            padding: 15px;
-        }
-
-        .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-    </style>
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background: white;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+        <div class="logo-container">
+          <img src="../images/sjcet.png" alt="SJCET Logo" />
+          <h4>SJUCET Library</h4>
+        </div>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="librarian_home.ejs"
+              ><i class="fas fa-home"></i> Home</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="librarian_category.ejs"
+              ><i class="fas fa-book"></i> Manage Catalog</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="managerequestlibrarian.ejs"
+              ><i class="fas fa-tasks"></i> Manage Requests</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="manageinventorylibrarian.ejs"
+              ><i class="fas fa-boxes"></i> Manage Inventory</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="massageandfeedback.ejs"
+              ><i class="fas fa-comments"></i> Messages & Feedback</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="generatereport.ejs"
+              ><i class="fas fa-chart-bar"></i> Generate Reports</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="Itsupport.ejs"
+              ><i class="fas fa-tools"></i> IT Support</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="manageusers.ejs"
+              ><i class="fas fa-users"></i> Manage Users</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="managefines.ejs"
+              ><i class="fas fa-money-bill-wave"></i> Manage Fines</a
+            >
+          </li>
+        </ul>
+      </nav>
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-                <div class="logo-container">
-                    <img src="../images/sjcet.png" alt="SJCET Logo"> 
-                    <h4>SJUCET Library</h4>
-                </div>
-                <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link" href="librarian_home.ejs"><i class="fas fa-home"></i> Home</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="librarian_category.ejs"><i class="fas fa-book"></i> Manage Catalog</a></li>
-                    <li class="nav-item"><a class="nav-link" href="managerequestlibrarian.ejs"><i class="fas fa-tasks"></i> Manage Requests</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manageinventorylibrarian.ejs"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
-                    <li class="nav-item"><a class="nav-link" href="massageandfeedback.ejs"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
-                    <li class="nav-item"><a class="nav-link" href="generatereport.ejs"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
-                    <li class="nav-item"><a class="nav-link" href="Itsupport.ejs"><i class="fas fa-tools"></i> IT Support</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manageusers.ejs"><i class="fas fa-users"></i> Manage Users</a></li>
-                    <li class="nav-item"><a class="nav-link" href="managefines.ejs"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
-                </ul>
-            </nav>
-     <!-- Main Content -->
-     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            
-       <!-- Top Bar -->
-       <div class="top-bar d-flex justify-content-between align-items-center">
-        <input type="text" class="form-control w-25" placeholder="Search here">
-        <div class="d-flex align-items-center">
+      <!-- Main Content -->
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <!-- Top Bar -->
+        <div class="top-bar d-flex justify-content-between align-items-center">
+          <input
+            type="text"
+            class="form-control w-25"
+            placeholder="Search here"
+            id="searchInput"
+            onkeyup="filterPapers()"
+          />
+          <div class="d-flex align-items-center">
             <!-- Notification Dropdown -->
             <div class="dropdown me-3">
-                <button class="btn btn-light dropdown-toggle" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-bell"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-                    <li><a class="dropdown-item" href="booknotification.ejs">New book added</a></li>
-                    <li><a class="dropdown-item" href="requestnotification.ejs">Request pending approval</a></li>
-                    <li><a class="dropdown-item" href="systemnotification.ejs">System maintenance scheduled</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-center" href="viewallnotification.ejs">View all</a></li>
-                </ul>
+              <button
+                class="btn btn-light dropdown-toggle"
+                type="button"
+                id="notificationDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-bell"></i>
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="notificationDropdown"
+              >
+                <li>
+                  <a class="dropdown-item" href="booknotification.ejs"
+                    >New paper added</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="requestnotification.ejs"
+                    >Request pending approval</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="systemnotification.ejs"
+                    >System maintenance scheduled</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li class="text-center">
+                  <a class="dropdown-item" href="viewallnotification.ejs"
+                    >View all</a
+                  >
+                </li>
+              </ul>
             </div>
 
             <!-- User Dropdown -->
             <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-user"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item" href="librarian_account.ejs">Librarian Account</a></li>
-                    <li><a class="dropdown-item" href="admin_account.ejs">Admin Account</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="librarian_interface.ejs">Logout</a></li>
-                </ul>
+              <button
+                class="btn btn-light dropdown-toggle"
+                type="button"
+                id="userDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-user"></i>
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="userDropdown"
+              >
+                <li>
+                  <a class="dropdown-item" href="librarian_account.ejs"
+                    >Librarian Account</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="admin_account.ejs"
+                    >Admin Account</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item text-danger" href="librarian_interface.ejs"
+                    >Logout</a
+                  >
+                </li>
+              </ul>
             </div>
+          </div>
         </div>
-    </div>
-                <div class="content-container">
-                    <h2 class="text-center mb-4">Librarian Dashboard</h2>
-                    
-                    <!-- View & Add Sections -->
-                    <ul class="nav nav-tabs" id="libraryTabs">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#viewpapers">View papers</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#addpapers">Add papers</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#removepapers">Remove papers</a>
-                        </li>
-                    </ul>
 
-                    <div class="tab-content mt-3">
-                        <!-- View Section -->
-                        <div class="tab-pane fade show active" id="viewBooks">
-                            <ul class="nav nav-pills mb-3" id="viewTabs">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="pill" href="#availablepapers">Available papers</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#deletedpapers">Deleted papers</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#borrowedpapers">Borrowed papers</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#departments">Departments</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#newpapers">New papers</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#updatedpapers">Recently Updated papers</a>
-                                </li>
-                            </ul>
+        <div class="content-container">
+          <h2 class="text-center mb-4">Librarian Dashboard - Manage Papers</h2>
 
-                            <div class="tab-content">
-                                <div class="tab-pane fade show active" id="availablepapers">
-                                    <p>List of available papers will be displayed here.</p>
-                                </div>
-                                <div class="tab-pane fade" id="deletedpapers">
-                                    <p>List of deleted papers will be displayed here.</p>
-                                </div>
-                                <div class="tab-pane fade" id="borrowedpapers">
-                                    <p>List of borrowed papers and borrowers will be displayed here.</p>
-                                </div>
-                                <div class="tab-pane fade" id="departments">
-                                    <p>List of departments and papers categories.</p>
-                                </div>
-                                <div class="tab-pane fade" id="newpapers">
-                                    <p>Recently added papers will be displayed here.</p>
-                                </div>
-                                <div class="tab-pane fade" id="updatedpapers">
-                                    <p>Recently updated papers details will be displayed here.</p>
-                                </div>
-                            </div>
-                        </div>
+          <!-- Tabs -->
+          <ul class="nav nav-tabs" id="libraryTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="viewpapers-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#viewpapers"
+                type="button"
+                role="tab"
+                aria-controls="viewpapers"
+                aria-selected="true"
+              >
+                View Papers
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="addpapers-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#addpapers"
+                type="button"
+                role="tab"
+                aria-controls="addpapers"
+                aria-selected="false"
+              >
+                Add Papers
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="removepapers-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#removepapers"
+                type="button"
+                role="tab"
+                aria-controls="removepapers"
+                aria-selected="false"
+              >
+                Remove Papers
+              </button>
+            </li>
+          </ul>
 
+          <div class="tab-content mt-3" id="libraryTabsContent">
+            <!-- View Papers Tab -->
+            <div
+              class="tab-pane fade show active"
+              id="viewpapers"
+              role="tabpanel"
+              aria-labelledby="viewpapers-tab"
+            >
+              <ul
+                class="nav nav-pills mb-3"
+                id="viewPapersTabs"
+                role="tablist"
+              >
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link active"
+                    id="availablepapers-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#availablepapers"
+                    type="button"
+                    role="tab"
+                    aria-controls="availablepapers"
+                    aria-selected="true"
+                  >
+                    Available Papers
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="deletedpapers-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#deletedpapers"
+                    type="button"
+                    role="tab"
+                    aria-controls="deletedpapers"
+                    aria-selected="false"
+                  >
+                    Deleted Papers
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="borrowedpapers-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#borrowedpapers"
+                    type="button"
+                    role="tab"
+                    aria-controls="borrowedpapers"
+                    aria-selected="false"
+                  >
+                    Borrowed Papers
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="departments-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#departments"
+                    type="button"
+                    role="tab"
+                    aria-controls="departments"
+                    aria-selected="false"
+                  >
+                    Departments
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="newpapers-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#newpapers"
+                    type="button"
+                    role="tab"
+                    aria-controls="newpapers"
+                    aria-selected="false"
+                  >
+                    New Papers
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="updatedpapers-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#updatedpapers"
+                    type="button"
+                    role="tab"
+                    aria-controls="updatedpapers"
+                    aria-selected="false"
+                  >
+                    Recently Updated Papers
+                  </button>
+                </li>
+              </ul>
 
-                        <!-- Add Section -->
-                        <div class="tab-pane fade" id="addpapers">
-                            <h4 class="text-center">Add a New papers</h4>
-                            <form>
-                                <div class="mb-3">
-                                    <label class="form-label">Title</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Author</label>
-                                    <input type="text" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Date</label>
-                                    <input type="date" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">paper Code</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="bookCode" readonly>
-                                        <button type="button" class="btn btn-primary" onclick="generateCode()">Generate Code</button>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-success">Submit</button>
-                            </form>
-                        </div>
-
-                          
-
-<!-- Remove Book Section -->
-<div class="tab-pane fade" id="removepapers">
-    <h4 class="text-center">Remove a papers</h4>
-    <form>
-        <div class="mb-3">
-            <label class="form-label">Enter paper Code or Title</label>
-            <div class="input-group">
-                <input type="text" class="form-control" id="searchBook">
-                <button type="button" class="btn btn-secondary" onclick="searchBook()">Search</button>
-            </div>
-        </div>
-        <div id="bookDetails" class="mb-3 d-none">
-            <p><strong>Title:</strong> <span id="bookTitle"></span></p>
-            <p><strong>Author:</strong> <span id="bookAuthor"></span></p>
-            <button type="button" class="btn btn-danger" onclick="removeBook()">Remove paper</button>
-        </div>
-    </form>
-</div>
-
-<script>
-    function searchBook() {
-        let searchInput = document.getElementById("searchBook").value;
-        if (!searchInput) {
-            alert("Please enter a book code or title.");
-            return;
-        }
-
-        fetch('http://localhost:3000/api/books/${searchInput}')
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    alert(data.message);
-                } else {
-                    document.getElementById("bookTitle").textContent = data.title;
-                    document.getElementById("bookAuthor").textContent = data.author;
-                    document.getElementById("bookDetails").classList.remove("d-none");
-                }
-            })
-            .catch(error => console.error("Error:", error));
-    }
-
-    function removeBook() {
-        let searchInput = document.getElementById("searchBook").value;
-        if (!confirm("Are you sure you want to remove this book?")) return;
-
-        fetch('http://localhost:3000/api/books/${searchInput}, { method: "DELETE" }')
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                document.getElementById("bookDetails").classList.add("d-none");
-                document.getElementById("searchBook").value = "";
-            })
-            .catch(error => console.error("Error:", error));
-    }
-</script>
-
-                    </div>
+              <div class="tab-content" id="viewPapersTabsContent">
+                <div
+                  class="tab-pane fade show active"
+                  id="availablepapers"
+                  role="tabpanel"
+                  aria-labelledby="availablepapers-tab"
+                >
+                  <p>List of available papers will be displayed here.</p>
                 </div>
+                <div
+                  class="tab-pane fade"
+                  id="deletedpapers"
+                  role="tabpanel"
+                  aria-labelledby="deletedpapers-tab"
+                >
+                  <p>List of deleted papers will be displayed here.</p>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="borrowedpapers"
+                  role="tabpanel"
+                  aria-labelledby="borrowedpapers-tab"
+                >
+                  <p>List of borrowed papers and borrowers will be displayed here.</p>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="departments"
+                  role="tabpanel"
+                  aria-labelledby="departments-tab"
+                >
+                  <p>List of departments and papers categories.</p>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="newpapers"
+                  role="tabpanel"
+                  aria-labelledby="newpapers-tab"
+                >
+                  <p>Recently added papers will be displayed here.</p>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="updatedpapers"
+                  role="tabpanel"
+                  aria-labelledby="updatedpapers-tab"
+                >
+                  <p>Recently updated papers details will be displayed here.</p>
+                </div>
+              </div>
+            </div>
 
-            </main>
-        </div>
+            <!-- Add Papers Tab -->
+            <div
+              class="tab-pane fade"
+              id="addpapers"
+              role="tabpanel"
+              aria-labelledby="addpapers-tab"
+            >
+              <h4 class="text-center mb-3">Add a New Paper</h4>
+             <form id="addPaperForm" method="POST" action="/librarian/papers/add" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Paper Cover Image</label>
+    <input type="file" class="form-control" name="paper_image" accept="image/*" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input type="text" class="form-control" name="title" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Author</label>
+    <input type="text" class="form-control" name="author" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Department</label>
+    <input type="text" class="form-control" name="department" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Date</label>
+    <input type="date" class="form-control" name="date_added" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Paper Code</label>
+    <div class="input-group">
+      <input type="text" class="form-control" name="paper_code" id="paperCode" readonly required>
+      <button type="button" class="btn btn-primary" onclick="generateCode()">Generate Code</button>
     </div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Shelf Number</label>
+    <input type="number" class="form-control" name="shelf_no" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Drawer Number</label>
+    <input type="number" class="form-control" name="draw_no" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Year</label>
+    <input type="number" class="form-control" name="year" required>
+  </div>
+  <input type="hidden" name="to_json" value="true">
+  <button type="submit" class="btn btn-success">Submit</button>
+</form>
 
-    <script>
-        function generateCode() {
-            document.getElementById("bookCode").value = "BK" + Math.floor(1000 + Math.random() * 9000);
+            </div>
+
+            <!-- Remove Papers Tab -->
+            <div
+              class="tab-pane fade"
+              id="removepapers"
+              role="tabpanel"
+              aria-labelledby="removepapers-tab"
+            >
+              <h4 class="text-center mb-3">Remove a Paper</h4>
+              <form id="removePaperForm" onsubmit="event.preventDefault(); searchPaper();">
+                <div class="mb-3">
+                  <label for="searchPaperInput" class="form-label"
+                    >Enter Paper Code or Title</label
+                  >
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="searchPaperInput"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      class="btn btn-secondary"
+                    >
+                      Search
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              <div id="paperDetails" class="mb-3 d-none">
+                <p><strong>Title:</strong> <span id="paperTitleDisplay"></span></p>
+                <p><strong>Author:</strong> <span id="paperAuthorDisplay"></span></p>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  onclick="removePaper()"
+                >
+                  Remove Paper
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Generate a paper code like BK1234
+    function generateCode() {
+      document.getElementById("paperCode").value =
+        "BK" + Math.floor(1000 + Math.random() * 9000);
+    }
+
+    // Filter papers on top-bar input (dummy for now)
+    function filterPapers() {
+      // Implement search/filter logic here if needed
+    }
+
+    // Search for paper by code or title (calls backend)
+    async function searchPaper() {
+      const searchInput = document.getElementById("searchPaperInput").value.trim();
+      if (!searchInput) {
+        alert("Please enter a paper code or title.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/papers/${encodeURIComponent(searchInput)}`);
+        const data = await response.json();
+
+        if (data.message) {
+          alert(data.message);
+          document.getElementById("paperDetails").classList.add("d-none");
+        } else {
+          document.getElementById("paperTitleDisplay").textContent = data.title;
+          document.getElementById("paperAuthorDisplay").textContent = data.author;
+          document.getElementById("paperDetails").classList.remove("d-none");
         }
-    </script>
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error fetching paper details.");
+      }
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    // Remove paper (calls backend DELETE)
+    async function removePaper() {
+      const searchInput = document.getElementById("searchPaperInput").value.trim();
+      if (!confirm("Are you sure you want to remove this paper?")) return;
 
+      try {
+        const response = await fetch(`http://localhost:3000/api/papers/${encodeURIComponent(searchInput)}`, {
+          method: "DELETE",
+        });
+        const data = await response.json();
+        alert(data.message);
+        document.getElementById("paperDetails").classList.add("d-none");
+        document.getElementById("searchPaperInput").value = "";
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error removing paper.");
+      }
+    }
+
+    // Handle Add Paper form submission (placeholder)
+    document.getElementById("addPaperForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const newPaper = {
+        title: document.getElementById("paperTitle").value.trim(),
+        author: document.getElementById("paperAuthor").value.trim(),
+        date_added: document.getElementById("paperDate").value,
+        paper_code: document.getElementById("paperCode").value.trim(),
+      };
+
+      // TODO: Send POST request to backend to add the paper
+      /*
+      try {
+        const response = await fetch("http://localhost:3000/api/papers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newPaper),
+        });
+        const data = await response.json();
+        alert(data.message || "Paper added successfully!");
+        e.target.reset();
+        document.getElementById("paperCode").value = "";
+      } catch (error) {
+        console.error(error);
+        alert("Failed to add paper.");
+      }
+      */
+
+      alert("Add paper functionality not implemented yet.");
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -30,6 +30,13 @@ router.post('/pay-fine', userController.payFine);
 router.get('/payments/:regNo', userController.getPaymentHistoryByRegNo);
 router.post('/register', upload.single('photo'), userController.registerUser);
 
+router.get('/papers', userController.papers); // optional static view
+router.get('/papers/departments', userController.getPaperDepartments);
+router.get('/show-papers/:department', userController.getPapersByDepartment);
+router.get('/projects', userController.projects);
+router.get('/projects/departments', userController.getProjectDepartments);
+router.get('/show-projects/:department', userController.getProjectsByDepartment);
+
 
 
 
@@ -64,7 +71,7 @@ router.get('/help', userController.help);
 router.get('/register', userController.register);
 
 router.get('/books', userController.books);
-router.get('/books/departments', userController.getDepartments);
+router.get('/books/departments', userController.getBookDepartments);
 router.get('/books/:department', userController.getBooksByDepartment);
 router.get('/show-books/:department', userController.getBooksByDepartment);
 module.exports = router;

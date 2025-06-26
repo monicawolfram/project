@@ -500,3 +500,73 @@ exports.renameAttachment = (req, res) => {
     res.json({ message: 'Attachment renamed.' });
   });
 };
+
+
+// Add a new paper
+exports.addPaper = (req, res) => {
+  const {
+    title,
+    author,
+    department,
+    date_added,
+    paper_code,
+    shelf_no,
+    draw_no,
+    year
+  } = req.body;
+
+  const paperImage = req.file ? req.file.filename : null;
+
+  const sql = `INSERT INTO papers (title, author, department, date_added, paper_code, shelf_no, draw_no, year, paper_image)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  db.query(
+    sql,
+    [title, author, department, date_added, paper_code, shelf_no, draw_no, year, paperImage],
+    (err, result) => {
+      if (err) {
+        console.error('Failed to add paper:', err);
+        return res.status(500).json({ error: 'Failed to add paper' });
+      }
+      res.redirect('/librarian/papers'); // or send JSON response if using fetch
+    }
+  );
+};
+
+// Get paper by code or title
+exports.getPaperByCodeOrTitle = (req, res) => {
+  const searchValue = req.params.search;
+
+  const sql = `SELECT * FROM papers WHERE paper_code = ? OR title = ? LIMIT 1`;
+  db.query(sql, [searchValue, searchValue], (err, results) => {
+    if (err) {
+      console.error('Error retrieving paper:', err);
+      return res.status(500).json({ error: 'Failed to retrieve paper' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Paper not found' });
+    }
+
+    res.json(results[0]);
+  });
+};
+
+// Delete a paper by code or title
+exports.deletePaper = (req, res) => {
+  const searchValue = req.params.search;
+
+  const sql = `DELETE FROM papers WHERE paper_code = ? OR title = ?`;
+  db.query(sql, [searchValue, searchValue], (err, result) => {
+    if (err) {
+      console.error('Error deleting paper:', err);
+      return res.status(500).json({ error: 'Failed to delete paper' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Paper not found or already deleted' });
+    }
+
+    res.json({ message: 'Paper removed successfully' });
+  });
+};
