@@ -381,54 +381,39 @@
               </ul>
 
               <div class="tab-content" id="viewPapersTabsContent">
-                <div
-                  class="tab-pane fade show active"
-                  id="availablepapers"
-                  role="tabpanel"
-                  aria-labelledby="availablepapers-tab"
-                >
-                  <p>List of available papers will be displayed here.</p>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="deletedpapers"
-                  role="tabpanel"
-                  aria-labelledby="deletedpapers-tab"
-                >
-                  <p>List of deleted papers will be displayed here.</p>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="borrowedpapers"
-                  role="tabpanel"
-                  aria-labelledby="borrowedpapers-tab"
-                >
-                  <p>List of borrowed papers and borrowers will be displayed here.</p>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="departments"
-                  role="tabpanel"
-                  aria-labelledby="departments-tab"
-                >
-                  <p>List of departments and papers categories.</p>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="newpapers"
-                  role="tabpanel"
-                  aria-labelledby="newpapers-tab"
-                >
-                  <p>Recently added papers will be displayed here.</p>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="updatedpapers"
-                  role="tabpanel"
-                  aria-labelledby="updatedpapers-tab"
-                >
-                  <p>Recently updated papers details will be displayed here.</p>
-                </div>
+           <div class="tab-pane fade show active" id="availablepapers" role="tabpanel" aria-labelledby="availablepapers-tab">
+  <div id="availablePapersList" class="row"></div>
+</div>
+
+              <div
+  class="tab-pane fade"
+  id="deletedpapers"
+  role="tabpanel"
+  aria-labelledby="deletedpapers-tab"
+>
+  <div id="deletedPapersList" class="row"></div>
+</div>
+
+                <!-- Borrowed Papers -->
+<div class="tab-pane fade" id="borrowedpapers" role="tabpanel" aria-labelledby="borrowedpapers-tab">
+  <div id="borrowedPapersList" class="row"></div>
+</div>
+
+<!-- Departments -->
+<div class="tab-pane fade" id="departments" role="tabpanel" aria-labelledby="departments-tab">
+  <div id="departmentsList" class="row"></div>
+</div>
+
+<!-- New Papers -->
+<div class="tab-pane fade" id="newpapers" role="tabpanel" aria-labelledby="newpapers-tab">
+  <div id="newPapersList" class="row"></div>
+</div>
+
+<!-- Recently Updated Papers -->
+<div class="tab-pane fade" id="updatedpapers" role="tabpanel" aria-labelledby="updatedpapers-tab">
+  <div id="updatedPapersList" class="row"></div>
+</div>
+
               </div>
             </div>
 
@@ -440,27 +425,32 @@
               aria-labelledby="addpapers-tab"
             >
               <h4 class="text-center mb-3">Add a New Paper</h4>
-             <form id="addPaperForm" method="POST" action="/librarian/papers/add" enctype="multipart/form-data">
+<form id="addPaperForm" method="POST" action="/librarian/papers/add" enctype="multipart/form-data">
   <div class="mb-3">
     <label class="form-label">Paper Cover Image</label>
     <input type="file" class="form-control" name="paper_image" accept="image/*" required>
   </div>
+
   <div class="mb-3">
     <label class="form-label">Title</label>
     <input type="text" class="form-control" name="title" required>
   </div>
+
   <div class="mb-3">
     <label class="form-label">Author</label>
     <input type="text" class="form-control" name="author" required>
   </div>
+
   <div class="mb-3">
     <label class="form-label">Department</label>
     <input type="text" class="form-control" name="department" required>
   </div>
+
   <div class="mb-3">
     <label class="form-label">Date</label>
     <input type="date" class="form-control" name="date_added" required>
   </div>
+
   <div class="mb-3">
     <label class="form-label">Paper Code</label>
     <div class="input-group">
@@ -468,21 +458,28 @@
       <button type="button" class="btn btn-primary" onclick="generateCode()">Generate Code</button>
     </div>
   </div>
+
   <div class="mb-3">
     <label class="form-label">Shelf Number</label>
     <input type="number" class="form-control" name="shelf_no" required>
   </div>
+
   <div class="mb-3">
     <label class="form-label">Drawer Number</label>
     <input type="number" class="form-control" name="draw_no" required>
   </div>
+
   <div class="mb-3">
     <label class="form-label">Year</label>
     <input type="number" class="form-control" name="year" required>
   </div>
+
   <input type="hidden" name="to_json" value="true">
+
   <button type="submit" class="btn btn-success">Submit</button>
 </form>
+
+
 
             </div>
 
@@ -534,95 +531,301 @@
     </div>
   </div>
 
-  <script>
-    // Generate a paper code like BK1234
-    function generateCode() {
-      document.getElementById("paperCode").value =
-        "BK" + Math.floor(1000 + Math.random() * 9000);
-    }
+<script>
+  function generateCode() {
+    document.getElementById("paperCode").value =
+      "BK" + Math.floor(1000 + Math.random() * 9000);
+  }
+</script>
 
-    // Filter papers on top-bar input (dummy for now)
-    function filterPapers() {
-      // Implement search/filter logic here if needed
-    }
 
-    // Search for paper by code or title (calls backend)
-    async function searchPaper() {
-      const searchInput = document.getElementById("searchPaperInput").value.trim();
-      if (!searchInput) {
-        alert("Please enter a paper code or title.");
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Load available papers
+  fetch('/librarian/papers/available')
+    .then(response => response.json())
+    .then(papers => {
+      const container = document.getElementById('availablepapers');
+      container.innerHTML = '';
+
+      if (!papers || papers.length === 0) {
+        container.innerHTML = '<p class="text-muted">No available papers found.</p>';
         return;
       }
 
-      try {
-        const response = await fetch(`http://localhost:3000/api/papers/${encodeURIComponent(searchInput)}`);
-        const data = await response.json();
+      const row = document.createElement('div');
+      row.className = 'row';
 
-        if (data.message) {
-          alert(data.message);
-          document.getElementById("paperDetails").classList.add("d-none");
-        } else {
-          document.getElementById("paperTitleDisplay").textContent = data.title;
-          document.getElementById("paperAuthorDisplay").textContent = data.author;
-          document.getElementById("paperDetails").classList.remove("d-none");
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Error fetching paper details.");
-      }
-    }
+      papers.forEach(paper => {
+        const card = document.createElement('div');
+        card.className = 'col-md-4 mb-3';
+        card.innerHTML = `
+          <div class="card h-100 shadow-sm">
+            <img src="/uploads/papers/${paper.image || 'default.jpg'}" class="card-img-top" alt="${paper.title}" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">${paper.title}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">${paper.author}</h6>
+              <p class="card-text">
+                <strong>Department:</strong> ${paper.department}<br>
+                <strong>Drawer No:</strong> ${paper.draw_no}<br>
+                <strong>Shelf No:</strong> ${paper.shelf_no}
+              </p>
+            </div>
+          </div>
+        `;
+        row.appendChild(card);
+      });
 
-    // Remove paper (calls backend DELETE)
-    async function removePaper() {
-      const searchInput = document.getElementById("searchPaperInput").value.trim();
-      if (!confirm("Are you sure you want to remove this paper?")) return;
-
-      try {
-        const response = await fetch(`http://localhost:3000/api/papers/${encodeURIComponent(searchInput)}`, {
-          method: "DELETE",
-        });
-        const data = await response.json();
-        alert(data.message);
-        document.getElementById("paperDetails").classList.add("d-none");
-        document.getElementById("searchPaperInput").value = "";
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Error removing paper.");
-      }
-    }
-
-    // Handle Add Paper form submission (placeholder)
-    document.getElementById("addPaperForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const newPaper = {
-        title: document.getElementById("paperTitle").value.trim(),
-        author: document.getElementById("paperAuthor").value.trim(),
-        date_added: document.getElementById("paperDate").value,
-        paper_code: document.getElementById("paperCode").value.trim(),
-      };
-
-      // TODO: Send POST request to backend to add the paper
-      /*
-      try {
-        const response = await fetch("http://localhost:3000/api/papers", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newPaper),
-        });
-        const data = await response.json();
-        alert(data.message || "Paper added successfully!");
-        e.target.reset();
-        document.getElementById("paperCode").value = "";
-      } catch (error) {
-        console.error(error);
-        alert("Failed to add paper.");
-      }
-      */
-
-      alert("Add paper functionality not implemented yet.");
+      container.appendChild(row);
+    })
+    .catch(err => {
+      console.error('Error fetching papers:', err);
+      document.getElementById('availablepapers').innerHTML = '<p class="text-danger">Error loading papers.</p>';
     });
-  </script>
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  fetch('/librarian/papers/borrowed')
+    .then(response => response.json())
+    .then(papers => {
+      const container = document.getElementById("borrowedpapers");
+      container.innerHTML = '';
+
+      if (!papers || papers.length === 0) {
+        container.innerHTML = '<p class="text-muted">No borrowed papers found.</p>';
+        return;
+      }
+
+      const row = document.createElement('div');
+      row.className = 'row';
+
+      papers.forEach(paper => {
+        const card = document.createElement('div');
+        card.className = 'col-md-4 mb-3';
+        card.innerHTML = `
+          <div class="card shadow-sm">
+            <img src="/uploads/papers/${paper.image || 'default.jpg'}" class="card-img-top" alt="${paper.title}" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">${paper.title}</h5>
+              <p class="card-text">
+                <strong>Author:</strong> ${paper.author}<br>
+                <strong>Borrowed By:</strong> ${paper.borrowed_by}<br>
+                <strong>Borrowed At:</strong> ${new Date(paper.borrowed_at).toLocaleDateString()}<br>
+                <strong>Return At:</strong> ${new Date(paper.return_at).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        `;
+        row.appendChild(card);
+      });
+
+      container.appendChild(row);
+    })
+    .catch(err => {
+      console.error('Error loading borrowed papers:', err);
+      document.getElementById("borrowedpapers").innerHTML = '<p class="text-danger">Failed to load borrowed papers.</p>';
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  fetch('/librarian/papers/deleted')
+    .then(response => response.json())
+    .then(papers => {
+      const container = document.getElementById("deletedpapers");
+      container.innerHTML = '';
+
+      if (!papers || papers.length === 0) {
+        container.innerHTML = '<p class="text-muted">No deleted papers found.</p>';
+        return;
+      }
+
+      const row = document.createElement('div');
+      row.className = 'row';
+
+      papers.forEach(paper => {
+        const card = document.createElement('div');
+        card.className = 'col-md-4 mb-3';
+        card.innerHTML = `
+          <div class="card shadow-sm">
+            <img src="/uploads/papers/${paper.image || 'default.jpg'}" class="card-img-top" alt="${paper.title}" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">${paper.title}</h5>
+              <p class="card-text">
+                <strong>Author:</strong> ${paper.author}<br>
+                <strong>Deleted At:</strong> ${new Date(paper.deleted_at).toLocaleDateString()}<br>
+                <strong>Paper Code:</strong> ${paper.paper_code || 'N/A'}
+              </p>
+            </div>
+          </div>
+        `;
+        row.appendChild(card);
+      });
+
+      container.appendChild(row);
+    })
+    .catch(err => {
+      console.error('Error loading deleted papers:', err);
+      document.getElementById("deletedpapers").innerHTML = '<p class="text-danger">Failed to load deleted papers.</p>';
+    });
+});
+</script>
+
+<script>
+  async function fetchAvailablePapers() {
+    try {
+      const response = await fetch('/librarian/available-papers');
+      const papers = await response.json();
+
+      const container = document.getElementById('availablePapersList');
+      container.innerHTML = '';
+
+      if (papers.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">No available papers found.</p>';
+        return;
+      }
+
+      papers.forEach(paper => {
+        const card = `
+          <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+              <img src="${paper.image ? '/uploads/papers/' + paper.image : '/uploads/papers/default.jpg'}" class="card-img-top" alt="${paper.title}">
+              <div class="card-body">
+                <h5 class="card-title">${paper.title}</h5>
+                <p class="card-text"><strong>Author:</strong> ${paper.author}</p>
+                <p class="card-text"><strong>Department:</strong> ${paper.department}</p>
+              </div>
+              <div class="card-footer text-muted small">
+                Paper Code: ${paper.paper_code}
+              </div>
+            </div>
+          </div>
+        `;
+        container.innerHTML += card;
+      });
+    } catch (error) {
+      console.error('Error fetching papers:', error);
+    }
+  }
+
+  // Load papers on tab switch or page load
+  document.addEventListener('DOMContentLoaded', fetchAvailablePapers);
+</script>
+
+<script>
+  async function fetchDeletedPapers() {
+    try {
+      const response = await fetch('/librarian/deleted-papers');
+      const papers = await response.json();
+
+      const container = document.getElementById('deletedPapersList');
+      container.innerHTML = '';
+
+      if (papers.length === 0) {
+        container.innerHTML = `<p class="text-muted text-center">No deleted papers found.</p>`;
+        return;
+      }
+
+      papers.forEach(paper => {
+        const card = `
+          <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+              <img src="${paper.paper_image ? '/uploads/papers/' + paper.paper_image : '/uploads/papers/default.jpg'}" class="card-img-top" alt="${paper.title}">
+              <div class="card-body">
+                <h5 class="card-title">${paper.title}</h5>
+                <p class="card-text"><strong>Author:</strong> ${paper.author}</p>
+                <p class="card-text"><strong>Department:</strong> ${paper.department}</p>
+                <p class="card-text text-danger"><strong>Status:</strong> Deleted</p>
+              </div>
+            </div>
+          </div>
+        `;
+        container.innerHTML += card;
+      });
+    } catch (error) {
+      console.error('Error loading deleted papers:', error);
+    }
+  }
+
+  // Optional: Fetch on tab show
+  document.getElementById('deletedpapers-tab').addEventListener('click', fetchDeletedPapers);
+</script>
+
+<script>
+  async function fetchAndRender(url, targetId, cardCallback) {
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      const container = document.getElementById(targetId);
+      container.innerHTML = '';
+
+      if (data.length === 0) {
+        container.innerHTML = `<p class="text-muted text-center">No items found.</p>`;
+        return;
+      }
+
+      data.forEach(item => {
+        container.innerHTML += cardCallback(item);
+      });
+    } catch (err) {
+      console.error(`Error loading ${targetId}:`, err);
+    }
+  }
+
+  function paperCard(paper, extra = '') {
+    return `
+      <div class="col-md-4 mb-3">
+        <div class="card shadow-sm">
+          <img src="${paper.paper_image ? '/uploads/papers/' + paper.paper_image : '/uploads/papers/default.jpg'}" class="card-img-top" alt="${paper.title}">
+          <div class="card-body">
+            <h5 class="card-title">${paper.title}</h5>
+            <p class="card-text"><strong>Author:</strong> ${paper.author}</p>
+            <p class="card-text"><strong>Department:</strong> ${paper.department}</p>
+            ${extra}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Bind tab click events
+  document.getElementById('borrowedpapers-tab').addEventListener('click', () => {
+    fetchAndRender('/librarian/borrowed-papers', 'borrowedPapersList', paper =>
+      paperCard(paper, `<p class="card-text text-info"><strong>Borrower:</strong> ${paper.borrower_name}</p>`)
+    );
+  });
+
+  document.getElementById('departments-tab').addEventListener('click', () => {
+    fetchAndRender('/librarian/paper-departments', 'departmentsList', dept =>
+      `
+      <div class="col-md-4 mb-3">
+        <div class="card shadow-sm">
+          <div class="card-body text-center">
+            <h5 class="card-title">${dept.department}</h5>
+            <a href="/librarian/papers/department/${dept.department}" class="btn btn-sm btn-primary">View</a>
+          </div>
+        </div>
+      </div>
+      `
+    );
+  });
+
+  document.getElementById('newpapers-tab').addEventListener('click', () => {
+    fetchAndRender('/librarian/new-papers', 'newPapersList', paper =>
+      paperCard(paper, `<span class="badge bg-success">New</span>`)
+    );
+  });
+
+  document.getElementById('updatedpapers-tab').addEventListener('click', () => {
+    fetchAndRender('/librarian/updated-papers', 'updatedPapersList', paper =>
+      paperCard(paper, `<span class="badge bg-warning text-dark">Updated</span>`)
+    );
+  });
+</script>
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

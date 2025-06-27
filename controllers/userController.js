@@ -473,12 +473,14 @@ exports.getPapersByDepartment = async (req, res) => {
       return res.render('user/paper_list', { papers: [], department, message: 'No papers available for this department.' });
     }
 
-    res.render('user/paper_list', { papers, department });
+    // Pass message as null when papers found
+    res.render('user/paper_list', { papers, department, message: null });
   } catch (error) {
     console.error(error);
     res.render('user/paper_list', { papers: [], department, message: 'Failed to load papers.' });
   }
 };
+
 exports.viewPapersByDepartment = (req, res) => {
   const dept = req.params.department;
   res.redirect(`/user/show-papers/${dept}`);

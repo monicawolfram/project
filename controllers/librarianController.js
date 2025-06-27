@@ -503,7 +503,7 @@ exports.renameAttachment = (req, res) => {
 
 
 
-exports.addPaper = (req, res) => {
+exports.addPaper = async (req, res) => {
   const {
     title,
     author,
@@ -512,25 +512,77 @@ exports.addPaper = (req, res) => {
     paper_code,
     shelf_no,
     draw_no,
-    year
+    year,
+    to_json
   } = req.body;
 
-  const paperImage = req.file ? req.file.filename : null;
+  const paper_image = req.file ? req.file.filename : null;
+  const isJson = to_json === 'true';
 
-  const sql = `INSERT INTO papers (title, author, department, date_added, paper_code, shelf_no, draw_no, year, paper_image)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const conn = await db.getConnection();
 
-  db.query(
-    sql,
-    [title, author, department, date_added, paper_code, shelf_no, draw_no, year, paperImage],
-    (err, result) => {
-      if (err) {
-        console.error('Failed to add paper:', err);
-        return res.status(500).json({ error: 'Failed to add paper' });
-      }
-      res.redirect('/librarian/papers'); // or send JSON response if using fetch
+  try {
+    await conn.beginTransaction();
+
+    // 1. Insert department only if it doesn't exist
+    const checkDeptSQL = `SELECT * FROM departments WHERE name = ?`;
+    const [deptRows] = await conn.execute(checkDeptSQL, [department]);
+
+    if (deptRows.length === 0) {
+      const insertDeptSQL = `
+        INSERT INTO departments (name, image, page)
+        VALUES (?, ?, ?)
+      `;
+
+      const imagePath = `/uploads/papers/${paper_image}`; // use paper's uploaded image
+      const page = department.toLowerCase(); // assume page naming convention
+
+      await conn.execute(insertDeptSQL, [department, imagePath, page]);
     }
-  );
+
+    // 2. Insert paper
+    const insertPaperSQL = `
+      INSERT INTO papers
+      (title, author, department, date_added, paper_code, shelf_no, draw_no, year, image, status, is_deleted, is_borrowed)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no', 'no')
+    `;
+
+    const paperValues = [
+      title, author, department, date_added,
+      paper_code, shelf_no, draw_no, year, paper_image
+    ];
+
+    await conn.execute(insertPaperSQL, paperValues);
+
+    await conn.commit();
+
+    if (isJson) {
+      return res.json({ status: 'success', message: 'Paper and department added successfully!' });
+    } else {
+      return res.redirect('/librarian/papers');
+    }
+
+  } catch (err) {
+    await conn.rollback();
+    console.error('❌ Transaction Error:', err.sqlMessage || err);
+
+    let errorMessage = 'Something went wrong while saving the paper. Please try again later.';
+
+    if (err.code === 'ER_BAD_NULL_ERROR') {
+      errorMessage = 'Please fill all required fields.';
+    } else if (err.code === 'ER_DUP_ENTRY') {
+      errorMessage = 'A paper with the same code already exists.';
+    }
+
+    if (isJson) {
+      return res.status(400).json({ status: 'error', error: errorMessage });
+    } else {
+      return res.redirect('/librarian/papers');
+    }
+
+  } finally {
+    conn.release();
+  }
 };
 exports.getPaperByCodeOrTitle = (req, res) => {
   const searchValue = req.params.search;
@@ -566,6 +618,72 @@ exports.deletePaper = (req, res) => {
     res.json({ message: 'Paper removed successfully' });
   });
 };
+exports.getAvailablePapers = async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM papers WHERE status = 'available'");
+    res.json(rows);
+  } catch (error) {
+    console.error("Error fetching available papers:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+exports.getDeletedPapers = async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM papers WHERE status = 'deleted'");
+    res.json(rows);
+  } catch (err) {
+    console.error("Failed to fetch deleted papers:", err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+exports.getBorrowedPapers = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT papers.*, users.name AS borrower_name
+      FROM papers
+      JOIN borrowed_papers ON borrowed_papers.paper_id = papers.id
+      JOIN users ON users.id = borrowed_papers.user_id
+      WHERE papers.status = 'borrowed'
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch borrowed papers' });
+  }
+};
+exports.getPaperDepartments = async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT DISTINCT department FROM papers");
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch departments' });
+  }
+};
+exports.getNewPapers = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT * FROM papers 
+      WHERE date_added >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+      AND status = 'available'
+    `);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch new papers' });
+  }
+};
+exports.getUpdatedPapers = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT * FROM papers 
+      WHERE updated_at >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+      AND status = 'available'
+    `);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch updated papers' });
+  }
+};
+
 
 exports.addProject = async (req, res) => {
   try {

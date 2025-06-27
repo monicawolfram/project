@@ -43,9 +43,18 @@ router.delete('/attachment/:id/:attachmentId', librarianController.removeAttachm
 router.put('/attachment/:id/:attachmentId', librarianController.renameAttachment);
 
 
-router.post('/librarian/papers/add', upload.single('paper_image'), librarianController.addPaper);
+router.post('/papers/add', upload.single('paper_image'), librarianController.addPaper);
 router.get('/papers/:search', librarianController.getPaperByCodeOrTitle);
 router.delete('/papers/:search', librarianController.deletePaper);
+router.get('/available-papers', librarianController.getAvailablePapers);
+router.get('/deleted-papers', librarianController.getDeletedPapers);
+router.get('/borrowed-papers', librarianController.getBorrowedPapers);
+router.get('/paper-departments', librarianController.getPaperDepartments);
+router.get('/new-papers', librarianController.getNewPapers);
+router.get('/updated-papers', librarianController.getUpdatedPapers);
+
+
+
 
 router.post('/projects/add', upload.single('project_image'), librarianController.addProject);
 router.get('/projects/:code_or_title', librarianController.getProjectByCodeOrTitle);
