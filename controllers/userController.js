@@ -70,9 +70,48 @@ exports.papers = (req, res) => {
 exports.projects = (req, res) => {
  res.render('user/projects');
 };
-exports.Attendance = (req, res) => {
- res.render('user/Attendance');
+
+exports.Attendance = async (req, res) => {
+  try {
+    const sessionUser = req.session.user;
+
+    if (!sessionUser || !sessionUser.reg_no) {
+      // If no session or user, redirect to login or show error
+      return res.redirect('/login');
+    }
+
+    const reg_no = sessionUser.reg_no;
+    const name = sessionUser.name || "User";
+
+    const now = new Date();
+    const month = req.query.month || now.getMonth() + 1;  // 1-12
+    const year = req.query.year || now.getFullYear();
+
+    // Fetch attendance for logged-in user
+    const [attendanceRows] = await db.execute(
+      `SELECT DATE_FORMAT(date, '%Y-%m-%d') AS date,
+              TIME_FORMAT(time_in, '%H:%i') AS time_in,
+              TIME_FORMAT(time_out, '%H:%i') AS time_out
+       FROM attendance
+       WHERE reg_no = ? AND MONTH(date) = ? AND YEAR(date) = ?
+       ORDER BY date ASC`,
+      [reg_no, month, year]
+    );
+
+    // Render the attendance page with user and attendance data
+    res.render('user/Attendance', {
+      user: { reg_no, name },
+      attendance: attendanceRows,
+      selectedMonth: month,
+      selectedYear: year
+    });
+  } catch (error) {
+    console.error("Error rendering attendance page:", error);
+    res.status(500).send("Internal Server Error");
+  }
 };
+
+ 
 exports.borrowing = (req, res) => {
  res.render('user/borrowing');
 };
@@ -184,80 +223,34 @@ exports.getUserByReg_no = async (req, res) => {
   }
 };
 
-exports.getAttendanceByMonthYear = async (req, res) => {
+// Controller: getFlatAttendance.js
+exports.getFlatAttendance = async (req, res) => {
   try {
     const { regNo } = req.params;
     const { month, year } = req.query;
 
     if (!month || !year) {
-      return res.status(400).json({ error: 'Month and year query parameters are required' });
+      return res.status(400).json({ error: 'Month and year are required' });
     }
 
-    // 1. Fetch user info (name) by regNo
-    const [userRows] = await db.execute(
-      `SELECT name FROM users WHERE reg_no = ? LIMIT 1`,
-      [regNo]
-    );
-
-    if (userRows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const userName = userRows[0].name;
-
-    // 2. Fetch attendance records
     const query = `
       SELECT DATE_FORMAT(date, '%Y-%m-%d') AS date,
-             DAYNAME(date) AS day,
              TIME_FORMAT(time_in, '%H:%i') AS time_in,
              TIME_FORMAT(time_out, '%H:%i') AS time_out
       FROM attendance
-      WHERE reg_no = ?
-        AND MONTH(date) = ?
-        AND YEAR(date) = ?
+      WHERE reg_no = ? AND MONTH(date) = ? AND YEAR(date) = ?
       ORDER BY date ASC
     `;
 
     const [rows] = await db.execute(query, [regNo, month, year]);
 
-    const attendanceMap = {};
-
-    rows.forEach(record => {
-      const { date, day, time_in, time_out } = record;
-      const dayKey = day.toLowerCase();
-
-      if (!attendanceMap[date]) {
-        attendanceMap[date] = {
-          date,
-          monday: null,
-          tuesday: null,
-          wednesday: null,
-          thursday: null,
-          friday: null
-        };
-      }
-
-      if (['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].includes(dayKey)) {
-        attendanceMap[date][dayKey] = {
-          time_in: time_in || '-',
-          time_out: time_out || '-'
-        };
-      }
-    });
-
-    const attendanceArray = Object.values(attendanceMap);
-
-    // 3. Send response with user name and attendance
-    res.json({
-      name: userName,
-      attendance: attendanceArray
-    });
-
-  } catch (error) {
-    console.error('Error fetching attendance:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching flat attendance:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
-}
+};
+
 
 
 exports.getBorrowedResources = async (req, res) => {
@@ -661,4 +654,92 @@ exports.setSession = async (req, res) => {
 
 
 
+exports.postAttendance = async (req, res) => {
+  try {
+    const { reg_no, date, time_in } = req.body;
+
+    if (!reg_no || !date || !time_in) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    // Check if there’s any attendance record for this user today
+    const [existing] = await db.execute(
+      `SELECT id, time_in, time_out FROM attendance WHERE reg_no = ? AND date = ? ORDER BY id DESC LIMIT 1`,
+      [reg_no, date]
+    );
+
+    if (existing.length > 0) {
+      const lastRecord = existing[0];
+
+      if (lastRecord.time_in && !lastRecord.time_out) {
+        // Still logged in → log out
+        const now = new Date();
+        const timeOut = now.toTimeString().split(':').slice(0, 2).join(':');
+
+        await db.execute(
+          `UPDATE attendance SET time_out = ? WHERE id = ?`,
+          [timeOut, lastRecord.id]
+        );
+
+        return res.json({ type: 'logout', message: 'Logout time recorded', time_out: timeOut });
+      } else {
+        // Already logged out → start new session
+        await db.execute(
+          `INSERT INTO attendance (reg_no, time_in, date) VALUES (?, ?, ?)`,
+          [reg_no, time_in, date]
+        );
+
+        return res.json({ type: 'login', message: 'New login session started', time_in });
+      }
+    }
+
+    // No record yet today → first login
+    await db.execute(
+      `INSERT INTO attendance (reg_no, time_in, date) VALUES (?, ?, ?)`,
+      [reg_no, time_in, date]
+    );
+
+    res.json({ type: 'login', message: 'Login time recorded', time_in });
+  } catch (error) {
+    console.error('Error inserting attendance:', error);
+    res.status(500).json({ message: 'Server error while inserting attendance' });
+  }
+};
+
+
+exports.getMyAttendance = async (req, res) => {
+  try {
+    const sessionUser = req.session.user;
+
+    if (!sessionUser || !sessionUser.reg_no) {
+      return res.status(401).json({ success: false, message: "No session or reg_no found" });
+    }
+
+    const reg_no = sessionUser.reg_no;
+
+    // For testing, return reg_no only (uncomment below to fetch data)
+    // return res.json({ reg_no });
+
+    const { month, year } = req.query;
+
+    if (!month || !year)
+      return res.status(400).json({ success: false, message: "Month and year required" });
+
+    const [rows] = await db.execute(
+      `SELECT DATE_FORMAT(date, '%Y-%m-%d') AS date,
+              TIME_FORMAT(time_in, '%H:%i') AS time_in,
+              TIME_FORMAT(time_out, '%H:%i') AS time_out
+       FROM attendance
+       WHERE reg_no = ? AND MONTH(date) = ? AND YEAR(date) = ?
+       ORDER BY date ASC`,
+      [reg_no, month, year]
+    );
+
+    res.json(rows);
+
+  } catch (err) {
+    console.error("Error fetching user attendance:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 

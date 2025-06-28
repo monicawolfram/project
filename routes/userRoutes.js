@@ -24,7 +24,9 @@ router.get('/dashboard', userController.dashboard);
 router.get('/notifications', userController.getNotifications);
 router.post('/send-feedback', userController.sendFeedback);
 router.get('/fetch-user', userController.getUserByReg_no);
-router.get('/attendance/:regNo', userController.getAttendanceByMonthYear);
+router.get('/flat-attendance/:regNo', userController.getFlatAttendance);
+router.post('/attendance', userController.postAttendance);
+
 router.get('/borrowed-resources/:userId', userController.getBorrowedResources);
 router.post('/pay-fine', userController.payFine);
 router.get('/payments/:regNo', userController.getPaymentHistoryByRegNo);
@@ -64,6 +66,7 @@ router.get('/mechactronics', userController.mechactronics);
 router.get('/papers', userController.papers);
 router.get('/projects', userController.projects);
 router.get('/Attendance', userController.Attendance);
+router.get('/my-attendance', userController.getMyAttendance);
 router.get('/borrowing', userController.borrowing);
 router.get('/paying', userController.paying);
 router.get('/resources', userController.resources);
