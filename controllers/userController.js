@@ -160,9 +160,32 @@ exports.borrow = async (req, res) => {
 exports.payment = (req, res) => {
  res.render('user/payment');
 };
-exports.profile = (req, res) => {
- res.render('user/profile');
+
+exports.profile = async (req, res) => {
+  try { 
+    const sessionUser = req.session.user;
+
+    if (!sessionUser || !sessionUser.reg_no) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: User session not found' });
+    }
+
+    const regNo = sessionUser.reg_no;
+    const [rows] = await db.execute('SELECT * FROM users WHERE reg_no = ?', [regNo]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.render('user/profile', { user: rows[0] });
+
+  } catch (err) {
+    console.error("Profile Fetch Error:", err);  // This will show full error in console
+    res.status(500).json({ success: false, message: 'Server not responding. Please try again later.' });
+  }
 };
+
+
+
 exports.AboutUs = (req, res) => {
  res.render('user/AboutUs');
 };
