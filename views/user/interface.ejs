@@ -186,7 +186,7 @@
           popup.classList.add("active");
 
           // Fetch attendance data for the user for current month/year
-          fetch(`http://localhost:3000/user/attendance/${reg_no}?month=${month}&year=${year}`)
+          fetch(`/user/attendance/${reg_no}?month=${month}&year=${year}`)
             .then(res => res.json())
             .then(attendanceData => {
               // Process attendance data (assuming latest attendance for today)
@@ -233,6 +233,24 @@
             });
 
           // Determine route
+          // Tell backend to store reg_no in session
+fetch('/user/set-session', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ reg_no: data.reg_no })
+})
+.then(res => res.json())
+.then(result => {
+  console.log("Session set result:", result);
+  if (!result.success) {
+    console.warn("Session not set:", result.message);
+  }
+})
+.catch(err => {
+  console.error("Error setting session:", err);
+});
+
+
           let redirectPath = "/user/home";
           if (data.role.toUpperCase() === "ADMIN") {
             redirectPath = "/admin/dashboard";

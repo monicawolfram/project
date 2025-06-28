@@ -82,9 +82,42 @@ exports.paying = (req, res) => {
 exports.resources = (req, res) => {
  res.render('user/resources');
 };
-exports.borrow = (req, res) => {
- res.render('user/borrow'); 
-}
+
+exports.borrow = async (req, res) => {
+  const sessionUser = req.session.user;
+
+  if (!sessionUser || !sessionUser.reg_no) {
+    return res.redirect('/login'); // or return 401 error
+  }
+
+  try {
+    const regNo = sessionUser.reg_no;
+
+    // Fetch name from DB
+    const [rows] = await db.execute(
+      'SELECT name FROM users WHERE reg_no = ?',
+      [regNo]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).send('User not found');
+    }
+
+    const name = rows[0].name;
+
+    // Render borrow form with pre-filled borrowerId and borrowerName
+    res.render('user/borrow', {
+      borrowerId: regNo,
+      borrowerName: name
+    });
+
+  } catch (err) {
+    console.error('Error fetching user info for borrow page:', err);
+    res.status(500).send('Internal server error');
+  }
+};
+
+
 exports.payment = (req, res) => {
  res.render('user/payment');
 };
@@ -599,6 +632,32 @@ exports.submitBorrow = async (req, res) => {
 
 
 
+// Route: POST /user/set-session
+exports.setSession = async (req, res) => {
+  const { reg_no } = req.body;
+
+  if (!reg_no) {
+    return res.status(400).json({ success: false, message: 'reg_no is required' });
+  }
+
+  try {
+    const [rows] = await db.execute('SELECT name FROM users WHERE reg_no = ?', [reg_no]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const name = rows[0].name;
+
+    // Set the server-side session
+    req.session.user = { reg_no, name };
+
+    res.json({ success: true, message: 'Session set successfully' });
+  } catch (err) {
+    console.error('Error setting session:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
 
 
 
