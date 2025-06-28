@@ -641,9 +641,10 @@ exports.getBorrowedPapers = async (req, res) => {
     const [rows] = await db.query(`
       SELECT papers.*, users.name AS borrower_name
       FROM papers
-      JOIN borrowed_papers ON borrowed_papers.paper_id = papers.id
-      JOIN users ON users.id = borrowed_papers.user_id
-      WHERE papers.status = 'borrowed'
+      JOIN borrowed_resources ON borrowed_resources.resource_id = papers.id
+        AND borrowed_resources.resource_type = 'paper'
+      JOIN users ON users.id = borrowed_resources.user_id
+      WHERE borrowed_resources.status = 'borrowed'
     `);
     res.json(rows);
   } catch (err) {
@@ -651,6 +652,7 @@ exports.getBorrowedPapers = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch borrowed papers' });
   }
 };
+
 exports.getPaperDepartments = async (req, res) => {
   try {
     const [rows] = await db.query("SELECT DISTINCT department FROM papers");
@@ -773,6 +775,74 @@ exports.getAvailableProjects = async (req, res) => {
     res.status(500).json({ message: 'Error fetching available projects' });
   }
 };
+exports.getDeletedProjects = async (req, res) => {
+  try {
+    const [projects] = await db.query(`
+      SELECT * FROM projects
+      WHERE is_deleted = 'yes'
+      ORDER BY deleted_at DESC
+    `);
+    res.json(projects);
+  } catch (err) {
+    console.error('❌ Failed to fetch deleted projects:', err);
+    res.status(500).json({ error: 'Failed to load deleted projects' });
+  }
+};
+exports.getBorrowedProjects = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT p.*, u.name AS borrower_name, br.borrowed_at, br.return_at
+      FROM borrowed_resources br
+      JOIN projects p ON p.id = br.resource_id
+      JOIN users u ON u.id = br.user_id
+      WHERE br.resource_type = 'project'
+      ORDER BY br.borrowed_at DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error('❌ Failed to fetch borrowed projects:', err);
+    res.status(500).json({ error: 'Failed to fetch borrowed projects' });
+  }
+};
+exports.getDepartmentCatalogs = async (req, res) => {
+  try {
+    const [rows] = await db.query(`SELECT * FROM your_catalog_table WHERE is_deleted = 'no'`);
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    console.error('Error fetching department catalogs:', error);
+    res.status(500).json({ success: false, message: 'Failed to load department catalogs.' });
+  }
+};
+exports.getNewProjects = async (req, res) => {
+  try {
+    const [projects] = await db.query(`
+      SELECT * FROM projects
+      WHERE is_deleted = 'no'
+      ORDER BY date_added DESC
+      LIMIT 10
+    `);
+    res.json(projects);
+  } catch (err) {
+    console.error('❌ Failed to fetch new projects:', err);
+    res.status(500).json({ error: 'Failed to load new projects' });
+  }
+};
+exports.getUpdatedProjects = async (req, res) => {
+  try {
+    const [projects] = await db.query(`
+      SELECT * FROM projects
+      WHERE is_deleted = 'no'
+      ORDER BY last_updated DESC
+      LIMIT 10
+    `);
+    res.json(projects);
+  } catch (err) {
+    console.error('❌ Failed to fetch updated projects:', err);
+    res.status(500).json({ error: 'Failed to load updated projects' });
+  }
+};
+
+
 
 exports.getAllRequests = (req, res) => {
   const sql = 'SELECT * FROM requests ORDER BY id DESC';

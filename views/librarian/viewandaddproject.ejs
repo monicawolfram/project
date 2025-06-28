@@ -382,54 +382,38 @@
               </ul>
 
               <div class="tab-content" id="viewProjectsTabsContent">
-                <div
-                  class="tab-pane fade show active"
-                  id="availableprojects"
-                  role="tabpanel"
-                  aria-labelledby="availableprojects-tab"
-                >
-                  <p>List of available projects will be displayed here.</p>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="deletedprojects"
-                  role="tabpanel"
-                  aria-labelledby="deletedprojects-tab"
-                >
-                  <p>List of deleted projects will be displayed here.</p>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="borrowedprojects"
-                  role="tabpanel"
-                  aria-labelledby="borrowedprojects-tab"
-                >
-                  <p>List of borrowed projects and borrowers will be displayed here.</p>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="departments"
-                  role="tabpanel"
-                  aria-labelledby="departments-tab"
-                >
-                  <p>List of departments and project categories.</p>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="newprojects"
-                  role="tabpanel"
-                  aria-labelledby="newprojects-tab"
-                >
-                  <p>Recently added projects will be displayed here.</p>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="updatedprojects"
-                  role="tabpanel"
-                  aria-labelledby="updatedprojects-tab"
-                >
-                  <p>Recently updated project details will be displayed here.</p>
-                </div>
+                <div class="tab-pane fade show active" id="availableprojects">
+  <div id="availableProjectsList" class="row"></div>
+</div>
+                <div class="tab-pane fade" id="deletedprojects">
+  <div id="deletedProjectsList" class="row"></div>
+</div>
+                <div class="tab-pane fade" id="borrowedprojects">
+  <div id="borrowedProjectsList" class="row"></div>
+</div>
+                <div class="tab-pane fade" id="departments">
+  <div id="projectDepartments" class="row"></div>
+</div>
+                <!-- Recently Added Projects -->
+<div
+  class="tab-pane fade"
+  id="newprojects"
+  role="tabpanel"
+  aria-labelledby="newprojects-tab"
+>
+  <div id="recentProjectsList" class="row"></div>
+</div>
+
+<!-- Recently Updated Projects -->
+<div
+  class="tab-pane fade"
+  id="updatedprojects"
+  role="tabpanel"
+  aria-labelledby="updatedprojects-tab"
+>
+  <div id="updatedProjectsList" class="row"></div>
+</div>
+
               </div>
             </div>
 
@@ -441,50 +425,59 @@
               aria-labelledby="addprojects-tab"
             >
               <h4 class="text-center mb-3">Add a New Project</h4>
-  <form id="addProjectForm" method="POST" action="/librarian/projects/add" enctype="multipart/form-data">
-    <div class="mb-3">
-      <label class="form-label">Project Cover Image</label>
-      <input type="file" class="form-control" name="project_image" accept="image/*" required>
+ <form id="addProjectForm" method="POST" action="/librarian/projects/add" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Project Cover Image</label>
+    <input type="file" class="form-control" name="project_image" accept="image/*" required>
+  </div>
 
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input type="text" class="form-control" name="title" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Author</label>
+    <input type="text" class="form-control" name="author" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Department</label>
+    <input type="text" class="form-control" name="department" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Date</label>
+    <input type="date" class="form-control" name="date_added" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Project Code</label>
+    <div class="input-group">
+      <input type="text" id="projectCode" name="project_code" placeholder="Project Code" readonly autocomplete="off" required class="form-control" />
+      <button type="button" class="btn btn-outline-secondary" onclick="generateProjectCode()">Generate</button>
     </div>
-    <div class="mb-3">
-      <label class="form-label">Title</label>
-      <input type="text" class="form-control" name="title" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Author</label>
-      <input type="text" class="form-control" name="author" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Department</label>
-      <input type="text" class="form-control" name="department" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Date</label>
-      <input type="date" class="form-control" name="date_added" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Project Code</label>
-      <div class="input-group">
-        <input type="text" class="form-control" name="project_code" id="projectCode" readonly required>
-        <button type="button" class="btn btn-primary" onclick="generateProjectCode()">Generate Code</button>
-      </div>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Shelf Number</label>
-      <input type="number" class="form-control" name="shelf_no" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Drawer Number</label>
-      <input type="number" class="form-control" name="draw_no" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Year</label>
-      <input type="number" class="form-control" name="year" required>
-    </div>
-    <input type="hidden" name="to_json" value="true">
-    <button type="submit" class="btn btn-success">Submit</button>
-  </form>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Shelf Number</label>
+    <input type="number" class="form-control" name="shelf_no" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Drawer Number</label>
+    <input type="number" class="form-control" name="draw_no" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Year</label>
+    <input type="number" class="form-control" name="year" required>
+  </div>
+
+  <input type="hidden" name="to_json" value="true">
+
+  <button type="submit" class="btn btn-success">Submit</button>
+</form>
 
             </div>
 
@@ -536,134 +529,288 @@
     </div>
   </div>
 
-  <script>
+
+
+ <script>
   function generateProjectCode() {
-    document.getElementById("projectCode").value = "PR" + Math.floor(1000 + Math.random() * 9000);
+    const input = document.getElementById("projectCode");
+    if (!input) {
+      console.error("Project Code input not found");
+      return;
+    }
+    input.value = "PR" + Math.floor(1000 + Math.random() * 9000);
   }
-
-
-
-    async function searchProject() {
-      const searchInput = document.getElementById("searchProjectInput").value.trim();
-      if (!searchInput) {
-        alert("Please enter a project code or title.");
-        return;
-      }
-
-      try {
-        const response = await fetch(`http://localhost:3000/api/projects/${encodeURIComponent(searchInput)}`);
-        const data = await response.json();
-
-        if (data.message) {
-          alert(data.message);
-          document.getElementById("projectDetails").classList.add("d-none");
-        } else {
-          document.getElementById("projectTitleDisplay").textContent = data.title;
-          document.getElementById("projectAuthorDisplay").textContent = data.author;
-          document.getElementById("projectDetails").classList.remove("d-none");
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Error fetching project details.");
-      }
-    }
-
-    async function removeProject() {
-      const searchInput = document.getElementById("searchProjectInput").value.trim();
-      if (!confirm("Are you sure you want to remove this project?")) return;
-
-      try {
-        const response = await fetch(`http://localhost:3000/api/projects/${encodeURIComponent(searchInput)}`, {
-          method: "DELETE",
-        });
-        const data = await response.json();
-        alert(data.message);
-        document.getElementById("projectDetails").classList.add("d-none");
-        document.getElementById("searchProjectInput").value = "";
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Error removing project.");
-      }
-    }
-
-    function filterProjects() {
-      // Placeholder for search/filter logic if needed
-    }
-
-    document.getElementById("addProjectForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const form = e.target;
-  const formData = new FormData(form); // includes file input + all fields
-
-  try {
-    const response = await fetch("/librarian/projects/add", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    alert(data.message || "Project added successfully!");
-    form.reset();
-    document.getElementById("projectCode").value = "";
-  } catch (error) {
-    console.error("Failed to add project:", error);
-    alert("Failed to add project.");
-  }
-});
-
-  </script>
+</script>
 
 <script>
-  async function loadAvailableProjects() {
-    const container = document.getElementById('availableprojects');
-    container.innerHTML = '<p>Loading projects...</p>';
-
-    try {
-      const response = await fetch('/librarian/projects/available');
-      if (!response.ok) throw new Error('Failed to fetch projects');
-
-      const projects = await response.json();
+document.addEventListener("DOMContentLoaded", function () {
+  // Load Available Projects
+  fetch('/librarian/projects/available')
+    .then(response => response.json())
+    .then(projects => {
+      const projectList = document.getElementById('availableProjectsList');
+      projectList.innerHTML = '';
 
       if (!Array.isArray(projects) || projects.length === 0) {
-        container.innerHTML = '<p>No available projects found.</p>';
+        projectList.innerHTML = '<p class="text-muted text-center w-100">No available projects found.</p>';
         return;
       }
 
-      let html = '<div class="row">';
       projects.forEach(proj => {
-        html += `
-          <div class="col-md-4 mb-3">
-            <div class="card h-100 shadow-sm">
-              <img src="/uploads/projects/${proj.image || 'default.jpg'}" class="card-img-top" alt="Project Image" style="height: 200px; object-fit: cover;" />
-              <div class="card-body">
-                <h5 class="card-title">${proj.title}</h5>
-                <p class="card-text"><strong>Author:</strong> ${proj.author}</p>
-                <p class="card-text"><strong>Year:</strong> ${proj.year}</p>
-                <a href="#" class="btn btn-outline-primary btn-sm">View Details</a>
-              </div>
+        const card = document.createElement('div');
+        card.className = 'col-md-4 mb-3';
+        card.innerHTML = `
+          <div class="card h-100 shadow-sm">
+            <img src="/uploads/projects/${proj.image || 'default.jpg'}" class="card-img-top" alt="${proj.title}" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">${proj.title}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">${proj.author}</h6>
+              <p class="card-text"><strong>Department:</strong> ${proj.department || 'N/A'}</p>
+              <p class="card-text"><strong>Year:</strong> ${proj.year || 'N/A'}</p>
             </div>
           </div>
         `;
+        projectList.appendChild(card);
       });
-      html += '</div>';
-
-      container.innerHTML = html;
-    } catch (err) {
-      container.innerHTML = `<p class="text-danger">Error loading projects: ${err.message}</p>`;
-    }
-  }
-
-  // Optional: only load when tab is shown (on click)
-  document.getElementById('availableprojects-tab').addEventListener('click', loadAvailableProjects);
+    })
+    .catch(err => {
+      console.error('Error fetching projects:', err);
+      document.getElementById('availableProjectsList').innerHTML =
+        '<p class="text-danger text-center">Error loading projects.</p>';
+    });
+});
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Load Available Projects
+  fetch('/librarian/projects/available')
+    .then(response => response.json())
+    .then(projects => {
+      const projectList = document.getElementById('availableProjectsList');
+      projectList.innerHTML = '';
 
+      if (!Array.isArray(projects) || projects.length === 0) {
+        projectList.innerHTML = '<p class="text-muted text-center w-100">No available projects found.</p>';
+        return;
+      }
 
+      projects.forEach(proj => {
+        const card = document.createElement('div');
+        card.className = 'col-md-4 mb-3';
+        card.innerHTML = `
+          <div class="card h-100 shadow-sm">
+            <img src="/uploads/projects/${proj.image || 'default.jpg'}" class="card-img-top" alt="${proj.title}" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">${proj.title}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">${proj.author}</h6>
+              <p class="card-text"><strong>Department:</strong> ${proj.department || 'N/A'}</p>
+              <p class="card-text"><strong>Year:</strong> ${proj.year || 'N/A'}</p>
+            </div>
+          </div>
+        `;
+        projectList.appendChild(card);
+      });
+    })
+    .catch(err => {
+      console.error('Error fetching projects:', err);
+      document.getElementById('availableProjectsList').innerHTML =
+        '<p class="text-danger text-center">Error loading projects.</p>';
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  fetch('/librarian/projects/deleted')
+    .then(res => res.json())
+    .then(projects => {
+      const container = document.getElementById("deletedProjectsList");
+      container.innerHTML = '';
+
+      if (!Array.isArray(projects) || projects.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">No deleted projects found.</p>';
+        return;
+      }
+
+      projects.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'col-md-4 mb-3';
+        card.innerHTML = `
+          <div class="card shadow-sm h-100">
+            <img src="/uploads/projects/${p.image || 'default.jpg'}" class="card-img-top" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">${p.title}</h5>
+              <p><strong>Author:</strong> ${p.author}</p>
+              <p><strong>Department:</strong> ${p.department}</p>
+              <p><strong>Year:</strong> ${p.year}</p>
+              <p><strong>Deleted At:</strong> ${p.deleted_at || 'N/A'}</p>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    })
+    .catch(err => {
+      console.error('Error loading deleted projects:', err);
+      document.getElementById("deletedProjectsList").innerHTML =
+        '<p class="text-danger">Failed to load deleted projects.</p>';
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  fetch('/librarian/projects/borrowed')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("borrowedProjectsList");
+      container.innerHTML = '';
+
+      if (!Array.isArray(data) || data.length === 0) {
+        container.innerHTML = `<p class="text-muted">No borrowed projects found.</p>`;
+        return;
+      }
+
+      data.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'col-md-4 mb-3';
+        card.innerHTML = `
+          <div class="card shadow h-100">
+            <img src="/uploads/projects/${p.image || 'default.jpg'}" class="card-img-top" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">${p.title}</h5>
+              <p><strong>Author:</strong> ${p.author}</p>
+              <p><strong>Borrowed By:</strong> ${p.borrower_name}</p>
+              <p><strong>Borrowed At:</strong> ${p.borrowed_at ? new Date(p.borrowed_at).toLocaleDateString() : 'N/A'}</p>
+              <p><strong>Return At:</strong> ${p.return_at ? new Date(p.return_at).toLocaleDateString() : 'N/A'}</p>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    })
+    .catch(err => {
+      console.error("Error fetching borrowed projects:", err);
+      document.getElementById("borrowedProjectsList").innerHTML =
+        `<p class="text-danger">Error loading borrowed projects.</p>`;
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  fetch('/librarian/departments/catalogs')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("projectDepartments");
+
+      if (!Array.isArray(data) || data.length === 0) {
+        container.innerHTML = `<p class="text-muted">No departmental project catalogs found.</p>`;
+        return;
+      }
+
+      const grouped = {};
+
+      data.forEach(item => {
+        if (!grouped[item.department]) grouped[item.department] = [];
+        grouped[item.department].push(item);
+      });
+
+      container.innerHTML = Object.entries(grouped).map(([dept, projects]) => `
+        <div class="col-12 mb-4">
+          <h3 class="text-primary">${dept}</h3>
+          <div class="row">
+            ${projects.map(p => `
+              <div class="col-md-4">
+                <div class="card shadow-sm mb-3">
+                  <img src="/uploads/projects/${p.image || 'default.jpg'}" class="card-img-top" alt="${p.title}" style="height: 180px; object-fit: cover;">
+                  <div class="card-body">
+                    <h5 class="card-title">${p.title}</h5>
+                    <p class="card-text">
+                      <strong>Author:</strong> ${p.author}<br>
+                      <strong>Year:</strong> ${p.year}<br>
+                      <strong>Status:</strong> ${p.status}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    })
+    .catch(err => {
+      console.error("Error fetching project departments:", err);
+      document.getElementById("projectDepartments").innerHTML =
+        `<p class="text-danger">Error loading department catalog.</p>`;
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Load Recently Added Projects
+  fetch('/librarian/projects/recent')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("recentProjectsList");
+      if (!Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<p class="text-muted">No recently added projects found.</p>';
+        return;
+      }
+
+      container.innerHTML = data.map(p => `
+        <div class="col-md-4 mb-3">
+          <div class="card h-100 shadow-sm">
+            <img src="/uploads/projects/${p.image || 'default.jpg'}" class="card-img-top" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">${p.title}</h5>
+              <p class="card-text"><strong>Author:</strong> ${p.author}</p>
+              <p class="card-text"><strong>Year:</strong> ${p.year}</p>
+              <p class="card-text"><strong>Added:</strong> ${new Date(p.date_added).toLocaleDateString()}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    })
+    .catch(err => {
+      console.error("Error fetching recent projects:", err);
+      document.getElementById("recentProjectsList").innerHTML =
+        '<p class="text-danger">Error loading recently added projects.</p>';
+    });
+
+  // Load Recently Updated Projects
+  fetch('/librarian/projects/updated')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("updatedProjectsList");
+      if (!Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<p class="text-muted">No recently updated projects found.</p>';
+        return;
+      }
+
+      container.innerHTML = data.map(p => `
+        <div class="col-md-4 mb-3">
+          <div class="card h-100 shadow-sm">
+            <img src="/uploads/projects/${p.image || 'default.jpg'}" class="card-img-top" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title">${p.title}</h5>
+              <p class="card-text"><strong>Author:</strong> ${p.author}</p>
+              <p class="card-text"><strong>Year:</strong> ${p.year}</p>
+              <p class="card-text"><strong>Updated:</strong> ${new Date(p.updated_at).toLocaleDateString()}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    })
+    .catch(err => {
+      console.error("Error fetching updated projects:", err);
+      document.getElementById("updatedProjectsList").innerHTML =
+        '<p class="text-danger">Error loading updated projects.</p>';
+    });
+});
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

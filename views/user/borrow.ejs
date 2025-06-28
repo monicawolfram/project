@@ -101,13 +101,15 @@
     const borrowDate = new Date(document.getElementById("borrowDate").value);
     const returnDate = new Date(document.getElementById("returnDate").value);
 
-    // Validate return date within 5 days
+    // Validate return date within 1–5 days
     const timeDiff = (returnDate - borrowDate) / (1000 * 60 * 60 * 24);
+    const errorMsg = document.getElementById("returnDateError");
+
     if (timeDiff < 1 || timeDiff > 5) {
-      document.getElementById("returnDateError").style.display = "block";
+      errorMsg.style.display = "block";
       return;
     } else {
-      document.getElementById("returnDateError").style.display = "none";
+      errorMsg.style.display = "none";
     }
 
     const data = {
@@ -119,23 +121,24 @@
     };
 
     try {
-      const res = await fetch("/user/borrow", {
+      const response = await fetch("/user/borrow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
-      const result = await res.json();
+      const result = await response.json();
       const msgBox = document.getElementById("formMsg");
+
+      console.log("Borrow request result:", result);
 
       if (result.success) {
         msgBox.innerHTML = `<div class="alert alert-success">Borrow request submitted successfully!</div>`;
         borrowForm.reset();
         document.getElementById("borrowDate").value = today;
 
-        // Redirect to borrowed resources page
         setTimeout(() => {
-          window.location.href = `/user/borrowed-resources/${data.borrower_id}`;
+          window.location.href = `/user/borrowing`;
         }, 1000);
       } else {
         msgBox.innerHTML = `<div class="alert alert-danger">Failed: ${result.error || "Unknown error."}</div>`;
@@ -147,6 +150,7 @@
     }
   });
 </script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

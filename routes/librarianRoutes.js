@@ -53,13 +53,16 @@ router.get('/paper-departments', librarianController.getPaperDepartments);
 router.get('/new-papers', librarianController.getNewPapers);
 router.get('/updated-papers', librarianController.getUpdatedPapers);
 
-
-
-
 router.post('/projects/add', upload.single('project_image'), librarianController.addProject);
 router.get('/projects/:code_or_title', librarianController.getProjectByCodeOrTitle);
 router.delete('/projects/:code_or_title', librarianController.deleteProject);
 router.get('/projects/available', librarianController.getAvailableProjects);
+router.get('/deleted-projects', librarianController.getDeletedProjects);
+router.get('/borrowed-projects', librarianController.getBorrowedProjects);
+router.get('/departments/catalogs', librarianController.getDepartmentCatalogs);
+router.get('/new-projects', librarianController.getNewProjects);
+router.get('/updated-projects', librarianController.getUpdatedProjects);
+
 
 router.get('/all', librarianController.getAllRequests);
 router.post('/add', librarianController.addRequest);

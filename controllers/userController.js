@@ -498,43 +498,38 @@ exports.getProjectDepartments = async (req, res) => {
     res.status(500).json({ error: 'Failed to load departments' });
   }
 };
-// userController.js
 exports.showProjectsByDepartment = async (req, res) => {
+  const dept = req.params.department;
+
   try {
-    const department = req.params.department;
+    // Use LOWER for case insensitive match & trim
+    const [projects] = await db.execute(
+      `SELECT id, title, author, year, image 
+       FROM projects 
+       WHERE LOWER(TRIM(department)) = LOWER(TRIM(?)) AND is_deleted = 'no' 
+       ORDER BY date_added DESC`,
+      [dept.trim()]
+    );
 
-    const [projects] = await db.execute(`
-      SELECT id, image, title, author, year, file_url
-      FROM projects
-      WHERE department = ? AND is_deleted = 'no'
-      ORDER BY date_added DESC
-    `, [department]);
-
-    // Map DB column `image` to `image_url` for EJS template
-    const mappedProjects = projects.map(p => ({
-      ...p,
-      image_url: p.image,  // so your template works with image_url
-    }));
-
-    if (mappedProjects.length === 0) {
+    if (projects.length === 0) {
       return res.render('user/project_list', {
-        department,
         projects: [],
+        department: dept,
         message: 'No projects found for this department.'
       });
     }
 
     res.render('user/project_list', {
-      department,
-      projects: mappedProjects,
+      projects,
+      department: dept,
       message: null
     });
-  } catch (error) {
-    console.error('Error fetching projects by department:', error);
-    res.render('user/project_list', {
-      department: req.params.department,
+  } catch (err) {
+    console.error('❌ Error fetching projects:', err);
+    res.status(500).render('user/project_list', {
       projects: [],
-      message: 'Error loading projects. Please try again later.'
+      department: dept,
+      message: 'Failed to fetch projects.'
     });
   }
 };
@@ -550,19 +545,28 @@ exports.getProjectsByDepartment = async (req, res) => {
     if (!department) {
       return res.status(400).json({ message: 'Department required' });
     }
+
     const [rows] = await db.execute(`
       SELECT id, image, title, author, status, year, project_code, date_added 
-      FROM projects WHERE department = ? AND is_deleted = 'no' ORDER BY date_added DESC
-    `, [department]);
+      FROM projects 
+      WHERE LOWER(TRIM(department)) = LOWER(TRIM(?)) AND is_deleted = 'no' 
+      ORDER BY date_added DESC
+    `, [department.trim()]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No projects found for this department' });
+    }
+
     res.json(rows);
   } catch (err) {
-    console.error(err);
+    console.error('Error loading projects:', err);
     res.status(500).json({ message: 'Error loading projects' });
   }
 };
 
+
 // controller/userController.js
-exports.submitBorrow = (req, res) => {
+exports.submitBorrow = async (req, res) => {
   const { borrower_id, borrower_name, resource_type, borrow_date, return_date } = req.body;
 
   if (!borrower_id || !borrower_name || !resource_type || !borrow_date || !return_date) {
@@ -570,22 +574,29 @@ exports.submitBorrow = (req, res) => {
   }
 
   const query = `
-    INSERT INTO borrow_requests (borrower_id, borrower_name, resource_type, borrow_date, return_date, status)
+    INSERT INTO borrow_requests 
+    (borrower_id, borrower_name, resource_type, borrow_date, return_date, status)
     VALUES (?, ?, ?, ?, ?, 'Pending')
   `;
 
-  db.query(query, [borrower_id, borrower_name, resource_type, borrow_date, return_date], (err) => {
-    if (err) {
-      console.error('DB Insert Error:', err);
-      return res.json({ success: false, error: 'Database error' });
-    }
+  try {
+    await db.execute(query, [
+      borrower_id,
+      borrower_name,
+      resource_type,
+      borrow_date,
+      return_date,
+    ]);
 
-    // Optional: notify librarian (e.g., via another table or flag)
-    // e.g., INSERT INTO notifications (type, message, target_role) ...
+    // Send success response with dynamic redirect
+    res.json({ success: true, redirect: `/user/borrowed-resources/${borrower_id}` });
 
-    res.json({ success: true, redirect: '/user/borrowed-resources' }); // <-- Redirect after success
-  });
+  } catch (err) {
+    console.error('DB Insert Error:', err);
+    res.json({ success: false, error: 'Database error' });
+  }
 };
+
 
 
 
