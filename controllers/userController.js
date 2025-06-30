@@ -25,6 +25,25 @@ exports.rules_and_regulation = (req, res) => {
 exports.books = (req, res) => {
  res.render('user/books');
 };
+exports.Logout = (req, res) => {
+  // If using express-session
+  if (req.session) {
+    req.session.destroy(err => {
+      if (err) {
+        console.error("Error destroying session during logout:", err);
+        // Still redirect even if error destroying session
+        return res.redirect('/');
+      }
+      // Clear cookie if any (optional, depending on your setup)
+      res.clearCookie('connect.sid', { path: '/' });
+      return res.redirect('/');
+    });
+  } else {
+    // No session? Just redirect
+    res.redirect('/');
+  }
+};
+
 exports.cs = (req, res) => {
  res.render('user/cs');
 };
@@ -587,7 +606,7 @@ exports.viewProjectsByDepartment = (req, res) => {
   const dept = req.params.department;
   res.redirect(`/user/show-projects/${dept}`);
 };
-// controllers/userController.js
+
 exports.getProjectsByDepartment = async (req, res) => {
   try {
     const department = req.params.department;
@@ -614,7 +633,6 @@ exports.getProjectsByDepartment = async (req, res) => {
 };
 
 
-// controller/userController.js
 exports.submitBorrow = async (req, res) => {
   const { borrower_id, borrower_name, resource_type, borrow_date, return_date } = req.body;
 

@@ -53,23 +53,68 @@
         <p><strong>User ID:</strong> <span><%= user.reg_no %></span></p>
         <p><strong>Department:</strong> <span><%= user.department %></span></p>
         <p><strong>Year:</strong> <span><%= user.year %></span></p>
-        <p><strong>Sex:</strong> <span><%= user.sex %></span></p>
+        <p><strong>Gender:</strong> <span><%= user.gender %></span></p>
       </div>
 
       <!-- Logout Button -->
       <div class="mt-4">
-        <a href="/login" onclick="logout()" class="btn btn-danger">
-          Logout <i class="fas fa-sign-out-alt"></i>
-        </a>
-      </div>
+  <a href="#" id="logoutBtn" class="btn btn-danger">
+    Logout <i class="fas fa-sign-out-alt"></i>
+  </a>
+</div>
+
     </div>
   </div>
 
   <script>
     function logout() {
       alert("You have successfully logged out!");
-      // Optionally add logic to clear session on backend
+
     }
+    document.getElementById('logoutBtn').addEventListener('click', async function(event) {
+  event.preventDefault();
+
+  // Assume you have user info (reg_no, date, day, time)
+  // You may want to fetch or store these from your session or page context
+  const reg_no = sessionStorage.getItem('userId') || localStorage.getItem('userId');
+  if (!reg_no) {
+    // No user session, just redirect to logout
+    window.location.href = '/user/logout';
+    return;
+  }
+
+  const now = new Date();
+  const date = now.toISOString().slice(0, 10);  // YYYY-MM-DD
+  const weekday = now.toLocaleDateString('en-US', { weekday: 'long' });
+  const time_out = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  try {
+    const response = await fetch('/user/attendance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        reg_no: reg_no,
+        date: date,
+        day: weekday,
+        time_out: time_out   // Note: sending time_out to mark logout time
+      })
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      console.log('Attendance updated:', result.message || 'Logged out time recorded');
+    } else {
+      console.warn('Attendance update failed:', result.message);
+    }
+  } catch (error) {
+    console.error('Error updating attendance:', error);
+  } finally {
+    // Redirect to logout regardless of fetch success
+    // window.location.href = '/user/logout';
+  }
+});
+
   </script>
 </body>
 

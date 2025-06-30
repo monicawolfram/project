@@ -1,141 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABOUT US</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        body {
-            background: url('Library.jpg') no-repeat center center/cover;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            transition: background 1s ease-in-out;
-        }
-        .navbar {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-        .nav-link {
-            color: white !important;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .nav-link:hover {
-            color: #ffdd57 !important;
-            transform: scale(1.1);
-        }
-        .container-box {
-            background: transparent;
-            color: white;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-        .about-us {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 15px;
-            margin-top: 20px;
-            text-align: center;
-        }
-        .librarian-card {
-            background: white;
-            color: black;
-            padding: 15px;
-            border-radius: 15px;
-            margin: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            text-align: center;
-        }
-        .librarian-card img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
-        .footer-btns {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .footer-btns .btn {
-            border-radius: 25px;
-            padding: 10px 20px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            margin: 5px;
-        }
-        .footer-btns .btn:hover {
-            transform: scale(1.1);
-            background: #27ae60;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ABOUT US</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <style>
+    body {
+      background: url('Library.jpg') no-repeat center center/cover;
+      color: #f0f8ff;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .navbar {
+      background: rgba(0, 55, 90, 0.9); /* deep blue tone */
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .nav-link {
+      color: #ffffff !important;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #00ffcc !important;
+      transform: scale(1.1);
+    }
+
+    .about-us {
+      background: rgba(0, 0, 0, 0.85);
+      padding: 25px;
+      border-radius: 20px;
+      margin-top: 25px;
+      text-align: center;
+      color: #e0f7fa;
+    }
+
+    .about-us h2, .about-us h4 {
+      color: #66ffcc;
+      font-weight: 600;
+    }
+
+    .services ul {
+      text-align: left;
+      max-width: 700px;
+      margin: 0 auto;
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .services ul li::before {
+      content: "✔️ ";
+      margin-right: 8px;
+      color: #00ffaa;
+    }
+
+    .librarian-card {
+      background: #ffffff;
+      color: #003344;
+      padding: 15px;
+      border-radius: 15px;
+      margin: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    .librarian-card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      object-fit: cover;
+      border: 3px solid #00cc99;
+    }
+
+    .footer-btns {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .footer-btns .btn {
+      border-radius: 25px;
+      padding: 10px 20px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      margin: 5px;
+      background-color: #00cc99;
+      border: none;
+      color: white;
+    }
+
+    .footer-btns .btn:hover {
+      transform: scale(1.1);
+      background: #00997a;
+    }
+  </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <nav class="navbar d-flex justify-content-around">
-            <a href="home.ejs" class="nav-link"><i class="fas fa-home"></i> Home</a>
-            <div class="dropdown">
-                <a class="nav-link dropdown-toggle" href="Resources.ejs" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-book"></i> Resources
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="books.ejs">Books</a></li>
-                    <li><a class="dropdown-item" href="papers.ejs">Papers</a></li>
-                    <li><a class="dropdown-item" href="projects.ejs">Projects</a></li>
-                </ul>
-            </div>
-            <a href="attendance.ejs" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
-            <div class="dropdown">
-                <a class="nav-link dropdown-toggle" href="transcation.ejs" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-exchange-alt"></i> Transaction
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="borrowing.ejs">Borrowing</a></li>
-                    <li><a class="dropdown-item" href="paying.ejs">Paying Fine</a></li>
-                </ul>
-            </div>
-            <div class="dropdown">
-                <a class="nav-link dropdown-toggle" href="viewstatus.ejs" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-eye"></i> Viewstatus
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="resources.ejs">Resources</a></li>
-                    <li><a class="dropdown-item" href="payment.ejs">Payment </a></li>
-                    <li><a class="dropdown-item" href="profile.ejs">Profile </a></li>
-                </ul>
-            </div>
-        </nav>
-        <div class="about-us">
-            <h2>About Us</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="librarian-card">
-                        <img src="/images/student4.jpeg" alt="Alice William">
-                        <h4>Monica w Mgeni</h4>
-                        <p>Monica is a dedicated librarian with years of experience in managing library resources and assisting readers.</p>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="librarian-card">
-                        <img src="/images/student1.jpeg" alt="Trezia Izack">
-                        <h4>Trezia Izack</h4>
-                        <p>Trezia is passionate about books and ensures the library operates smoothly for all members.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="footer-btns">
-            <a href="AboutUs.ejs" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
-            <a href="help.ejs" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
-        </div>
+  <div class="container mt-4">
+    <nav class="navbar d-flex justify-content-around flex-wrap">
+      <a href="/user/home" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <div class="dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fas fa-book"></i> Resources
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/user/books">Books</a></li>
+          <li><a class="dropdown-item" href="/user/papers">Papers</a></li>
+          <li><a class="dropdown-item" href="/user/projects">Projects</a></li>
+        </ul>
+      </div>
+      <a href="/user/attendance" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
+      <div class="dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fas fa-exchange-alt"></i> Transaction
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/user/borrowing">Borrowing</a></li>
+          <li><a class="dropdown-item" href="/user/paying">Paying Fine</a></li>
+        </ul>
+      </div>
+      <div class="dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fas fa-eye"></i> Viewstatus
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/user/resources">Resources</a></li>
+          <li><a class="dropdown-item" href="/user/payment">Payment</a></li>
+          <li><a class="dropdown-item" href="/user/borrow">Borrow</a></li>
+          <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="about-us">
+      <h2>About Our Library</h2>
+      <p class="mt-3">
+        The SJCET Library is the academic hub of St. Joseph University College of Engineering and Technology. Our mission is to empower students and faculty with seamless access to educational materials, research tools, and academic resources.
+      </p>
+      <p>
+        We offer a rich collection of Books, Papers, and Projects archives. With a modern library system that includes barcode-based attendance, borrowing history tracking, and digital access, we ensure a user-friendly experience for all.
+      </p>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <div class="about-us services">
+      <h4>Our Services</h4>
+      <ul>
+        <li>Access to Books, Papers, and Student projects archives</li>
+        <li>Borrowing, returning, and fine management system</li>
+        <li>Attendance tracking using barcode login</li>
+        <li>Feedback and IT support for user assistance</li>
+        <li>Report generation for library statistics and audits</li>
+      </ul>
+    </div>
+
+    <div class="about-us">
+      <h4>Meet Our Librarians</h4>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="librarian-card">
+            <img src="/images/student4.jpeg" alt="Monica w Mgeni">
+            <h4>Monica w Mgeni</h4>
+            <p>Monica is a dedicated librarian with years of experience in managing library resources and assisting readers.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="librarian-card">
+            <img src="/images/student1.jpeg" alt="Trezia Izack">
+            <h4>Trezia Izack</h4>
+            <p>Trezia is passionate about books and ensures the library operates smoothly for all members.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-btns">
+      <a href="/user/AboutUs" class="btn"><i class="fa-solid fa-info-circle"></i> About Us</a>
+      <a href="/user/help" class="btn"><i class="fa-solid fa-question-circle"></i> Help</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

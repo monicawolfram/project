@@ -40,9 +40,7 @@ router.get('/projects', userController.projects);
 router.get('/projects/departments', userController.getProjectDepartments);
 router.get('/show-projects/:department', userController.showProjectsByDepartment);
 router.get('/projects/:department', userController.getProjectsByDepartment);
-
 router.post('/borrow', userController.submitBorrow);
-
 router.post('/set-session', userController.setSession);
 
 
@@ -80,6 +78,7 @@ router.get('/help', userController.help);
 router.get('/register', userController.register);
 
 router.get('/books', userController.books);
+router.get('/logout', userController.Logout);
 router.get('/books/departments', userController.getBookDepartments);
 router.get('/books/:department', userController.getBooksByDepartment);
 router.get('/show-books/:department', userController.getBooksByDepartment);
