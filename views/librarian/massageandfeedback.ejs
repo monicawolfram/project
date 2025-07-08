@@ -170,123 +170,112 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>
-    $(document).ready(function(){
-      let messages = [
-        { name: "Alice William", type: "Suggestion", message: "We need maintenance...", attachment: "📷", status: "Opened" },
-        { name: "John Doe", type: "Complaint", message: "More books needed...", attachment: "📄", status: "Resolved" },
-        { name: "Emma Brown", type: "Feedback", message: "Great service!", attachment: "✅", status: "Reviewed" }
-      ];
+<script>
+  $(document).ready(function () {
+    let messages = [];
 
-      function loadMessages(filterType = "all") {
-        let tableContent = "";
-        messages.forEach((msg, index) => {
-          if (filterType === "reply" && msg.status !== "Resolved") return;
-          if (filterType === "feedback" && msg.type !== "Feedback") return;
-          let badgeClass = msg.status === "Opened" ? "badge-warning" : msg.status === "In Progress" ? "badge-primary" : "badge-success";
-          tableContent += `
-            <tr>
-              <td>${msg.name}</td>
-              <td>${msg.type}</td>
-              <td class="message-click" data-index="${index}" style="cursor:pointer;">${msg.message}</td>
-              <td class="attachment-click" data-attachment="${msg.attachment}" style="cursor:pointer;">${msg.attachment}</td>
-              <td><span class="badge ${badgeClass}">${msg.status}</span></td>
-            </tr>`;
-        });
-        $("#messageTable").ejs(tableContent);
-      }
+    // Load messages from backend
+    function fetchMessages() {
+      fetch('http://localhost:3000/librarian/all-messages')
+        .then(res => res.json())
+        .then(data => {
+          messages = data;
+          loadMessages("all");
+        })
+        .catch(err => console.error("Failed to fetch messages:", err));
+    }
 
-      $("#allMessagesTab").click(function() {
-        $(".nav-link").removeClass("active");
-        $(this).addClass("active");
-        loadMessages("all");
+    // Render messages into the table
+    function loadMessages(filterType = "all") {
+      let tableContent = "";
+      messages.forEach((msg, index) => {
+        if (filterType === "reply" && msg.status !== "Resolved") return;
+        if (filterType === "feedback" && msg.type !== "Feedback") return;
+
+        const badgeClass =
+          msg.status === "Opened"
+            ? "badge-warning"
+            : msg.status === "In Progress"
+            ? "badge-primary"
+            : "badge-success";
+
+        tableContent += `
+          <tr>
+            <td>${msg.name}</td>
+            <td>${msg.type}</td>
+            <td class="message-click" data-index="${index}" style="cursor:pointer;">${msg.message}</td>
+            <td class="attachment-click" data-attachment="${msg.attachment}" style="cursor:pointer;">${msg.attachment}</td>
+            <td><span class="badge ${badgeClass}">${msg.status}</span></td>
+          </tr>`;
       });
 
-      $("#replyMessagesTab").click(function() {
-        $(".nav-link").removeClass("active");
-        $(this).addClass("active");
-        loadMessages("reply");
-      });
+      $("#messageTable").html(tableContent);
+    }
 
-      $("#feedbackTab").click(function() {
-        $(".nav-link").removeClass("active");
-        $(this).addClass("active");
-        loadMessages("feedback");
-      });
-
-      $("#searchInput").on("keyup", function() {
-        const value = $(this).val().toLowerCase();
-        $("#messageTable tr").filter(function() {
-          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-      });
-
-      $(document).on("click", ".message-click", function() {
-        alert("Message: " + messages[$(this).data("index")].message);
-      });
-
-      $(document).on("click", ".attachment-click", function() {
-        alert("Opening attachment: " + $(this).data("attachment"));
-      });
-
-      $("#sendMessage").click(function() {
-        alert("Message sent successfully!");
-      });
-
-      loadMessages();
+    // Tab click handlers
+    $("#allMessagesTab").click(function () {
+      $(".nav-link").removeClass("active");
+      $(this).addClass("active");
+      loadMessages("all");
     });
 
-
-    // GET all messages
-fetch('http://localhost:3000/api/messages')
-    .then(res => res.json())
-    .then(data => {
-        console.log(data); // Replace this with render logic
+    $("#replyMessagesTab").click(function () {
+      $(".nav-link").removeClass("active");
+      $(this).addClass("active");
+      loadMessages("reply");
     });
 
-// POST a message
-fetch('http://localhost:3000/api/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        name: "Test User",
-        type: "Feedback",
-        message: "Loving the library!",
-        attachment: "✅",
-        status: "Opened"
-    })
-})
-.then(res => res.json())
-.then(data => console.log(data));
+    $("#feedbackTab").click(function () {
+      $(".nav-link").removeClass("active");
+      $(this).addClass("active");
+      loadMessages("feedback");
+    });
 
+    // Search filter
+    $("#searchInput").on("keyup", function () {
+      const value = $(this).val().toLowerCase();
+      $("#messageTable tr").filter(function () {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    });
 
+    // Click to view message
+    $(document).on("click", ".message-click", function () {
+      const index = $(this).data("index");
+      alert("Message:\n" + messages[index].message);
+    });
 
+    // Click to view attachment
+    $(document).on("click", ".attachment-click", function () {
+      const attachment = $(this).data("attachment");
+      alert("Opening attachment: " + attachment);
+    });
 
-fetch('http://localhost:3000/api/messages')
-  .then(res => res.json())
-  .then(data => {
-    console.log("Fetched messages:", data);
-    // render to table here
+    // Send dummy message (for testing)
+    $("#sendMessage").click(function () {
+      fetch("http://localhost:3000/librarian/add-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Test User",
+          type: "Suggestion",
+          message: "Example suggestion from user.",
+          attachment: "📎",
+          status: "Opened",
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          alert("Message sent!");
+          fetchMessages(); // reload after sending
+        })
+        .catch((err) => console.error("Error sending message:", err));
+    });
+
+    // Initial load
+    fetchMessages();
   });
+</script>
 
-
-  fetch('http://localhost:3000/api/messages', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    name: "Test User",
-    type: "Suggestion",
-    message: "Example message",
-    attachment: "📎",
-    status: "Opened"
-  })
-})
-.then(res => res.json())
-.then(data => console.log("Message sent:", data));
-
-
-  </script>
-
-  
 </body>
 </html>

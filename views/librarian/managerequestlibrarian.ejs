@@ -1,290 +1,324 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MANAGE REQUEST</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body {
-            background: url('library-bg.jpg') no-repeat center center fixed;
-            background-size: cover;
-            font-family: Arial, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Requests</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+  <style>
+    body {
+      background: url('library-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
 
-        .sidebar {
-            background-color: white;
-            min-height: 100vh;
-            padding: 20px;
-            border-radius: 15px;
-        }
+    .sidebar {
+      background-color: white;
+      min-height: 100vh;
+      padding: 20px;
+      border-radius: 15px;
+    }
 
-        .sidebar .nav-link {
-            color: black;
-            font-size: 18px;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
+    .sidebar .nav-link {
+      color: black;
+      font-size: 18px;
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
 
-        .sidebar .nav-link:hover {
-            background-color: green;
-            color: white;
-            border-radius: 8px;
-        }
+    .sidebar .nav-link:hover {
+      background-color: green;
+      color: white;
+      border-radius: 8px;
+    }
 
-       
+    .sidebar .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
-        .sidebar .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+    .sidebar img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
 
-        .sidebar img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-        }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background: white;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
 
-        .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
+    .main-content {
+      flex-grow: 1;
+      padding: 20px;
+    }
 
-        .main-content {
-            flex-grow: 1;
-            padding: 20px;
-        }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
-       
+    .tab-button {
+      padding: 8px 15px;
+      border: none;
+      background: hsl(0, 0%, 98%);
+      color: #0e0c0c;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+    .tab-button.active {
+      background-color: green;
+      color: white;
+    }
 
-        .tab-button {
-            padding: 8px 15px;
-            border: none;
-            background: hsl(0, 0%, 98%);
-            color: #0e0c0c;
-            border-radius: 5px;
-        }
+    .table-container {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+    }
 
-        .table-container {
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        
-    </style>
+    .form-control + .form-control {
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
 
 <div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-            <div class="logo-container">
-                <img src="/images/sjcet.png" alt="SJCET Logo"> 
-                <h4>SJUCET Library</h4>
-            </div>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a class="nav-link" href="librarian_home.ejs"><i class="fas fa-home"></i> Home</a></li>
-                <li class="nav-item"><a class="nav-link active" href="librarian_category.ejs"><i class="fas fa-book"></i> Manage Catalog</a></li>
-                <li class="nav-item"><a class="nav-link" href="managerequestlibrarian.ejs"><i class="fas fa-tasks"></i> Manage Requests</a></li>
-                <li class="nav-item"><a class="nav-link" href="manageinventorylibrarian.ejs"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
-                <li class="nav-item"><a class="nav-link" href="massageandfeedback.ejs"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
-                <li class="nav-item"><a class="nav-link" href="generatereport.ejs"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
-                <li class="nav-item"><a class="nav-link" href="Itsupport.ejs"><i class="fas fa-tools"></i> IT Support</a></li>
-                <li class="nav-item"><a class="nav-link" href="manageusers.ejs"><i class="fas fa-users"></i> Manage Users</a></li>
-                <li class="nav-item"><a class="nav-link" href="managefines.ejs"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+      <div class="logo-container">
+        <img src="/images/sjcet.png" alt="SJCET Logo" />
+        <h4>SJUCET Library</h4>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" href="/librarian/librarian_home"><i class="fas fa-home"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/librarian_category"><i class="fas fa-book"></i> Manage Catalog</a></li>
+        <li class="nav-item"><a class="nav-link active" href="#"><i class="fas fa-tasks"></i> Manage Requests</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/manageinventorylibrarian"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/massageandfeedback"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/generatereport"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/Itsupport"><i class="fas fa-tools"></i> IT Support</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/manageusers"><i class="fas fa-users"></i> Manage Users</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/managefines"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="top-bar">
+        <input type="text" class="form-control w-25" placeholder="Search here">
+        <div class="d-flex align-items-center">
+          <div class="dropdown me-3">
+            <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="fas fa-bell"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#">New book added</a></li>
+              <li><a class="dropdown-item" href="#">Request pending approval</a></li>
+              <li><a class="dropdown-item" href="#">System maintenance</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-center" href="#">View all</a></li>
             </ul>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            
-           <!-- Top Bar -->
-           <div class="top-bar d-flex justify-content-between align-items-center">
-            <input type="text" class="form-control w-25" placeholder="Search here">
-            <div class="d-flex align-items-center">
-                <!-- Notification Dropdown -->
-                <div class="dropdown me-3">
-                    <button class="btn btn-light dropdown-toggle" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-bell"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-                        <li><a class="dropdown-item" href="booknotification.ejs">New book added</a></li>
-                        <li><a class="dropdown-item" href="requestnotification.ejs">Request pending approval</a></li>
-                        <li><a class="dropdown-item" href="systemnotification.ejs">System maintenance scheduled</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-center" href="viewallnotification.ejs">View all</a></li>
-                    </ul>
-                </div>
-
-                <!-- User Dropdown -->
-                <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="librarian_account.ejs">Librarian Account</a></li>
-                        <li><a class="dropdown-item" href="admin_account.ejs">Admin Account</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="librarian_interface.ejs">Logout</a></li>
-                    </ul>
-                </div>
-            </div>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#">Librarian Account</a></li>
+              <li><a class="dropdown-item" href="#">Admin Account</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+            </ul>
+          </div>
         </div>
+      </div>
 
-        <!-- Main Content -->
-    <div class="main-content">
-        <h3>Librarian Manage Request</h3>
+      <div class="main-content">
+        <h3>Librarian Manage Requests</h3>
 
         <!-- Add Request Form -->
         <div class="mb-3">
-            <input type="text" id="requestName" placeholder="Name" class="form-control">
-            <input type="text" id="requestResource" placeholder="Resource" class="form-control mt-2">
-            <input type="text" id="requestTitle" placeholder="Title" class="form-control mt-2">
-            <button class="btn btn-primary mt-2" onclick="addRequest()">➕ Add Request</button>
+          <input type="text" id="requestUserId" placeholder="Reg No" class="form-control">
+          <input type="text" id="requestName" placeholder="Name" class="form-control">
+          <input type="text" id="requestResource" placeholder="Resource" class="form-control">
+          <input type="text" id="requestTitle" placeholder="Title" class="form-control">
+          <button class="btn btn-primary mt-2" onclick="addRequest()">➕ Add Request</button>
         </div>
 
-        
-        <!-- Tabs for Requests -->
-        <div class="tabs">
-            <button class="tab-button active" onclick="filterRequests('all')">📑 Requests</button>
-            <button class="tab-button" onclick="filterRequests('pending')">🕒 Pending</button>
-            <button class="tab-button" onclick="filterRequests('approved')">✅ Approved</button>
-            <button class="tab-button" onclick="filterRequests('rejected')">❌ Rejected</button>
+        <!-- Filter by Reg No -->
+        <div class="mb-3 d-flex gap-2 align-items-center">
+          <input type="text" id="filterUserId" class="form-control w-25" placeholder="Filter by Reg No" oninput="loadRequests()">
+          <button class="btn btn-outline-secondary" onclick="document.getElementById('filterUserId').value=''; loadRequests();">Clear</button>
         </div>
 
-        <!-- Table of Requests -->
+        <!-- Tabs -->
+        <div class="tabs" id="requestTabs">
+          <button class="tab-button active" data-status="all">📑 All Requests</button>
+          <button class="tab-button" data-status="pending">🕒 Pending</button>
+          <button class="tab-button" data-status="approved">✅ Approved</button>
+        </div>
+
+        <!-- Table -->
         <div class="table-container">
-            <table class="table table-striped">
-                <thead>
-  <tr>
-    <th>ID</th>
-    <th>Name</th>
-    <th>Resource</th>
-    <th>Title</th>
-    <th>Date</th>
-    <th>Status</th>
-    <th>Action</th>
-  </tr>
-</thead>
-<tbody id="request-list">
-  <!-- Dynamic Content -->
-</tbody>
-
-            </table>
+          <table class="table table-striped">
+            <thead>
+              <tr><th>Id</th><th>Reg No</th><th>Name</th><th>Resource</th><th>Title</th><th>Date</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody id="request-list"></tbody>
+          </table>
         </div>
+      </div>
+    </main>
+  </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-async function loadRequests() {
-    try {
-        const res = await fetch('/librarian/requests/all');
-        const data = await res.json();
-        displayRequests(data);
-    } catch (err) {
-        console.error('Failed to fetch requests:', err);
-    }
-}
+  let currentStatus = 'all';
 
-function displayRequests(data) {
+  document.addEventListener('DOMContentLoaded', () => {
+    loadRequests();
+    setupTabClickHandlers();
+  });
+
+  function setupTabClickHandlers() {
+    const buttons = document.querySelectorAll('#requestTabs .tab-button');
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        buttons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        currentStatus = button.dataset.status;
+        loadRequests();
+      });
+    });
+  }
+
+  async function loadRequests() {
+    try {
+      const regNoFilter = document.getElementById("filterUserId").value.trim();
+
+      let url = '/librarian/requests/all';
+      if (regNoFilter) {
+        url += `?reg_no=${encodeURIComponent(regNoFilter)}`;
+      }
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      // Filter by status if not 'all'
+      const filtered = currentStatus === 'all'
+        ? data
+        : data.filter(r => r.status.toLowerCase() === currentStatus);
+
+      displayRequests(filtered);
+    } catch (err) {
+      console.error('Failed to fetch requests:', err);
+    }
+  }
+
+  function displayRequests(data) {
     const tbody = document.getElementById("request-list");
     tbody.innerHTML = "";
 
-    data.forEach((req) => {
-        const row = document.createElement("tr");
+    const thead = document.querySelector("thead tr");
+    thead.innerHTML = currentStatus === 'pending'
+      ? `<th>ID</th><th>Reg No</th><th>Name</th><th>Resource</th><th>Title</th><th>Date</th><th>Reason</th><th>Status</th><th>Action</th>`
+      : `<th>ID</th><th>Reg No</th><th>Name</th><th>Resource</th><th>Title</th><th>Date</th><th>Status</th><th>Action</th>`;
 
-        const badgeColor = {
-            pending: "warning",
-            approved: "success",
-            rejected: "danger"
-        }[req.status.toLowerCase()] || "secondary";
+    data.forEach(req => {
+      const badgeColor = {
+        pending: "warning",
+        approved: "success",
+        rejected: "danger"
+      }[req.status.toLowerCase()] || "secondary";
 
-        row.innerHTML = `
-            <td>${req.id}</td>
-            <td>${req.name}</td>
-            <td>${req.resource}</td>
-            <td>${req.title}</td>
-            <td>${new Date(req.date).toLocaleDateString()}</td>
-            <td><span class="badge bg-${badgeColor}">${req.status}</span></td>
-            <td>
-                ${req.status.toLowerCase() === "pending"
-                    ? `<button class="btn btn-sm btn-success me-2" onclick="updateStatus(${req.id}, 'Approved')">Approve</button>
-                       <button class="btn btn-sm btn-danger" onclick="updateStatus(${req.id}, 'Rejected')">Reject</button>`
-                    : `<span class="text-muted">No Action</span>`
-                }
-            </td>
-        `;
-        tbody.appendChild(row);
+      const reasonCell = currentStatus === 'pending' ? `<td>${req.reason || 'N/A'}</td>` : '';
+
+      let actionButtons = `<span class="text-muted">No Action</span>`;
+      if (req.status.toLowerCase() === "pending") {
+        actionButtons = `
+          <button class="btn btn-sm btn-success me-2" onclick="updateStatus(${req.id}, 'Approved')">Approve</button>
+          <button class="btn btn-sm btn-danger" onclick="updateStatus(${req.id}, 'Rejected')">Reject</button>`;
+      } else if (req.status.toLowerCase() === "approved") {
+        actionButtons = `<span class="text-muted">Approved</span>`;
+      }
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${req.id}</td>
+        <td>${req.reg_no || 'N/A'}</td>
+        <td>${req.name}</td>
+        <td>${req.resource}</td>
+        <td>${req.title}</td>
+        <td>${new Date(req.date).toLocaleDateString()}</td>
+        ${reasonCell}
+        <td><span class="badge bg-${badgeColor}">${req.status}</span></td>
+        <td>${actionButtons}</td>
+      `;
+      tbody.appendChild(row);
     });
-}
+  }
 
-async function addRequest() {
-    const name = document.getElementById("requestName").value;
-    const resource = document.getElementById("requestResource").value;
-    const title = document.getElementById("requestTitle").value;
-
-    if (!name || !resource || !title) return alert("Please fill all fields");
+  async function addRequest() {
+    const reg_no = document.getElementById("requestUserId").value.trim();
+    const name = document.getElementById("requestName").value.trim();
+    const resource = document.getElementById("requestResource").value.trim();
+    const title = document.getElementById("requestTitle").value.trim();
+    if (!reg_no || !name || !resource || !title) return alert("Please fill all fields");
 
     const res = await fetch('/librarian/requests/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, resource, title })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reg_no, name, resource, title })
     });
 
     const result = await res.json();
     if (result.success) {
-        loadRequests();
+      clearAddForm();
+      loadRequests();
     } else {
-        console.error('Error adding request');
+      alert("Failed to add request");
     }
-}
+  }
 
-async function updateStatus(id, status) {
+  function clearAddForm() {
+    document.getElementById("requestUserId").value = '';
+    document.getElementById("requestName").value = '';
+    document.getElementById("requestResource").value = '';
+    document.getElementById("requestTitle").value = '';
+  }
+
+  async function updateStatus(id, status) {
     const res = await fetch('/librarian/requests/update-status', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status })
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status })
     });
 
     const result = await res.json();
     if (result.success) {
-        loadRequests();
+      loadRequests();
     } else {
-        alert("Failed to update status");
+      alert("Failed to update status");
     }
-}
-
-function filterRequests(status) {
-    fetch('/librarian/requests/all')
-        .then(res => res.json())
-        .then(data => {
-            const filtered = status === 'all' ? data : data.filter(r => r.status.toLowerCase() === status);
-            displayRequests(filtered);
-        });
-}
-
-document.addEventListener('DOMContentLoaded', loadRequests);
+  }
 </script>
+
 
 </body>
 </html>

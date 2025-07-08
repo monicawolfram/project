@@ -842,29 +842,140 @@ exports.getUpdatedProjects = async (req, res) => {
   }
 };
 
+exports.getAllRequests = async (req, res) => {
+  const regNo = req.query.reg_no;
 
+  try {
+    let sql = `
+      SELECT 
+        id,
+        reg_no,
+        name,
+        resource,
+        title,
+        date,
+        status,
+        reason
+      FROM requests
+    `;
+    
+    const params = [];
 
-exports.getAllRequests = (req, res) => {
-  const sql = 'SELECT * FROM requests ORDER BY id DESC';
-  db.query(sql, (err, result) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json(result);
-  });
+    if (regNo) {
+      sql += ' WHERE reg_no = ?';
+      params.push(regNo);
+    }
+
+    sql += ' ORDER BY date DESC';
+
+    const [rows] = await db.execute(sql, params);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching requests:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.addRequest = (req, res) => {
-  const { name, resource, title } = req.body;
-  const sql = 'INSERT INTO requests (name, resource, title, date) VALUES (?, ?, ?, CURDATE())';
-  db.query(sql, [name, resource, title], (err, result) => {
+  const { reg_no, name, resource, title } = req.body;
+  const sql = 'INSERT INTO requests (reg_no, name, resource, title, date) VALUES (?, ?, ?, ?, CURDATE())';
+  db.query(sql, [reg_no, name, resource, title], (err, result) => {
     if (err) return res.status(500).json({ error: err });
     res.json({ success: true, insertedId: result.insertId });
   });
 };
 exports.updateRequestStatus = (req, res) => {
-    const { id, status } = req.body;
-    const sql = 'UPDATE requests SET status = ? WHERE id = ?';
-    db.query(sql, [status, id], (err, result) => {
-        if (err) return res.status(500).json({ success: false, error: err });
-        res.json({ success: true });
-    });
+  const { id, status } = req.body;
+
+  if (!id || !status) {
+    return res.status(400).json({ success: false, error: 'Missing id or status' });
+  }
+
+  const sql = 'UPDATE requests SET status = ? WHERE id = ?';
+  db.query(sql, [status, id], (err, result) => {
+    if (err) return res.status(500).json({ success: false, error: err });
+    res.json({ success: true });
+  });
+};
+
+
+exports.getAllInventory = async (req, res) => {
+  try {
+    const [rows] = await db.execute('SELECT * FROM inventory ORDER BY id DESC');
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching inventory:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+exports.addInventory = async (req, res) => {
+  const { name, resource, title, date, status } = req.body;
+  if (!name || !resource || !title || !date) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    const [result] = await db.execute(
+      'INSERT INTO inventory (name, resource, title, date, status) VALUES (?, ?, ?, ?, ?)',
+      [name, resource, title, date, status || 'Available']
+    );
+    res.status(201).json({ id: result.insertId, name, resource, title, date, status: status || 'Available' });
+  } catch (error) {
+    console.error('Error adding inventory:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+exports.updateInventoryStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status) {
+    return res.status(400).json({ message: 'Status is required' });
+  }
+
+  try {
+    const [result] = await db.execute('UPDATE inventory SET status = ? WHERE id = ?', [status, id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Inventory item not found' });
+    }
+    res.json({ message: 'Status updated' });
+  } catch (error) {
+    console.error('Error updating status:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+exports.deleteInventory = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [result] = await db.execute('DELETE FROM inventory WHERE id = ?', [id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Inventory item not found' });
+    }
+    res.json({ message: 'Inventory item deleted' });
+  } catch (error) {
+    console.error('Error deleting inventory:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+// GET /all-messages
+exports.getAllMessages = async (req, res) => {
+  try {
+    const [messages] = await db.execute('SELECT * FROM messages ORDER BY created_at DESC');
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+exports.addMessage = async (req, res) => {
+  const { name, type, message, attachment, status } = req.body;
+  try {
+    const [result] = await db.execute(
+      'INSERT INTO messages (name, type, message, attachment, status) VALUES (?, ?, ?, ?, ?)',
+      [name, type, message, attachment || '', status || 'Opened']
+    );
+    res.status(201).json({ message: 'Message saved', id: result.insertId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
