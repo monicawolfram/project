@@ -151,9 +151,10 @@
 
                         <div class="download-options mt-3">
                             <h6>Download As</h6>
-                            <button class="btn btn-light"><i class="fas fa-file-pdf"></i> PDF</button>
-                            <button class="btn btn-light"><i class="fas fa-file-image"></i> SVG</button>
-                            <button class="btn btn-light"><i class="fas fa-file-excel"></i> Excel</button>
+                            <button onclick="window.location='/Librarian/generate/pdf'" class="btn btn-light"><i class="fas fa-file-pdf"></i> PDF</button>
+                            <button onclick="window.location='/Librarian/generate/svg'" class="btn btn-light"><i class="fas fa-file-image"></i> SVG</button>
+                            <button onclick="window.location='/Librarian/generate/excel'" class="btn btn-light"><i class="fas fa-file-excel"></i> Excel</button>
+
                         </div>
                     </div>
                 </div>
@@ -165,7 +166,7 @@
                         <label for="customFilter">Set Filters</label>
                         <select id="customFilter" class="form-select">
                             <option>Date Range</option>
-                            <option>Book Category</option>
+                            <option>Resources</option>
                             <option>Student Department</option>
                         </select>
                         <button class="btn btn-info mt-3">👁 Preview Report</button>
@@ -173,9 +174,10 @@
 
                         <div class="download-options mt-3">
                             <h6>Download As</h6>
-                            <button class="btn btn-light"><i class="fas fa-file-pdf"></i> PDF</button>
-                            <button class="btn btn-light"><i class="fas fa-file-image"></i> SVG</button>
-                            <button class="btn btn-light"><i class="fas fa-file-excel"></i> Excel</button>
+                           <button onclick="window.location='/Librarian/generate/pdf'" class="btn btn-light"><i class="fas fa-file-pdf"></i> PDF</button>
+                           <button onclick="window.location='/Librarian/generate/svg'" class="btn btn-light"><i class="fas fa-file-image"></i> SVG</button>
+                           <button onclick="window.location='/Librarian/generate/excel'" class="btn btn-light"><i class="fas fa-file-excel"></i> Excel</button>
+
                         </div>
                     </div>
                 </div>
@@ -186,17 +188,85 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-    console.log("Librarian Generate Reports Page Loaded");
+document.addEventListener("DOMContentLoaded", function () {
+  const predefinedSelect = document.getElementById("reportType");
+  const generateBtn = document.querySelector(".btn-primary");
+  const downloadButtons = document.querySelectorAll(".download-options button");
 
-    document.querySelector(".btn-primary").addEventListener("click", function () {
-        alert("Generating Predefined Report...");
-    });
+  // Disable downloads on load
+  downloadButtons.forEach(btn => {
+    btn.disabled = true;
+    btn.classList.add("disabled");
+  });
 
-    document.querySelector(".btn-info").addEventListener("click", function () {
-        alert("Previewing Custom Report...");
+  generateBtn.addEventListener("click", () => {
+    const type = predefinedSelect.value;
+    showLoading("Fetching report: " + type);
+
+    fetch('/Librarian/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reportType: type })
+    })
+    .then(res => res.json())
+    .then(data => {
+      hideLoading();
+      if (data.success) {
+        alert("✅ Data fetched for: " + type);
+        // Save reportType for downloads
+        sessionStorage.setItem('reportType', type);
+        enableDownloads();
+      } else {
+        alert("❌ " + data.message);
+      }
+    })
+    .catch(err => {
+      hideLoading();
+      console.error(err);
+      alert("❌ Failed to fetch report");
     });
+  });
+
+  // Add click listeners for download buttons
+  downloadButtons.forEach(btn => {
+    btn.addEventListener('click', e => {
+      if (btn.disabled) {
+        e.preventDefault();
+        return;
+      }
+      const reportType = sessionStorage.getItem('reportType');
+      const url = btn.getAttribute('data-url'); // get URL from data attribute
+      if (reportType && url) {
+        e.preventDefault();
+        // Append reportType as query param for backend filtering
+        window.location.href = `${url}?reportType=${encodeURIComponent(reportType)}`;
+      }
+    });
+  });
+
+  function enableDownloads() {
+    downloadButtons.forEach(btn => {
+      btn.disabled = false;
+      btn.classList.remove("disabled");
+    });
+  }
+
+  function showLoading(message) {
+    hideLoading();
+    const container = document.querySelector(".col-md-9.ms-sm-auto.col-lg-10.px-md-4");
+    const loading = document.createElement("div");
+    loading.className = "alert alert-info mt-3";
+    loading.id = "loadingMessage";
+    loading.innerText = message;
+    container.prepend(loading);
+  }
+
+  function hideLoading() {
+    const loading = document.getElementById("loadingMessage");
+    if (loading) loading.remove();
+  }
 });
 </script>
+
 </body>
 </html>

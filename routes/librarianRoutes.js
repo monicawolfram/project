@@ -71,6 +71,10 @@ router.put('/inventory/:id', librarianController.updateInventoryStatus);
 router.delete('/inventory/:id', librarianController.deleteInventory);
 router.get('/all-messages', librarianController.getAllMessages);
 router.post('/add-massages', librarianController.addMessage);
+router.post('/report', librarianController.generateReport);
+router.get('/generate/pdf', librarianController.generatePDF);
+router.get('/generate/excel',librarianController.generateExcel);
+router.get('/generate/svg', librarianController.generateSVG);
 
 
 // This will serve interface.html when visiting /api/librarian/

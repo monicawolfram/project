@@ -985,3 +985,158 @@ exports.addMessage = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.generateReport = async (req, res) => {
+  const { reportType } = req.body;
+
+  try {
+    let query;
+    switch (reportType) {
+      case 'Borrowing Trends':
+        // Count how many times each resource was borrowed
+        query = `
+          SELECT resource_id, resource_type, COUNT(*) AS borrow_count
+          FROM borrow_records
+          GROUP BY resource_id, resource_type
+          ORDER BY borrow_count DESC
+        `;
+        break;
+
+      case 'Late Returns':
+        // Records where return_date is after due date (assuming you track due_date elsewhere)
+        // If you don't have due_date column in this table, adjust or join accordingly.
+        query = `
+          SELECT resource_id, borrower_reg_no, borrow_date, return_date, status
+          FROM borrow_records
+          WHERE return_date > DATE_ADD(borrow_date, INTERVAL 14 DAY) -- example due date = borrow_date + 14 days
+        `;
+        break;
+
+      case 'Fine Collections':
+        // Assuming fines are in a separate fines table — adjust accordingly.
+        query = `
+          SELECT reg_no, amount, reason, date_paid
+          FROM fines
+          ORDER BY date_paid DESC
+        `;
+        break;
+
+      default:
+        return res.status(400).json({ success: false, message: 'Invalid report type' });
+    }
+
+    const [rows] = await db.execute(query);
+    req.app.locals.lastReportData = rows;
+
+    res.json({ success: true, rows });
+  } catch (err) {
+    console.error('Error generating report data:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+exports.generatePDF = async (req, res) => {
+  try {
+    const { reportType } = req.query;
+
+    let query;
+    switch (reportType) {
+      case 'Borrowing Trends':
+        query = `SELECT title, COUNT(*) AS borrow_count FROM borrow_records GROUP BY title ORDER BY borrow_count DESC`;
+        break;
+      case 'Late Returns':
+        query = `SELECT title, reg_no, return_date, due_date FROM borrow_records WHERE return_date > due_date`;
+        break;
+      case 'Fine Collections':
+        query = `SELECT reg_no, amount, reason, date_paid FROM fines ORDER BY date_paid DESC`;
+        break;
+      default:
+        query = `SELECT * FROM borrow_requests ORDER BY borrow_date DESC`;
+    }
+
+    const [data] = await db.execute(query);
+
+    const doc = new PDFDocument();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=report.pdf');
+    doc.pipe(res);
+
+    doc.fontSize(18).text('Library Report', { align: 'center' });
+    doc.moveDown();
+
+    if (reportType === 'Borrowing Trends') {
+      data.forEach((row, i) => {
+        doc.fontSize(12).text(`${i + 1}. ${row.title} - Borrowed ${row.borrow_count} times`);
+      });
+    } else if (reportType === 'Late Returns') {
+      data.forEach((row, i) => {
+        doc.fontSize(12).text(`${i + 1}. ${row.title} - Reg No: ${row.reg_no} - Returned: ${row.return_date} (Due: ${row.due_date})`);
+      });
+    } else if (reportType === 'Fine Collections') {
+      data.forEach((row, i) => {
+        doc.fontSize(12).text(`${i + 1}. Reg No: ${row.reg_no} - Amount: ${row.amount} - Reason: ${row.reason} - Date: ${row.date_paid}`);
+      });
+    } else {
+      data.forEach((row, i) => {
+        doc.fontSize(12).text(`${i + 1}. ${row.borrower_name} - ${row.resource_type} - ${row.borrow_date}`);
+      });
+    }
+
+    doc.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to generate PDF');
+  }
+};
+exports.generateExcel = async (req, res) => {
+  try {
+    const data = req.app.locals.lastReportData;
+    if (!data || data.length === 0) {
+      return res.status(400).send('No report data available to generate Excel.');
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Report');
+
+    const columns = Object.keys(data[0]).map(key => ({ header: key.toUpperCase(), key }));
+    sheet.columns = columns;
+
+    data.forEach(row => sheet.addRow(row));
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=report.xlsx');
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error('Error in generateExcel:', err);
+    res.status(500).send('Failed to generate Excel');
+  }
+};
+
+
+exports.generateSVG = async (req, res) => {
+  try {
+    const data = req.app.locals.lastReportData;
+    if (!data || data.length === 0) {
+      return res.status(400).send('No report data available to generate SVG.');
+    }
+
+    // Example: Show a simple SVG with count of rows
+    const rowCount = data.length;
+    const svgContent = `<?xml version="1.0" standalone="no"?>
+<svg width="600" height="100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="white"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="24" fill="green">
+    Library Report - ${rowCount} entries
+  </text>
+</svg>`;
+
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Content-Disposition', 'attachment; filename=report.svg');
+    res.send(svgContent);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to generate SVG');
+  }
+};
+
+
