@@ -217,7 +217,7 @@
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
           loadRequests();
-        }, 500); // wait 500ms after last keystroke
+        }, 500);
       });
     }
   }
@@ -237,7 +237,6 @@
 
       const data = await res.json();
 
-      // Filter by status if not 'all'
       const filtered = currentStatus === 'all'
         ? data
         : data.filter(r => r.status.toLowerCase() === currentStatus);
@@ -257,8 +256,8 @@
 
     const thead = document.querySelector("thead tr");
     thead.innerHTML = currentStatus === 'pending'
-      ? `<th>ID</th><th>Reg No</th><th>Name</th><th>Resource</th><th>Date</th><th>Reason</th><th>Status</th><th>Action</th>`
-      : `<th>ID</th><th>Reg No</th><th>Name</th><th>Resource</th><th>Date</th><th>Status</th><th>Action</th>`;
+      ? `<th>ID</th><th>Reg No</th><th>Name</th><th>Resource</th><th>Borrow Date</th><th>Return Date</th><th>Reason</th><th>Status</th><th>Action</th>`
+      : `<th>ID</th><th>Reg No</th><th>Name</th><th>Resource</th><th>Borrow Date</th><th>Return Date</th><th>Status</th><th>Action</th>`;
 
     data.forEach(req => {
       const badgeColor = {
@@ -273,9 +272,12 @@
       if (req.status.toLowerCase() === "pending") {
         actionButtons = `
           <button class="btn btn-sm btn-success me-2" onclick="confirmUpdateStatus(${req.id}, 'Approved')">Approve</button>
-`;
+       
+        `;
       } else if (req.status.toLowerCase() === "approved") {
         actionButtons = `<span class="text-muted">Approved</span>`;
+      } else if (req.status.toLowerCase() === "rejected") {
+        actionButtons = `<span class="text-muted">Rejected</span>`;
       }
 
       const row = document.createElement("tr");
@@ -284,8 +286,8 @@
         <td>${req.borrower_id || 'N/A'}</td>
         <td>${req.borrower_name}</td>
         <td>${req.resource_type}</td>
-      
-        <td>${new Date(req.borrower_date).toLocaleDateString()}</td>
+        <td>${new Date(req.borrow_date).toLocaleDateString()}</td>
+        <td>${new Date(req.return_date).toLocaleDateString()}</td>
         ${reasonCell}
         <td><span class="badge bg-${badgeColor}">${req.status}</span></td>
         <td>${actionButtons}</td>
@@ -294,36 +296,7 @@
     });
   }
 
-  async function addRequest() {
-    const reg_no = document.getElementById("requestUserId").value.trim();
-    const name = document.getElementById("requestName").value.trim();
-    const resource = document.getElementById("requestResource").value.trim();
-    const title = document.getElementById("requestTitle").value.trim();
-    if (!reg_no || !name || !resource || !title) return alert("Please fill all fields");
-
-    const res = await fetch('/librarian/requests/add', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reg_no, name, resource, title })
-    });
-
-    const result = await res.json();
-    if (result.success) {
-      clearAddForm();
-      loadRequests();
-    } else {
-      alert("Failed to add request");
-    }
-  }
-
-  function clearAddForm() {
-    document.getElementById("requestUserId").value = '';
-    document.getElementById("requestName").value = '';
-    document.getElementById("requestResource").value = '';
-    document.getElementById("requestTitle").value = '';
-  }
-
-  // Confirmation wrapper before updating status
+  // Confirmation before update
   function confirmUpdateStatus(id, status) {
     if (confirm(`Are you sure you want to ${status.toLowerCase()} this request?`)) {
       updateStatus(id, status);
@@ -342,24 +315,21 @@
       if (result.success) {
         loadRequests();
       } else {
-        alert("Failed to update status");
+        alert("Failed to update status.");
       }
-    } catch {
-      alert("Network error while updating status");
+    } catch (err) {
+      alert("Network error while updating status.");
     }
   }
 
   function showLoading(show) {
-  
+    // Optional: Add a loader element
     if (show) {
-      console.log("Loading requests...");
+      console.log("Loading...");
     } else {
-      console.log("Loading complete.");
+      console.log("Done.");
     }
   }
 </script>
-
-
-
 </body>
 </html>

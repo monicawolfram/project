@@ -842,19 +842,17 @@ exports.getUpdatedProjects = async (req, res) => {
   }
 };
 
+// GET: All borrow requests
 exports.getAllRequests = async (req, res) => {
   const regNo = req.query.reg_no;
 
   try {
-    let sql = `
-      SELECT * FROM borrow_requests
-    `;
-
+    let sql = `SELECT * FROM borrow_requests`;
     const params = [];
 
     if (regNo) {
-      sql += ' WHERE borrower_id= ?';
-      params.push(regNo);
+      sql += ' WHERE borrower_id LIKE ?';
+      params.push(`%${regNo}%`);
     }
 
     sql += ' ORDER BY borrow_date DESC';
@@ -867,29 +865,45 @@ exports.getAllRequests = async (req, res) => {
   }
 };
 
-
-exports.addRequest = (req, res) => {
+// POST: Add a new request to borrow_requests
+exports.addRequest = async (req, res) => {
   const { reg_no, name, resource, title } = req.body;
-  const sql = 'INSERT INTO requests (reg_no, name, resource, title, date) VALUES (?, ?, ?, ?, CURDATE())';
-  db.query(sql, [reg_no, name, resource, title], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
+
+  if (!reg_no || !name || !resource || !title) {
+    return res.status(400).json({ success: false, error: 'All fields are required' });
+  }
+
+  const sql = `
+    INSERT INTO borrow_requests 
+    (borrower_id, borrower_name, resource_type, title, borrow_date, return_date, status)
+    VALUES (?, ?, ?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY), 'Pending')
+  `;
+
+  try {
+    const [result] = await db.execute(sql, [reg_no, name, resource, title]);
     res.json({ success: true, insertedId: result.insertId });
-  });
+  } catch (err) {
+    console.error('Add request error:', err);
+    res.status(500).json({ success: false, error: 'Database error' });
+  }
 };
-exports.updateRequestStatus = (req, res) => {
+exports.updateRequestStatus = async (req, res) => {
   const { id, status } = req.body;
 
   if (!id || !status) {
     return res.status(400).json({ success: false, error: 'Missing id or status' });
   }
 
-  const sql = 'UPDATE requests SET status = ? WHERE id = ?';
-  db.query(sql, [status, id], (err, result) => {
-    if (err) return res.status(500).json({ success: false, error: err });
-    res.json({ success: true });
-  });
-};
+  const sql = `UPDATE borrow_requests SET status = ? WHERE id = ?`;
 
+  try {
+    const [result] = await db.execute(sql, [status, id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Update status error:', err);
+    res.status(500).json({ success: false, error: 'Database error' });
+  }
+};
 
 exports.getAllInventory = async (req, res) => {
   try {
@@ -953,7 +967,7 @@ exports.deleteInventory = async (req, res) => {
 // GET /all-messages
 exports.getAllMessages = async (req, res) => {
   try {
-    const [messages] = await db.execute('SELECT * FROM messages ORDER BY created_at DESC');
+    const [messages] = await db.execute('SELECT * FROM suggestions ORDER BY date_sent DESC');
     res.json(messages);
   } catch (err) {
     res.status(500).json({ error: err.message });
