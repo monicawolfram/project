@@ -1,5 +1,6 @@
 const db = require('../db');
 const path = require('path');
+const faq = require('../utils/faqAnswers');
 
 exports.dashboard = (req, res) => {
   res.json({ message: 'User Dashboard' });
@@ -631,8 +632,6 @@ exports.getProjectsByDepartment = async (req, res) => {
     res.status(500).json({ message: 'Error loading projects' });
   }
 };
-
-
 exports.submitBorrow = async (req, res) => {
   const { borrower_id, borrower_name, resource_type, borrow_date, return_date } = req.body;
 
@@ -663,9 +662,6 @@ exports.submitBorrow = async (req, res) => {
     res.json({ success: false, error: 'Database error' });
   }
 };
-
-
-
 // Route: POST /user/set-session
 exports.setSession = async (req, res) => {
   const { reg_no } = req.body;
@@ -692,9 +688,6 @@ exports.setSession = async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
-
-
-
 exports.postAttendance = async (req, res) => {
   try {
     const { reg_no, date, time_in } = req.body;
@@ -747,7 +740,6 @@ exports.postAttendance = async (req, res) => {
   }
 };
 
-
 exports.getMyAttendance = async (req, res) => {
   try {
     const sessionUser = req.session.user;
@@ -783,4 +775,170 @@ exports.getMyAttendance = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+exports.saveSuggestion = async (req, res) => {
+  try {
+    const { type, message, regNo } = req.body;
+
+    if (!type || !message.trim()) {
+      return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    const cleanMessage = message.trim().toLowerCase();
+    let answer = null;
+
+    if (type === 'question') {
+      // Try to find a matching key in faq
+      for (let key in faq) {
+        if (cleanMessage.includes(key)) {
+          answer = faq[key];
+          break;
+        }
+      }
+
+      // If no matching FAQ, set a default fallback answer
+      if (!answer) {
+        answer = "Thank you for your question! Our librarian will get back to you shortly.";
+      }
+    }
+
+    await db.execute(
+      `INSERT INTO suggestions (message_type, content, answer, reg_no) VALUES (?, ?, ?, ?)`,
+      [type, message.trim(), answer, regNo || null]
+    );
+
+    return res.status(200).json({
+      message: 'Message sent successfully.',
+      autoAnswer: answer,
+    });
+
+  } catch (err) {
+    console.error('Error saving message:', err);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
+exports.saveQuestion = async (req, res) => {
+  try {
+    const { type, message, reg_no } = req.body;
+
+    if (!message || type !== 'question') {
+      return res.status(400).json({ message: 'Invalid input. Question is required.' });
+    }
+
+    // Optional auto-answer logic
+    let autoAnswer = '';
+    const lower = message.toLowerCase();
+    if (lower.includes('book') || lower.includes('borrow')) {
+      autoAnswer = 'To borrow a book, visit the Resources > Books section, then click "Request" on a book.';
+    } else if (lower.includes('hour')) {
+      autoAnswer = 'Library hours are 8:30am - 4:30pm, Monday to Friday.';
+    }
+
+    // Insert into DB
+    const query = `
+      INSERT INTO support_messages (message_type, content, answer, reg_no, date_sent)
+      VALUES (?, ?, ?, ?, NOW())
+    `;
+    await db.execute(query, ['question', message, autoAnswer || null, reg_no || null]);
+
+    res.status(200).json({
+      message: 'Question submitted successfully.',
+      autoAnswer: autoAnswer || null,
+    });
+  } catch (error) {
+    console.error('Error saving question:', error);
+    res.status(500).json({ message: 'Server error while saving question.' });
+  }
+};
+exports.getAllResourcesStatus = async (req, res) => {
+  try {
+    // 1. Fetch all resources (books, papers, projects)
+    const [resources] = await db.execute(`
+      SELECT id, title AS resource, 'book' AS type, date_added
+      FROM books WHERE is_deleted = 'no'
+      UNION ALL
+      SELECT id, title AS resource, 'paper' AS type, date_added
+      FROM papers WHERE is_deleted = 'no'
+      UNION ALL
+      SELECT id, title AS resource, 'project' AS type, date_added
+      FROM projects WHERE is_deleted = 'no'
+      ORDER BY date_added DESC
+    `);
+
+    // 2. Fetch borrow records with borrower name (no is_deleted filter here)
+    const [borrowRecords] = await db.execute(`
+      SELECT br.resource_id, br.resource_type, u.name AS borrower_name, br.borrow_date, br.return_date, br.status
+      FROM borrow_records br
+      LEFT JOIN users u ON br.borrower_reg_no = u.reg_no
+      ORDER BY br.borrow_date DESC
+    `);
+
+    // 3. Prepare map keyed by resource_type + resource_id to get latest borrow record
+    const borrowMap = new Map();
+    for (const record of borrowRecords) {
+      const key = record.resource_type + '-' + record.resource_id;
+      if (!borrowMap.has(key)) {
+        borrowMap.set(key, record);
+      }
+    }
+
+    const now = new Date();
+    const NEW_THRESHOLD_DAYS = 7;
+
+    // 4. Merge resource and borrow data
+    const result = resources.map(res => {
+      const key = res.type + '-' + res.id;
+      const latestBorrow = borrowMap.get(key);
+      const dateAdded = new Date(res.date_added);
+      const isNew = (now - dateAdded) / (1000 * 60 * 60 * 24) <= NEW_THRESHOLD_DAYS;
+
+      let status = 'available';
+      let borrower = '';
+      let borrowDate = '';
+      let returnDate = '';
+
+      if (latestBorrow) {
+        borrower = latestBorrow.borrower_name || '';
+        borrowDate = latestBorrow.borrow_date
+          ? new Date(latestBorrow.borrow_date).toISOString().split('T')[0]
+          : '';
+        returnDate = latestBorrow.return_date
+          ? new Date(latestBorrow.return_date).toISOString().split('T')[0]
+          : '';
+
+        if (latestBorrow.status === 'borrowed') {
+          status = 'borrowed';
+        } else if (latestBorrow.status === 'returned') {
+          status = 'returned';
+        }
+      } else if (isNew) {
+        status = 'new';
+      }
+
+      return {
+        resource: res.resource,
+        type: res.type,
+        status,
+        borrower,
+        borrowDate,
+        returnDate,
+        dateAdded: res.date_added
+          ? new Date(res.date_added).toISOString().split('T')[0]
+          : '',
+      };
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error fetching all resources status:', error);
+    res.status(500).json({ message: 'Server error fetching resources' });
+  }
+};
+
+
+
+
+
+
 

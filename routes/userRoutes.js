@@ -42,6 +42,9 @@ router.get('/show-projects/:department', userController.showProjectsByDepartment
 router.get('/projects/:department', userController.getProjectsByDepartment);
 router.post('/borrow', userController.submitBorrow);
 router.post('/set-session', userController.setSession);
+router.post('/save-suggestion', userController.saveSuggestion);
+router.post('/save-question', userController.saveQuestion);
+router.get('/resources/all', userController.getAllResourcesStatus);
 
 
 

@@ -1,251 +1,381 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Help & Support</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Help & Support</title>
 
-    <!-- Bootstrap & FontAwesome -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Bootstrap & FontAwesome -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
 
-    <style>
-        body {
-    
-            color: black;
-            font-family: 'Poppins', sans-serif;
-        }
-        /* Navigation Bar */
-        .navbar {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 5px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-        .nav-link {
-            color: black !important;
-            font-weight: 500;
-            background: #f0f0f0;
-            padding: 10px 15px;
-            border-radius: 30px;
-            margin: 5px;
-        }
-        .nav-link:hover {
-            background: #27ae60;
-            color: white !important;
-        }
-        /* Help & Support Section */
-        .help-support {
-            background: white;
-            color: black;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-        .section-title {
-            text-align: center;
-            font-weight: bold;
-            font-size: 22px;
-            margin-bottom: 15px;
-        }
-        /* Suggestion Box & FAQ */
-        .support-container {
-            display: flex;
-            justify-content: space-between;
-        }
-        .support-box {
-            width: 48%;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            border: 2px solid black;
-        }
-        .support-box h4 {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: bold;
-        }
-        .support-box textarea {
-            width: 100%;
-            height: 120px;
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-        }
-        .submit-btn {
-            width: 100%;
-            background: #27ae60;
-            color: white;
-            padding: 10px;
-            border-radius: 10px;
-            border: none;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .contact-info p {
-            margin: 5px 0;
-        }
-        /* FAQ Section */
-        .faq-question {
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .faq-answer {
-            font-size: 14px;
-            color: gray;
-        }
-        .search-box {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid black;
-            border-radius: 10px;
-            padding: 5px;
-            margin-top: 10px;
-        }
-        .search-box input {
-            border: none;
-            outline: none;
-            flex: 1;
-            padding: 5px;
-        }
-        .search-box button {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        /* Footer Buttons */
-        .footer-btns {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .footer-btns .btn {
-            background: #c6c4c4;
-            color: black;
-            border-radius: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            margin: 5px;
-        }
-        .footer-btns .btn:hover {
-            background: #27ae60;
-            color: white;
-        }
-    </style>
+  <style>
+    body {
+      color: black;
+      font-family: 'Poppins', sans-serif;
+    }
+    .navbar {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 5px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+    .nav-link {
+      color: black !important;
+      font-weight: 500;
+      background: #f0f0f0;
+      padding: 10px 15px;
+      border-radius: 30px;
+      margin: 5px;
+    }
+    .nav-link:hover {
+      background: #27ae60;
+      color: white !important;
+    }
+    .help-support {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    .section-title {
+      text-align: center;
+      font-weight: bold;
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
+    .support-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .support-box {
+      width: 48%;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      border: 2px solid black;
+      box-sizing: border-box;
+    }
+    .support-box h4 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+    }
+    textarea,
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      margin-top: 10px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .submit-btn {
+      width: 100%;
+      background: #27ae60;
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .submit-btn:hover {
+      background: #219150;
+    }
+    .contact-info p {
+      margin: 5px 0;
+    }
+    .faq-question {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .faq-answer {
+      font-size: 14px;
+      color: gray;
+    }
+    .search-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid black;
+      border-radius: 10px;
+      padding: 5px;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+    .search-box input {
+      border: none;
+      outline: none;
+      flex: 1;
+      padding: 5px;
+    }
+    .search-box button {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .footer-btns {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .footer-btns .btn {
+      background: #c6c4c4;
+      color: black;
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 5px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .footer-btns .btn:hover {
+      background: #27ae60;
+      color: white;
+    }
+    .response-message {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      display: none;
+    }
+    .response-success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .response-error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
 </head>
 <body>
+  <div class="container mt-4">
+    <nav class="navbar d-flex justify-content-around flex-wrap">
+      <a href="/user/home" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <div class="dropdown">
+        <a
+          class="nav-link dropdown-toggle"
+          href="/user/Resource"
+          role="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          ><i class="fas fa-book"></i> Resources</a
+        >
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/user/books">Books</a></li>
+          <li><a class="dropdown-item" href="/user/papers">Papers</a></li>
+          <li><a class="dropdown-item" href="/user/projects">Projects</a></li>
+        </ul>
+      </div>
+      <a href="/user/attendance" class="nav-link"
+        ><i class="fas fa-user-check"></i> Attendance</a
+      >
+      <div class="dropdown">
+        <a
+          class="nav-link dropdown-toggle"
+          href="/user/transaction"
+          role="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          ><i class="fas fa-exchange-alt"></i> Transaction</a
+        >
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/user/borrowing">Borrowing</a></li>
+          <li><a class="dropdown-item" href="/user/paying">Paying Fine</a></li>
+        </ul>
+      </div>
+      <div class="dropdown">
+        <a
+          class="nav-link dropdown-toggle"
+          href="/user/viewstatus"
+          role="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          ><i class="fas fa-eye"></i> Viewstatus</a
+        >
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/user/resource">Resources</a></li>
+          <li><a class="dropdown-item" href="/user/payment">Payment</a></li>
+          <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
+        </ul>
+      </div>
+    </nav>
 
-    <div class="container mt-4">
-        <nav class="navbar d-flex justify-content-around">
-            <a href="/user/home" class="nav-link"><i class="fas fa-home"></i> Home</a>
-            <div class="dropdown">
-                <a class="nav-link dropdown-toggle" href="/user/Resource" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-book"></i> Resources
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/user/books">Books</a></li>
-                    <li><a class="dropdown-item" href="/user/papers">Papers</a></li>
-                    <li><a class="dropdown-item" href="/user/projects">Projects</a></li>
-                </ul>
-            </div>
-            <a href="/user/attendance" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
-            <div class="dropdown">
-                <a class="nav-link dropdown-toggle" href="/user/transaction" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-exchange-alt"></i> Transaction
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/user/borrowing">Borrowing</a></li>
-                    <li><a class="dropdown-item" href="/user/paying">Paying Fine</a></li>
-                </ul>
-            </div>
-            <div class="dropdown">
-                <a class="nav-link dropdown-toggle" href="/user/viewstatus" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-eye"></i> Viewstatus
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/user/resource">Resources</a></li>
-                    <li><a class="dropdown-item" href="/user/payment">Payment</a></li>
-                    <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
-                </ul>
-            </div>
-        </nav>
+    <div class="help-support mt-4">
+      <h2 class="section-title">
+        <i class="fas fa-info-circle"></i> Help & Support
+      </h2>
 
-    <!-- Help & Support Section -->
-    <div class="container mt-4">
-        <div class="help-support">
-            <h2 class="section-title"><i class="fas fa-info-circle"></i> Help & Support</h2>
-            
-            <div class="support-container">
-                <!-- Suggestion Box -->
-                <div class="support-box">
-                    <h4><i class="fas fa-comment"></i> Suggestion Box</h4>
-                    <textarea placeholder="Please describe your issue or question in detail. We’re here to help you instantly!"></textarea>
-                    <button class="submit-btn mt-2">Submit</button>
-                    
-                    <div class="contact-info mt-3">
-                        <p><i class="fas fa-envelope"></i> alicewilliam3@gmail.com</p>
-                        <p><i class="fab fa-whatsapp"></i> +255672414342</p>
-                        <p><i class="fas fa-phone"></i> +255672414342</p>
-                    </div>
-                </div>
+      <div class="support-container">
+        <!-- Suggestion Box Form -->
+        <form id="suggestionForm" class="support-box" autocomplete="off">
+          <h4><i class="fas fa-comment"></i> Suggestion Box</h4>
+          <textarea
+            name="message"
+            placeholder="Please describe your issue or suggestion here..."
+            required
+          ></textarea>
+          <button type="submit" class="submit-btn">Submit Suggestion</button>
+          <div id="suggestionResponse" class="response-message"></div>
 
-                <!-- Questions & Answers -->
-                <div class="support-box">
-                    <h4><i class="fas fa-question-circle"></i> Questions & Answers</h4>
-                    <p class="faq-question">Q: "How do I find a specific book or resource?"</p>
-                    <p class="faq-answer">You can search for books using our online catalog. Enter the title, author, or keywords in the search bar. If you need help, our staff can assist you.</p>
-                    
-                    <p class="faq-question">Q: "What are the library’s opening hours?"</p>
-                    <p class="faq-answer">Our current opening hours are [insert hours]. You can also check our website or the notice board for any changes, especially during holidays or exam periods.</p>
+          <div class="contact-info mt-3">
+            <p><i class="fas fa-envelope"></i> alicewilliam3@gmail.com</p>
+            <p><i class="fab fa-whatsapp"></i> +255672414342</p>
+            <p><i class="fas fa-phone"></i> +255672414342</p>
+          </div>
+        </form>
 
-                    <div class="search-box">
-                        <input type="text" placeholder="Write question here...">
-                        <button><i class="fas fa-paper-plane hover"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Questions & Answers Form -->
+        <form id="questionForm" class="support-box" autocomplete="off">
+          <h4><i class="fas fa-question-circle"></i> Questions & Answers</h4>
+
+          <p class="faq-question">Q: "How do I find a specific  Resource?"</p>
+          <p class="faq-answer">
+            You can search for books using our online catalog. Enter the title,
+            author, or keywords in the search bar. If you need help, our staff can
+            assist you.
+          </p>
+
+          <p class="faq-question">Q: "What are the library’s opening hours?"</p>
+          <p class="faq-answer">
+            Our current opening hours are 8:30am. You can also check our
+            website or the notice board for any changes, especially during holidays
+            or exam periods.
+          </p>
+
+         <p class="faq-question">Q: "What should I do if I lose a Resource?"</p>
+         <p class="faq-answer">
+          Please report the lost book to the librarian immediately. A replacement fee or fine may apply according to the library's policy.
+        </p>
+
+          <div id="questionResponse" class="response-message"></div>
+        </form>
+      </div>
     </div>
+  </div>
 
-    <!-- Footer Buttons -->
-    <div class="footer-btns">
-        <a href="/user/AboutUs" class="btn"><i class="fas fa-info-circle"></i> About Us</a>
-        <a href="/user/help" class="btn"><i class="fas fa-question-circle"></i> Help</a>
-    </div>
+  <div class="footer-btns">
+    <a href="/user/AboutUs" class="btn"
+      ><i class="fas fa-info-circle"></i> About Us</a
+    >
+    <a href="/user/help" class="btn"
+      ><i class="fas fa-question-circle"></i> Help</a
+    >
+  </div>
 
-    <script>
-        document.querySelector('.submit-btn').addEventListener('click', function () {
-            const suggestionText = document.querySelector('textarea').value;
-    
-            if (!suggestionText) {
-                alert("Please enter a suggestion.");
-                return;
-            }
-    
-            // Send the suggestion to the server using fetch
-            fetch('/submit-suggestion', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ suggestion: suggestionText })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert("Your suggestion has been submitted successfully!");
-                document.querySelector('textarea').value = ''; // Clear the textarea after submission
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("There was an error submitting your suggestion. Please try again.");
-            });
-        });
-    </script>
+<script>
+  // Helper function to handle response display
+  function showResponse(div, message, isSuccess) {
+    div.className = 'response-message'; // Reset classes
+    div.textContent = '';
+    div.innerHTML = '';
+    div.classList.add(isSuccess ? 'response-success' : 'response-error');
+    div.innerHTML = message;
+    div.style.display = 'block';
+  }
+
+  // Suggestion form handler
+  document.getElementById('suggestionForm')?.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const responseDiv = document.getElementById('suggestionResponse');
+    const message = this.message.value.trim();
+
+    if (!message) {
+      showResponse(responseDiv, 'Please enter a suggestion.', false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/user/save-suggestion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'suggestion', message }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        showResponse(responseDiv, data.message || 'Suggestion sent successfully.', true);
+        this.reset();
+      } else {
+        showResponse(responseDiv, data.message || 'Failed to send suggestion.', false);
+      }
+    } catch (err) {
+      showResponse(responseDiv, 'Server error. Please try again later.', false);
+    }
+  });
+
+  // Question form handler
+  document.getElementById('questionForm')?.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const responseDiv = document.getElementById('questionResponse');
+    const message = this.message.value.trim();
+
+    if (!message) {
+      showResponse(responseDiv, 'Please enter a question.', false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/user/save-question', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'question', message }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        const answer = data.autoAnswer || 'Thank you for your question! Our librarian will get back to you shortly.';
+        showResponse(responseDiv, `<strong>Answer:</strong> ${answer}`, true);
+        this.reset();
+      } else {
+        showResponse(responseDiv, data.message || 'Failed to send question.', false);
+      }
+    } catch (err) {
+      showResponse(responseDiv, 'Server error. Please try again later.', false);
+    }
+  });
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6863aba61c010c190e038e2b/1iv2ld117';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  ></script>
 </body>
 </html>
