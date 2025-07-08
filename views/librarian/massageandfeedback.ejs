@@ -3,23 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Library Messages & Feedback</title>
+  <title>Manage Inventory & Messages</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
   <style>
     body {
-      background: url('library-background.jpg') no-repeat center center fixed;
+      background: url('library-bg.jpg') no-repeat center center fixed;
       background-size: cover;
       font-family: Arial, sans-serif;
     }
-
     .sidebar {
       background-color: white;
       min-height: 100vh;
       padding: 20px;
       border-radius: 15px;
     }
-
     .sidebar .nav-link {
       color: black;
       font-size: 18px;
@@ -29,26 +27,22 @@
       gap: 10px;
       text-decoration: none;
     }
-
     .sidebar .nav-link:hover {
       background-color: green;
       color: white;
       border-radius: 8px;
     }
-
     .sidebar .logo-container {
       display: flex;
       align-items: center;
       gap: 10px;
       margin-bottom: 20px;
     }
-
     .sidebar img {
       width: 50px;
       height: 50px;
       border-radius: 50%;
     }
-
     .top-bar {
       display: flex;
       align-items: center;
@@ -58,224 +52,174 @@
       border-radius: 10px;
       margin-bottom: 20px;
     }
-
     .main-content {
       flex-grow: 1;
       padding: 20px;
+      background: white;
+      border-radius: 10px;
+      min-height: 80vh;
     }
-
-    .search-bar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
     .badge-warning { background-color: orange; }
     .badge-primary { background-color: blue; }
     .badge-success { background-color: green; }
-
     .nav-tabs .nav-link.active { font-weight: bold; }
   </style>
 </head>
 <body>
-  <div class="container-fluid">
-    <div class="row">
-      <!-- Sidebar -->
-      <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-        <div class="logo-container">
-          <img src="/images/sjcet.png" alt="SJCET Logo" />
-          <h4>SJCET Library</h4>
-        </div>
-        <ul class="nav flex-column">
-          <li class="nav-item"><a class="nav-link" href="librarian_home.ejs"><i class="fas fa-home"></i> Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="librarian_category.ejs"><i class="fas fa-book"></i> Manage Catalog</a></li>
-          <li class="nav-item"><a class="nav-link" href="managerequestlibrarian.ejs"><i class="fas fa-tasks"></i> Manage Requests</a></li>
-          <li class="nav-item"><a class="nav-link" href="manageinventorylibrarian.ejs"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
-          <li class="nav-item"><a class="nav-link active" href="massageandfeedback.ejs"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
-          <li class="nav-item"><a class="nav-link" href="generatereport.ejs"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
-          <li class="nav-item"><a class="nav-link" href="Itsupport.ejs"><i class="fas fa-tools"></i> IT Support</a></li>
-          <li class="nav-item"><a class="nav-link" href="manageusers.ejs"><i class="fas fa-users"></i> Manage Users</a></li>
-          <li class="nav-item"><a class="nav-link" href="managefines.ejs"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+      <div class="logo-container">
+        <img src="/images/sjcet.png" alt="SJCET Logo" />
+        <h4>SJUCET Library</h4>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" href="/librarian/librarian_home"><i class="fas fa-home"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/librarian_category"><i class="fas fa-book"></i> Manage Catalog</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/managerequestlibrarian"><i class="fas fa-tasks"></i> Manage Requests</a></li>
+        <li class="nav-item"><a class="nav-link active" href="#"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/massageandfeedback"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/generatereport"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/Itsupport"><i class="fas fa-tools"></i> IT Support</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/manageusers"><i class="fas fa-users"></i> Manage Users</a></li>
+        <li class="nav-item"><a class="nav-link" href="/librarian/managefines"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="top-bar">
+        <input type="text" class="form-control w-25" placeholder="Search here" id="search">
+      </div>
+
+      <div class="main-content">
+        <h3>📩 Messages & Feedback</h3>
+
+        <!-- Real Form -->
+        <form id="messageForm" enctype="multipart/form-data" class="mb-4 bg-light p-3 rounded">
+          <div class="row g-2">
+            <div class="col-md-4">
+              <input type="text" name="name" class="form-control" placeholder="Your Name" required />
+            </div>
+            <div class="col-md-4">
+              <select name="type" class="form-control" required>
+                <option value="">Select Type</option>
+                <option value="Feedback">Feedback</option>
+                <option value="Complaint">Complaint</option>
+                <option value="Suggestion">Suggestion</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <input type="file" name="attachment" class="form-control" />
+            </div>
+            <div class="col-12 mt-2">
+              <textarea name="message" class="form-control" placeholder="Your message..." required></textarea>
+            </div>
+            <div class="col-12 mt-2">
+              <button class="btn btn-primary" type="submit">Send Message</button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs">
+          <li class="nav-item"><a class="nav-link active" href="#" id="allMessagesTab">All Messages</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" id="replyMessagesTab">Reply Message</a></li>
+          <li class="nav-item"><a class="nav-link text-success" href="#" id="feedbackTab">Feedback</a></li>
         </ul>
-      </nav>
 
-      <!-- Main Content -->
-      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <!-- Top Bar -->
-        <div class="top-bar">
-          <input type="text" class="form-control w-25" placeholder="Search here" id="search">
-          <div class="d-flex align-items-center">
-            <!-- Notification Dropdown -->
-            <div class="dropdown me-3">
-              <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-bell"></i>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-                <li><a class="dropdown-item" href="booknotification.ejs">New book added</a></li>
-                <li><a class="dropdown-item" href="requestnotification.ejs">Request pending approval</a></li>
-                <li><a class="dropdown-item" href="systemnotification.ejs">System maintenance scheduled</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-center" href="viewallnotification.ejs">View all</a></li>
-            </ul>
-            </div>
-
-            <!-- User Dropdown -->
-            <div class="dropdown">
-              <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-user"></i>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="librarian_account.ejs">Librarian Account</a></li>
-                <li><a class="dropdown-item" href="admin_account.ejs">Admin Account</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="librarian_interface.ejs">Logout</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Page Heading -->
-        <div class="main-content">
-          <h3>📩 Messages & Feedback</h3>
-
-          <div class="search-bar">
-            <input type="text" id="searchInput" class="form-control" placeholder="Search messages...">
-            <button class="btn btn-primary" id="sendMessage">Send</button>
-          </div>
-
-          <!-- Tabs -->
-          <ul class="nav nav-tabs">
-            <li class="nav-item"><a class="nav-link active" href="#" id="allMessagesTab">All Messages</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" id="replyMessagesTab">Reply Message</a></li>
-            <li class="nav-item"><a class="nav-link text-success" href="#" id="feedbackTab">Feedback</a></li>
-          </ul>
-
-          <!-- Message Table -->
-          <table class="table table-bordered mt-3">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Message</th>
-                <th>Attachments</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="messageTable"></tbody>
-          </table>
-        </div>
-      </main>
-    </div>
+        <!-- Table -->
+        <table class="table table-bordered mt-3">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Message</th>
+              <th>Attachments</th>
+              <th>Status</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="messageTable"></tbody>
+        </table>
+      </div>
+    </main>
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   $(document).ready(function () {
     let messages = [];
 
-    // Load messages from backend
     function fetchMessages() {
-      fetch('http://localhost:3000/librarian/all-messages')
+      fetch('/librarian/all-messages')
         .then(res => res.json())
         .then(data => {
           messages = data;
-          loadMessages("all");
-        })
-        .catch(err => console.error("Failed to fetch messages:", err));
+          renderMessages("all");
+        });
     }
 
-    // Render messages into the table
-    function loadMessages(filterType = "all") {
-      let tableContent = "";
-      messages.forEach((msg, index) => {
-        if (filterType === "reply" && msg.status !== "Resolved") return;
-        if (filterType === "feedback" && msg.type !== "Feedback") return;
+    function renderMessages(filter) {
+      let html = "";
+      messages.forEach((msg, i) => {
+        if (filter === "reply" && msg.status !== "Resolved") return;
+        if (filter === "feedback" && msg.type !== "Feedback") return;
 
-        const badgeClass =
-          msg.status === "Opened"
-            ? "badge-warning"
-            : msg.status === "In Progress"
-            ? "badge-primary"
-            : "badge-success";
+        let badge = msg.status === "Opened" ? "badge-warning" :
+                    msg.status === "In Progress" ? "badge-primary" : "badge-success";
 
-        tableContent += `
+        html += `
           <tr>
             <td>${msg.name}</td>
             <td>${msg.type}</td>
-            <td class="message-click" data-index="${index}" style="cursor:pointer;">${msg.message}</td>
-            <td class="attachment-click" data-attachment="${msg.attachment}" style="cursor:pointer;">${msg.attachment}</td>
-            <td><span class="badge ${badgeClass}">${msg.status}</span></td>
+            <td>${msg.message}</td>
+            <td><a href="/uploads/${msg.attachment}" target="_blank">${msg.attachment}</a></td>
+            <td><span class="badge ${badge}">${msg.status}</span></td>
+            <td>${new Date(msg.created_at).toLocaleString()}</td>
           </tr>`;
       });
-
-      $("#messageTable").html(tableContent);
+      $('#messageTable').html(html);
     }
 
-    // Tab click handlers
-    $("#allMessagesTab").click(function () {
-      $(".nav-link").removeClass("active");
-      $(this).addClass("active");
-      loadMessages("all");
+    $('#allMessagesTab').click(() => {
+      $('.nav-link').removeClass('active');
+      $('#allMessagesTab').addClass('active');
+      renderMessages("all");
     });
 
-    $("#replyMessagesTab").click(function () {
-      $(".nav-link").removeClass("active");
-      $(this).addClass("active");
-      loadMessages("reply");
+    $('#replyMessagesTab').click(() => {
+      $('.nav-link').removeClass('active');
+      $('#replyMessagesTab').addClass('active');
+      renderMessages("reply");
     });
 
-    $("#feedbackTab").click(function () {
-      $(".nav-link").removeClass("active");
-      $(this).addClass("active");
-      loadMessages("feedback");
+    $('#feedbackTab').click(() => {
+      $('.nav-link').removeClass('active');
+      $('#feedbackTab').addClass('active');
+      renderMessages("feedback");
     });
 
-    // Search filter
-    $("#searchInput").on("keyup", function () {
-      const value = $(this).val().toLowerCase();
-      $("#messageTable tr").filter(function () {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+    $("#messageForm").on("submit", function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      fetch('/librarian/add-message', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert("Message sent!");
+        fetchMessages();
+        this.reset();
       });
     });
 
-    // Click to view message
-    $(document).on("click", ".message-click", function () {
-      const index = $(this).data("index");
-      alert("Message:\n" + messages[index].message);
-    });
-
-    // Click to view attachment
-    $(document).on("click", ".attachment-click", function () {
-      const attachment = $(this).data("attachment");
-      alert("Opening attachment: " + attachment);
-    });
-
-    // Send dummy message (for testing)
-    $("#sendMessage").click(function () {
-      fetch("http://localhost:3000/librarian/add-message", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "Test User",
-          type: "Suggestion",
-          message: "Example suggestion from user.",
-          attachment: "📎",
-          status: "Opened",
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          alert("Message sent!");
-          fetchMessages(); // reload after sending
-        })
-        .catch((err) => console.error("Error sending message:", err));
-    });
-
-    // Initial load
     fetchMessages();
   });
 </script>
-
 </body>
 </html>

@@ -847,26 +847,17 @@ exports.getAllRequests = async (req, res) => {
 
   try {
     let sql = `
-      SELECT 
-        id,
-        reg_no,
-        name,
-        resource,
-        title,
-        date,
-        status,
-        reason
-      FROM requests
+      SELECT * FROM borrow_requests
     `;
-    
+
     const params = [];
 
     if (regNo) {
-      sql += ' WHERE reg_no = ?';
+      sql += ' WHERE borrower_id= ?';
       params.push(regNo);
     }
 
-    sql += ' ORDER BY date DESC';
+    sql += ' ORDER BY borrow_date DESC';
 
     const [rows] = await db.execute(sql, params);
     res.json(rows);
@@ -875,6 +866,7 @@ exports.getAllRequests = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 exports.addRequest = (req, res) => {
   const { reg_no, name, resource, title } = req.body;
