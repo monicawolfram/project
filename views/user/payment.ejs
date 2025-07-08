@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Payment History - Library System</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- FontAwesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 
     <style>
         body {
@@ -72,10 +72,10 @@
 </head>
 <body>
     <div class="container mt-4">
-        <nav class="navbar d-flex justify-content-around">
+        <nav class="navbar d-flex justify-content-around flex-wrap">
             <a href="/user/home" class="nav-link"><i class="fas fa-home"></i> Home</a>
             <div class="dropdown">
-                <a class="nav-link dropdown-toggle" href="/user/Resources" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-book"></i> Resources
                 </a>
                 <ul class="dropdown-menu">
@@ -86,7 +86,7 @@
             </div>
             <a href="/user/attendance" class="nav-link"><i class="fas fa-user-check"></i> Attendance</a>
             <div class="dropdown">
-                <a class="nav-link dropdown-toggle" href="/user/transcation" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-exchange-alt"></i> Transaction
                 </a>
                 <ul class="dropdown-menu">
@@ -95,13 +95,14 @@
                 </ul>
             </div>
             <div class="dropdown">
-                <a class="nav-link dropdown-toggle" href="/user/viewstatus" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-eye"></i> Viewstatus
                 </a>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="/user/resources">Resources</a></li>
-                    <li><a class="dropdown-item" href="/user/payment">Payment </a></li>
-                    <li><a class="dropdown-item" href="/user/profile">Profile </a></li>
+                    <li><a class="dropdown-item"  href="/user/borrow">Borrow</a></li>
+                    <li><a class="dropdown-item" href="/user/payment">Payment</a></li>
+                    <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
                 </ul>
             </div>
         </nav>
@@ -113,7 +114,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>id</th>
                         <th>Student ID</th>
                         <th>Student Name</th>
                         <th>Payment Date</th>
@@ -129,14 +130,7 @@
         </div>
 
         <!-- Toast Notification -->
-        <div id="payment-toast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    Payment history loaded successfully!
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
+     
 
         <!-- Help & About Us Buttons -->
         <div class="footer-btns text-center mt-3">
@@ -148,81 +142,75 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-       const regNo = localStorage.getItem('user_regNo');
+   <script>
+    // No need to get regNo from localStorage for API call, session handles it securely
 
-if (!regNo) {
-    alert("User not logged in. Redirecting to login...");
-    window.location.href = "/login.html"; // Adjust path if needed
+// Render payment history rows
+function renderPaymentHistory(payments) {
+    const tableBody = document.getElementById('payment-history-table');
+    tableBody.innerHTML = '';
+
+    if (!payments || payments.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No payment history available.</td></tr>';
+        return;
+    }
+
+    payments.forEach((payment, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${payment.studentId}</td>
+            <td>${payment.studentName}</td>
+            <td>${payment.date}</td>
+            <td>${payment.amount.toLocaleString()}</td>
+            <td>${payment.method}</td>
+            <td>
+                <span class="badge ${payment.status === 'Completed' ? 'bg-success' : 'bg-warning'}">
+                    ${payment.status}
+                </span>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
 }
 
+// Show success toast
+function showPaymentSuccessToast() {
+    const toastEl = document.getElementById('payment-toast');
+    toastEl.classList.remove('text-bg-danger');
+    toastEl.classList.add('text-bg-success');
+    toastEl.querySelector('.toast-body').textContent = 'Payment history loaded successfully!';
+    new bootstrap.Toast(toastEl).show();
+}
 
-        // Function to render the payment history in the table
-        function renderPaymentHistory(payments) {
-            const tableBody = document.getElementById('payment-history-table');
-            tableBody.innerHTML = ''; // Clear existing data
+// Show error toast
+function showPaymentErrorToast(message) {
+    const toastEl = document.getElementById('payment-toast');
+    toastEl.classList.remove('text-bg-success');
+    toastEl.classList.add('text-bg-danger');
+    toastEl.querySelector('.toast-body').textContent = message;
+    new bootstrap.Toast(toastEl).show();
+}
 
-            payments.forEach((payment, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${payment.studentId}</td>
-                    <td>${payment.studentName}</td>
-                    <td>${payment.date}</td>
-                    <td>${payment.amount}</td>
-                    <td>${payment.method}</td>
-                    <td>
-                        <span class="badge ${payment.status === 'Completed' ? 'bg-success' : 'bg-warning'}">
-                            ${payment.status}
-                        </span>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
+// Fetch payment history from API without regNo param
+async function fetchPaymentHistory() {
+    try {
+        const response = await fetch('/user/payments');
+        if (!response.ok) throw new Error('Failed to fetch payment history');
+        const payments = await response.json();
+        renderPaymentHistory(payments);
+        showPaymentSuccessToast();
+    } catch (error) {
+        console.error(error);
+        renderPaymentHistory([]);
+        showPaymentErrorToast('Error loading payment history');
+    }
+}
 
-            if (payments.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No payment history available.</td></tr>';
-            }
-        }
+document.addEventListener('DOMContentLoaded', () => {
+    fetchPaymentHistory();
+});
 
-        // Show success toast
-        function showPaymentSuccessToast() {
-            const toast = new bootstrap.Toast(document.getElementById('payment-toast'));
-            toast.show();
-        }
-
-        // Show error toast
-        function showPaymentErrorToast(message) {
-            const toast = new bootstrap.Toast(document.getElementById('payment-toast'));
-            document.getElementById('payment-toast').classList.replace('text-bg-success', 'text-bg-danger');
-            document.querySelector('.toast-body').textContent = message;
-            toast.show();
-        }
-
-        // Fetch payment history from backend
-        async function fetchPaymentHistory() {
-            try {
-                const response = await fetch(`http://localhost:5000/api/payments/${regNo}`);
-                if (response.ok) {
-                    const payments = await response.json();
-                    renderPaymentHistory(payments);
-                    showPaymentSuccessToast();
-                } else {
-                    console.error('Failed to fetch payment history:', response.status);
-                    renderPaymentHistory([]);
-                    showPaymentErrorToast('Failed to load payment history');
-                }
-            } catch (err) {
-                console.error('Error fetching payments:', err);
-                renderPaymentHistory([]);
-                showPaymentErrorToast('Error loading payment history');
-            }
-        }
-
-        // Load payment history on page ready
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchPaymentHistory();
-        });
-    </script>
+   </script>
 </body>
 </html>

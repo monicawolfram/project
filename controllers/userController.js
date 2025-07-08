@@ -345,31 +345,35 @@ exports.payFine = async (req, res) => {
   }
 };
 
-exports.getPaymentHistoryByRegNo = (req, res) => {
-    const regNo = req.params.regNo;
+exports.getPaymentHistoryFromSession = (req, res) => {
+  if (!req.session || !req.session.user || !req.session.user.reg_no) {
+    return res.status(401).json({ error: "Unauthorized. Please log in." });
+  }
 
-    const query = `
-        SELECT 
-            users.reg_no AS studentId,
-            users.full_name AS studentName,
-            payments.payment_date AS date,
-            payments.amount,
-            payments.payment_method AS method,
-            payments.status
-        FROM payments
-        JOIN users ON payments.user_id = users.id
-        WHERE users.reg_no = ?
-        ORDER BY payments.payment_date DESC
-    `;
+  const regNo = req.session.user.reg_no;
 
-    db.query(query, [regNo], (err, results) => {
-        if (err) {
-            console.error("Error fetching payments:", err);
-            return res.status(500).json({ error: "Database error" });
-        }
+  const query = `
+    SELECT 
+      users.reg_no AS studentId,
+      users.full_name AS studentName,
+      payments.payment_date AS date,
+      payments.amount,
+      payments.payment_method AS method,
+      payments.status
+    FROM payments
+    JOIN users ON payments.user_id = users.id
+    WHERE users.reg_no = ?
+    ORDER BY payments.payment_date DESC
+  `;
 
-        res.json(results);
-    });
+  db.query(query, [regNo], (err, results) => {
+    if (err) {
+      console.error("Error fetching payments:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+
+    res.json(results);
+  });
 };
 
 exports.registerUser = async (req, res) => {

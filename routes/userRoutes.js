@@ -29,7 +29,7 @@ router.post('/attendance', userController.postAttendance);
 
 router.get('/borrowed-resources/:userId', userController.getBorrowedResources);
 router.post('/pay-fine', userController.payFine);
-router.get('/payments/:regNo', userController.getPaymentHistoryByRegNo);
+router.get('/payments', userController.getPaymentHistoryFromSession);
 router.post('/register', upload.single('photo'), userController.registerUser);
 
 router.get('/papers', userController.papers); // optional static view
