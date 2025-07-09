@@ -75,9 +75,21 @@ router.post('/report', librarianController.generateReport);
 router.get('/generate/pdf', librarianController.generatePDF);
 router.get('/generate/excel',librarianController.generateExcel);
 router.get('/generate/svg', librarianController.generateSVG);
+router.post('/it-support', upload.single('attachment'), librarianController.submitIssue);
+router.post('/fines', librarianController.addFine);
+router.get('/fines', librarianController.getAllFines);
+router.delete('/fines/:id', librarianController.deleteFine);
+router.put('/fines/:id', librarianController.updateFine);
+router.get('/fines/:id', librarianController.getFineById);
+router.get('/students', librarianController.getStudentUsers);
+router.get('/librarians', librarianController.getLibrarianUsers);
+router.get('/view-users', librarianController.getAllUsers);
+router.post('/add-user', upload.single('photo'), librarianController.addUser);
 
 
-// This will serve interface.html when visiting /api/librarian/
+
+
+
 router.get('/librarian_interface', librarianController.librarian_interface);
 router.get('/librarian_home', librarianController.librarian_home);
 router.get('/librarian_category', librarianController.librarian_category);

@@ -1111,8 +1111,6 @@ exports.generateExcel = async (req, res) => {
     res.status(500).send('Failed to generate Excel');
   }
 };
-
-
 exports.generateSVG = async (req, res) => {
   try {
     const data = req.app.locals.lastReportData;
@@ -1138,5 +1136,214 @@ exports.generateSVG = async (req, res) => {
     res.status(500).send('Failed to generate SVG');
   }
 };
+exports.submitIssue = async (req, res) => {
+  try {
+    const { issueType, description, priority } = req.body;
+    const attachment = req.file ? req.file.filename : null;
+
+    if (!description || !issueType || !priority) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Insert issue into database
+    await db.execute(
+      `INSERT INTO it_support_issues (issue_type, description, priority, attachment, status, created_at)
+       VALUES (?, ?, ?, ?, 'pending', NOW())`,
+      [issueType, description, priority, attachment]
+    );
+
+    // (Optional) Notify admin by saving to notifications table or sending email
+
+    res.json({ message: 'Issue submitted successfully and sent to admin.' });
+  } catch (err) {
+    console.error('Error submitting IT issue:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+exports.addFine = async (req, res) => {
+  const { id, resource, date, amount, status } = req.body;
+  if (!id || !resource || !date || !amount || !status) {
+    return res.status(400).json({ success: false, message: 'All fields are required.' });
+  }
+
+  try {
+    await db.execute(
+      `INSERT INTO fines (borrower_reg_no, resource_title, fine_date, fine_amount, status)
+       VALUES (?, ?, ?, ?, ?)`,
+      [id, resource, date, amount, status]
+    );
+    res.json({ success: true, message: 'Fine added successfully' });
+  } catch (err) {
+    console.error('Error adding fine:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+exports.getAllFines = async (req, res) => {
+  try {
+    const [fines] = await db.execute('SELECT * FROM fines ORDER BY fine_date DESC');
+    res.json({ success: true, fines });
+  } catch (err) {
+    console.error('Error fetching fines:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+exports.deleteFine = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.execute('DELETE FROM fines WHERE id = ?', [id]);
+    res.json({ success: true, message: 'Fine deleted' });
+  } catch (err) {
+    console.error('Error deleting fine:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+exports.updateFine = async (req, res) => {
+  const { resource, date, amount, status } = req.body;
+  const { id } = req.params;
+
+  if (!resource || !date || !amount || !status) {
+    return res.status(400).json({ success: false, message: 'All fields are required.' });
+  }
+
+  try {
+    await db.execute(
+      `UPDATE fines SET resource_title = ?, fine_date = ?, fine_amount = ?, status = ? WHERE borrower_reg_no = ?`,
+      [resource, date, amount, status, id]
+    );
+    res.json({ success: true, message: 'Fine updated successfully' });
+  } catch (err) {
+    console.error('Error updating fine:', err);
+    res.status(500).json({ success: false });
+  }
+};
+exports.getFineById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.execute(`SELECT * FROM fines WHERE borrower_reg_no = ?`, [id]);
+    if (rows.length === 0) return res.status(404).json({ success: false, message: 'Fine not found' });
+    res.json({ success: true, fine: rows[0] });
+  } catch (err) {
+    console.error('Error fetching fine:', err);
+    res.status(500).json({ success: false });
+  }
+};
+
+// Get all student users
+exports.getStudentUsers = async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      `SELECT name, reg_no, department, year, photo FROM users WHERE role = 'student'`
+    );
+
+    const studentsWithPhoto = rows.map(user => ({
+      ...user,
+      photo_url: user.photo
+        ? `/uploads/users/${user.photo}`
+        : '/images/default-user.png',
+    }));
+
+    res.json(studentsWithPhoto);
+  } catch (err) {
+    console.error('❌ Error fetching students:', err);
+    res.status(500).json([]);
+  }
+};
+
+// Get all librarian users
+exports.getLibrarianUsers = async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      `SELECT name, reg_no, department, year, photo FROM users WHERE role = 'librarian'`
+    );
+
+    const librariansWithPhoto = rows.map(user => ({
+      ...user,
+      photo_url: user.photo
+        ? `/uploads/users/${user.photo}`
+        : '/images/default-user.png',
+    }));
+
+    res.json(librariansWithPhoto);
+  } catch (err) {
+    console.error('❌ Error fetching librarians:', err);
+    res.status(500).json([]);
+  }
+};
+
+
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    // Query relevant user fields
+    const [users] = await db.execute(`
+      SELECT name, reg_no, department, year, role, photo
+      FROM users
+      ORDER BY role, name
+    `);
+
+    // Map photo to full URL (fallback to default image)
+    const usersWithPhotoUrl = users.map(user => ({
+      ...user,
+      photo_url: user.photo
+        ? `/uploads/users/${user.photo}`
+        : '/images/default-user.png', // fallback default
+    }));
+
+    res.json(usersWithPhotoUrl);
+  } catch (err) {
+    console.error('❌ Error fetching users:', err);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+};
+
+
+exports.addUser = async (req, res) => {
+  try {
+    const {
+      name,
+      reg_no,
+      department,
+      program,
+      college,
+      year,
+      role,
+      gender,
+      phone_no
+    } = req.body;
+
+    const photoFilename = req.file ? req.file.filename : null;
+
+    if (!name || !reg_no || !department || !program || !college || !year || !role || !gender || !phone_no) {
+      return res.status(400).json({ error: 'Missing required user fields' });
+    }
+
+    const sql = `
+      INSERT INTO users 
+      (name, reg_no, department, program, college, year, role, gender, phone_no, photo) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      name,
+      reg_no,
+      department,
+      program,
+      college,
+      year,
+      role,
+      gender,
+      phone_no,
+      photoFilename
+    ];
+
+    await db.execute(sql, values);
+    res.json({ message: 'User added successfully' });
+
+  } catch (err) {
+    console.error('Error adding user:', err);
+    res.status(500).json({ error: 'Server error while saving user' });
+  }
+};
+
 
 

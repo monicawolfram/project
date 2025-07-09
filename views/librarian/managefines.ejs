@@ -1,25 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MANAGE FINES</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   <style>
     body {
       background: url('library-bg.jpg') no-repeat center center fixed;
       background-size: cover;
       font-family: Arial, sans-serif;
     }
-
     .sidebar {
       background-color: white;
       min-height: 100vh;
       padding: 20px;
       border-radius: 15px;
     }
-
     .sidebar .nav-link {
       color: black;
       font-size: 18px;
@@ -29,26 +27,22 @@
       gap: 10px;
       text-decoration: none;
     }
-
     .sidebar .nav-link:hover {
       background-color: green;
       color: white;
       border-radius: 8px;
     }
-
     .sidebar .logo-container {
       display: flex;
       align-items: center;
       gap: 10px;
       margin-bottom: 20px;
     }
-
     .sidebar img {
       width: 50px;
       height: 50px;
       border-radius: 50%;
     }
-
     .top-bar {
       display: flex;
       align-items: center;
@@ -58,17 +52,6 @@
       border-radius: 10px;
       margin-bottom: 20px;
     }
-
-    .card {
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .download-options button {
-      margin-right: 10px;
-    }
-
     .notification-badge {
       position: absolute;
       top: 4px;
@@ -82,38 +65,34 @@
   </style>
 </head>
 <body>
-
 <div class="container-fluid">
   <div class="row">
     <!-- Sidebar -->
     <nav class="col-md-3 col-lg-2 d-md-block sidebar">
       <div class="logo-container">
-        <img src="/images/sjcet.png" alt="SJCET Logo">
+        <img src="/images/sjcet.png" alt="SJCET Logo" />
         <h4>SJUCET Library</h4>
       </div>
       <ul class="nav flex-column">
         <li class="nav-item"><a class="nav-link" href="librarian_home.ejs"><i class="fas fa-home"></i> Home</a></li>
-        <li class="nav-item"><a class="nav-link active" href="librarian_category.ejs"><i class="fas fa-book"></i> Manage Catalog</a></li>
+        <li class="nav-item"><a class="nav-link" href="librarian_category.ejs"><i class="fas fa-book"></i> Manage Catalog</a></li>
         <li class="nav-item"><a class="nav-link" href="managerequestlibrarian.ejs"><i class="fas fa-tasks"></i> Manage Requests</a></li>
         <li class="nav-item"><a class="nav-link" href="manageinventorylibrarian.ejs"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
         <li class="nav-item"><a class="nav-link" href="massageandfeedback.ejs"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
         <li class="nav-item"><a class="nav-link" href="generatereport.ejs"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
         <li class="nav-item"><a class="nav-link" href="Itsupport.ejs"><i class="fas fa-tools"></i> IT Support</a></li>
         <li class="nav-item"><a class="nav-link" href="manageusers.ejs"><i class="fas fa-users"></i> Manage Users</a></li>
-        <li class="nav-item"><a class="nav-link" href="managefines.ejs"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
+        <li class="nav-item"><a class="nav-link active" href="managefines.ejs"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
       </ul>
     </nav>
 
     <!-- Main Content -->
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-
-      <!-- Top Bar -->
       <div class="top-bar">
-        <input type="text" class="form-control w-25" id="searchBar" placeholder="Search here">
+        <input type="text" class="form-control w-25" id="searchBar" placeholder="Search here" />
         <div class="d-flex align-items-center position-relative">
-          <!-- Notification Icon -->
           <div class="dropdown me-3">
-            <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="btn btn-light position-relative" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="fas fa-bell"></i>
               <span class="notification-badge">3</span>
             </button>
@@ -121,20 +100,18 @@
               <li><a class="dropdown-item" href="booknotification.ejs">New book added</a></li>
               <li><a class="dropdown-item" href="requestnotification.ejs">Request pending approval</a></li>
               <li><a class="dropdown-item" href="systemnotification.ejs">System maintenance scheduled</a></li>
-              <li><hr class="dropdown-divider"></li>
+              <li><hr class="dropdown-divider" /></li>
               <li><a class="dropdown-item text-center" href="viewallnotification.ejs">View all</a></li>
             </ul>
           </div>
-
-          <!-- User Dropdown -->
           <div class="dropdown">
-            <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="fas fa-user"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="librarian_account.ejs">Librarian Account</a></li>
               <li><a class="dropdown-item" href="admin_account.ejs">Admin Account</a></li>
-              <li><hr class="dropdown-divider"></li>
+              <li><hr class="dropdown-divider" /></li>
               <li><a class="dropdown-item text-danger" href="librarian_interface.ejs">Logout</a></li>
             </ul>
           </div>
@@ -148,14 +125,40 @@
         <div id="addFineForm" class="collapse">
           <form id="newFineForm" class="mb-4">
             <div class="row">
-              <div class="col-md-3 mb-2"><input type="text" class="form-control" id="fineId" placeholder="ID" required></div>
-              <div class="col-md-3 mb-2"><input type="text" class="form-control" id="finePaper" placeholder="Paper" required></div>
-              <div class="col-md-2 mb-2"><input type="date" class="form-control" id="fineDate" required></div>
-              <div class="col-md-2 mb-2"><input type="number" class="form-control" id="fineAmount" placeholder="Fine" required></div>
+              <div class="col-md-3 mb-2">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="fineId"
+                  placeholder="ID"
+                  required
+                />
+              </div>
+              <div class="col-md-3 mb-2">
+                <select class="form-control" id="fineResource" required>
+                  <option value="">Select Resource</option>
+                  <option value="Book">Book</option>
+                  <option value="Paper">Paper</option>
+                  <option value="Project">Project</option>
+                </select>
+              </div>
+              <div class="col-md-2 mb-2">
+                <input type="date" class="form-control" id="fineDate" required />
+              </div>
+              <div class="col-md-2 mb-2">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="fineAmount"
+                  placeholder="Fine"
+                  required
+                  min="0"
+                />
+              </div>
               <div class="col-md-2 mb-2">
                 <select class="form-control" id="fineStatus">
                   <option value="Paid">Paid</option>
-                  <option value="Unpaid">Unpaid</option>
+                  <option value="Unpaid" selected>Unpaid</option>
                 </select>
               </div>
             </div>
@@ -163,52 +166,68 @@
           </form>
         </div>
 
-        <!-- Fines Table -->
         <table class="table table-striped" id="finesTable">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Paper</th>
+              <th>Resource</th>
               <th>Date</th>
               <th>Fine</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>22171055</td>
-              <td>The Great Gatsby</td>
-              <td>2025-02-12</td>
-              <td>$500</td>
-              <td><span class="badge bg-success">Paid</span></td>
-              <td>
-                <button class="btn btn-warning btn-sm" onclick="editFine(this)">Edit</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteFine(this)">Delete</button>
-              </td>
-            </tr>
-            <tr>
-              <td>22171056</td>
-              <td>1984</td>
-              <td>2025-02-15</td>
-              <td>$300</td>
-              <td><span class="badge bg-danger">Unpaid</span></td>
-              <td>
-                <button class="btn btn-warning btn-sm" onclick="editFine(this)">Edit</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteFine(this)">Delete</button>
-              </td>
-            </tr>
-          </tbody>
+          <tbody></tbody>
         </table>
       </section>
     </main>
   </div>
 </div>
+<!-- Edit Fine Modal -->
+<div class="modal fade" id="editFineModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form class="modal-content" id="editFineForm">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Fine</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editFineId">
+        <div class="mb-3">
+          <label class="form-label">Resource</label>
+          <input type="text" class="form-control" id="editFineResource" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-control" id="editFineDate" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Amount</label>
+          <input type="number" class="form-control" id="editFineAmount" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="editFineStatus">
+            <option value="Paid">Paid</option>
+            <option value="Unpaid">Unpaid</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" type="submit">Update</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-<!-- JS -->
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-  // Search
+  // Search functionality
   document.getElementById('searchBar').addEventListener('input', function () {
     const query = this.value.toLowerCase();
     const rows = document.querySelectorAll('#finesTable tbody tr');
@@ -220,41 +239,137 @@
     });
   });
 
-  // Delete
-  function deleteFine(button) {
-    const row = button.closest('tr');
-    row.remove();
-  }
-
-  // Edit (Placeholder)
-  function editFine(button) {
-    alert("Edit fine not implemented yet.");
-  }
-
   // Add Fine
   document.getElementById('newFineForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    const id = document.getElementById('fineId').value;
-    const paper = document.getElementById('finePaper').value;
-    const date = document.getElementById('fineDate').value;
-    const amount = document.getElementById('fineAmount').value;
-    const status = document.getElementById('fineStatus').value;
+
+    const fine = {
+      id: document.getElementById('fineId').value.trim(),
+      resource: document.getElementById('fineResource').value,
+      date: document.getElementById('fineDate').value,
+      amount: document.getElementById('fineAmount').value.trim(),
+      status: document.getElementById('fineStatus').value,
+    };
+
+    if (!fine.resource) {
+      alert('Please select a Resource.');
+      return;
+    }
+
+    fetch('http://localhost:3000/librarian/fines', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fine),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('✅ Fine added successfully');
+          appendFineToTable(fine);
+          this.reset();
+          const collapseElem = document.getElementById('addFineForm');
+          const bsCollapse = bootstrap.Collapse.getInstance(collapseElem);
+          if (bsCollapse) bsCollapse.hide();
+        } else {
+          alert('❌ Failed to add fine');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('❌ Error sending fine data to server.');
+      });
+  });
+
+  // Append Fine
+  function appendFineToTable(fine) {
     const table = document.querySelector('#finesTable tbody');
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${id}</td>
-      <td>${paper}</td>
-      <td>${date}</td>
-      <td>$${amount}</td>
-      <td><span class="badge ${status === 'Paid' ? 'bg-success' : 'bg-danger'}">${status}</span></td>
+      <td>${fine.id}</td>
+      <td>${fine.resource}</td>
+      <td>${fine.date}</td>
+      <td>Tsh ${Number(fine.amount).toLocaleString()}</td>
+      <td><span class="badge ${fine.status === 'Paid' ? 'bg-success' : 'bg-danger'}">${fine.status}</span></td>
       <td>
-        <button class="btn btn-warning btn-sm" onclick="editFine(this)">Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteFine(this)">Delete</button>
+        <button class="btn btn-sm btn-info me-2" onclick="editFine('${fine.id}')">
+          <i class="fas fa-pen"></i> Edit
+        </button>
+        <button class="btn btn-sm btn-danger" onclick="deleteFine(this)">
+          <i class="fas fa-trash-alt"></i> Delete
+        </button>
       </td>
     `;
     table.appendChild(row);
-    this.reset();
+  }
+
+  // Edit Fine - show modal and populate fields
+  function editFine(id) {
+    fetch(`http://localhost:3000/librarian/fines/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const fine = data.fine;
+          document.getElementById('editFineId').value = fine.borrower_reg_no;
+          document.getElementById('editFineResource').value = fine.resource_title;
+          document.getElementById('editFineDate').value = fine.fine_date;
+          document.getElementById('editFineAmount').value = fine.fine_amount;
+          document.getElementById('editFineStatus').value = fine.status;
+
+          const modal = new bootstrap.Modal(document.getElementById('editFineModal'));
+          modal.show();
+        } else {
+          alert('❌ Fine not found.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('❌ Error fetching fine data.');
+      });
+  }
+
+  // Submit Edit Fine Form
+  document.getElementById('editFineForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const updatedFine = {
+      resource: document.getElementById('editFineResource').value,
+      date: document.getElementById('editFineDate').value,
+      amount: document.getElementById('editFineAmount').value,
+      status: document.getElementById('editFineStatus').value,
+    };
+
+    const id = document.getElementById('editFineId').value;
+
+    fetch(`http://localhost:3000/librarian/fines/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedFine),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('✅ Fine updated successfully');
+          location.reload(); // You can replace this with manual row update logic
+        } else {
+          alert('❌ Failed to update fine');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('❌ Error updating fine');
+      });
   });
+
+  // Delete Fine
+  function deleteFine(button) {
+    if (confirm('⚠️ Are you sure you want to delete this fine?')) {
+      const row = button.closest('tr');
+      row.remove();
+      alert('✅ Fine deleted successfully');
+    }
+  }
 </script>
+
+
 </body>
 </html>

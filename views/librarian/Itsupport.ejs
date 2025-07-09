@@ -215,35 +215,44 @@
 </div>
 
 <script>
-    document.getElementById("issueForm").addEventListener("submit", function(event) {
-        event.preventDefault();
+  document.getElementById("issueForm").addEventListener("submit", function (e) {
+    e.preventDefault();
 
-        let issueType = document.getElementById("issueType").value;
-        let description = document.getElementById("description").value;
-        let priority = document.getElementById("priority").value;
+    const issueType = document.getElementById("issueType").value;
+    const description = document.getElementById("description").value.trim();
+    const priority = document.getElementById("priority").value;
 
-        if (description.trim() === "") {
-            alert("Please enter a description.");
-            return;
-        }
+    if (!description) {
+      return alert("⚠️ Please enter a description.");
+    }
 
-        alert(`Issue Submitted:\nType: ${issueType}\nPriority: ${priority}\nDescription: ${description}`);
-    });
+    const formData = new FormData(this);
 
-    document.getElementById("issueForm").addEventListener("submit", function (e) {
-        e.preventDefault();
+    // Optional: Add visual feedback while sending
+    const submitButton = this.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Submitting...';
 
-        const formData = new FormData(this);
-
-        fetch('http://localhost:3000/api/it-support', {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => alert(data.message))
-        .catch(err => console.error(err));
-    });
+    fetch('http://localhost:3000/librarian/it-support', {
+      method: 'POST',
+      body: formData
+    })
+      .then(res => res.json())
+      .then(data => {
+        alert(`✅ ${data.message}`);
+        this.reset();
+      })
+      .catch(err => {
+        console.error(err);
+        alert("❌ Failed to submit issue. Try again.");
+      })
+      .finally(() => {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Submit Issue';
+      });
+  });
 </script>
+
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -38,8 +38,6 @@ exports.librarian_Activities = (req, res) => {
  res.render('admin/librarian_Activities');   
 };
 
-
-
 // Function to create a new user      
 exports.createUser = (req, res) => {
   const { name, email, role } = req.body;
