@@ -17,26 +17,38 @@
       background-color: #0d6efd;
       color: white;
     }
+    .badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
     .badge-available {
       background-color: #28a745;
     }
     .badge-checked-out {
       background-color: #ffc107;
+      color: #000;
     }
     .badge-reserved {
       background-color: #dc3545;
+    }
+    .badge-new {
+      background-color: #0dcaf0;
+    }
+    .badge-deleted {
+      background-color: #6c757d;
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h2 class="mb-4">Resource Status - Admin Dashboard</h2>
+  <h2 class="mb-4">📚 Resource Status - Admin Dashboard</h2>
 
-  <!-- Filter Section -->
+  <!-- Filter Form -->
   <div class="card p-3 mb-4">
     <form id="filterForm" class="row g-3">
-      <div class="col-md-3">
+      <div class="col-md-4">
         <label for="resourceType" class="form-label">Resource Type</label>
         <select id="resourceType" class="form-select">
           <option value="">All</option>
@@ -45,24 +57,26 @@
           <option value="project">Project</option>
         </select>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-4">
         <label for="status" class="form-label">Status</label>
         <select id="status" class="form-select">
           <option value="">All</option>
           <option value="available">Available</option>
-          <option value="checked-out">Checked Out</option>
-          <option value="reserved">Reserved</option>
+          <option value="checked-out">Borrowed</option>
+          <option value="reserved">Removed</option>
+          <option value="new">New</option>
+          <option value="deleted">Deleted</option>
         </select>
       </div>
-      <div class="col-md-3 align-self-end">
+      <div class="col-md-4 align-self-end">
         <button class="btn btn-primary w-100" type="submit">Apply Filters</button>
       </div>
     </form>
   </div>
 
-  <!-- Resource Status Table -->
+  <!-- Table Section -->
   <div class="card p-3">
-    <h5 class="mb-3">All Resource Status</h5>
+    <h5 class="mb-3">All Resources</h5>
     <div class="table-responsive">
       <table class="table table-bordered align-middle" id="resourceStatusTable">
         <thead>
@@ -75,7 +89,7 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Data will be loaded here -->
+          <!-- Dynamic Data -->
         </tbody>
       </table>
     </div>
@@ -83,56 +97,89 @@
 </div>
 
 <script>
-  // Fetch and display all resource statuses
-  function fetchResources() {
+  const tableBody = document.querySelector("#resourceStatusTable tbody");
+
+  // Dynamically assign badge color class based on status
+  function getBadgeClass(status) {
+    const classes = {
+      'available': 'badge-available',
+      'checked-out': 'badge-checked-out',
+      'reserved': 'badge-reserved',
+      'new': 'bg-info',
+      'deleted': 'bg-dark'
+    };
+    return classes[status.toLowerCase()] || 'bg-secondary';
+  }
+
+  // Fetch and display all resources
+  async function fetchResources() {
     const resourceType = document.getElementById('resourceType').value;
     const status = document.getElementById('status').value;
-    
-    fetch(`/api/resources?resourceType=${resourceType}&status=${status}`)
-      .then(response => response.json())
-      .then(data => {
-        const tableBody = document.querySelector("#resourceStatusTable tbody");
-        tableBody.innerHTML = '';
-        data.forEach(resource => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${resource.resource_name}</td>
-            <td>${resource.resource_type}</td>
-            <td><span class="badge badge-${resource.status.toLowerCase()}">${resource.status}</span></td>
-            <td>${resource.date_added}</td>
-            <td>
-              <button class="btn btn-sm btn-success" onclick="changeStatus(this, 'available', ${resource.id})">Mark as Available</button>
-              <button class="btn btn-sm btn-warning" onclick="changeStatus(this, 'checked-out', ${resource.id})">Mark as Checked Out</button>
-              <button class="btn btn-sm btn-danger" onclick="changeStatus(this, 'reserved', ${resource.id})">Mark as Reserved</button>
-            </td>
-          `;
-          tableBody.appendChild(row);
-        });
+
+    try {
+      const response = await fetch(`/admin/resources?resourceType=${resourceType}&status=${status}`);
+      if (!response.ok) throw new Error("Failed to fetch resources");
+      const data = await response.json();
+
+      tableBody.innerHTML = '';
+      if (data.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No resources found.</td></tr>`;
+        return;
+      }
+
+      data.forEach(resource => {
+        const badgeClass = getBadgeClass(resource.status);
+        const capitalStatus = resource.status.charAt(0).toUpperCase() + resource.status.slice(1);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${resource.resource_name}</td>
+          <td>${resource.resource_type}</td>
+          <td><span class="badge ${badgeClass}">${capitalStatus}</span></td>
+          <td>${new Date(resource.date_added).toLocaleString()}</td>
+          <td>
+            <button class="btn btn-sm btn-success me-1" onclick="changeStatus(this, ${resource.id}, 'available')">Available</button>
+            <button class="btn btn-sm btn-warning me-1" onclick="changeStatus(this, ${resource.id}, 'checked-out')">Borrowed</button>
+            <button class="btn btn-sm btn-danger" onclick="changeStatus(this, ${resource.id}, 'reserved')">Removed</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
       });
+    } catch (err) {
+      console.error(err);
+      alert('Error loading resources. Please try again.');
+    }
   }
 
-  // Update resource status
-  function changeStatus(button, newStatus, resourceId) {
-    fetch(`/api/resources/${resourceId}/status`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus })
-    }).then(() => {
-      button.closest('tr').querySelector('td:nth-child(3)').innerHTML = `<span class="badge badge-${newStatus}">${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}</span>`;
-      button.disabled = true;
-      button.closest('tr').querySelectorAll('button').forEach(btn => btn.disabled = true);
-    });
+  // Update resource status and disable buttons after update
+  async function changeStatus(button, id, newStatus) {
+    try {
+      const res = await fetch(`/admin/resources/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!res.ok) throw new Error('Failed to update status.');
+
+      // Reload updated data
+      await fetchResources();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update status.");
+    }
   }
 
-  // Apply filters
+  // Filter form submit event
   document.getElementById("filterForm").addEventListener("submit", function (e) {
     e.preventDefault();
     fetchResources();
   });
 
-  // Initial load
-  fetchResources();
+  // Load data on page load
+  document.addEventListener("DOMContentLoaded", fetchResources);
 </script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

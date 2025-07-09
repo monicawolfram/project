@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Generate Reports - Library Management</title>
+  <title>Generate Reports</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -45,8 +45,6 @@
         <label for="librarian" class="form-label">Librarian</label>
         <select class="form-select" id="librarian">
           <option value="">All</option>
-          <option value="librarian1">Mr. John</option>
-          <option value="librarian2">Ms. Grace</option>
         </select>
       </div>
       <div class="col-md-3">
@@ -97,67 +95,133 @@
           </tr>
         </thead>
         <tbody id="reportTable">
-          <!-- Sample data -->
-          <tr>
-            <td>Mr. John</td>
-            <td>Resources</td>
-            <td>Books</td>
-            <td>2025-04-15</td>
-            <td>Added 10 new books</td>
-            <td><span class="badge bg-warning">Pending</span></td>
-            <td>
-              <button class="btn btn-sm btn-approve">Approve</button>
-              <button class="btn btn-sm btn-reject">Reject</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Ms. Grace</td>
-            <td>Attendance</td>
-            <td>-</td>
-            <td>2025-04-14</td>
-            <td>Recorded 95% staff attendance</td>
-            <td><span class="badge bg-success">Approved</span></td>
-            <td>
-              <button class="btn btn-sm btn-secondary" disabled>Approved</button>
-            </td>
-          </tr>
+  <!-- Dynamically loaded rows -->
         </tbody>
       </table>
     </div>
   </div>
 </div>
 
+
 <script>
-  function toggleResourceDropdown() {
-    const reportType = document.getElementById("reportType").value;
-    const resourceTypeGroup = document.getElementById("resourceTypeGroup");
-    resourceTypeGroup.style.display = reportType === "resource" ? "block" : "none";
-  }
+  document.addEventListener('DOMContentLoaded', () => {
+    loadReports(); // Auto-load reports when page loads
+  });
 
   document.getElementById("filterForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    // Simulated filter
-    alert("Filters applied (demo only — connect to backend for real results).");
+    loadReports(); // Load reports with filters
   });
 
-  document.querySelectorAll(".btn-approve").forEach(btn => {
-    btn.addEventListener("click", function () {
-      const row = this.closest("tr");
-      row.querySelector("td:nth-child(6)").innerHTML = '<span class="badge bg-success">Approved</span>';
-      this.disabled = true;
-      row.querySelector(".btn-reject").disabled = true;
-    });
-  });
+  function loadReports() {
+    const librarian = document.getElementById("librarian").value;
+    const type = document.getElementById("reportType").value;
+    const resource = document.getElementById("resourceType").value;
+    const dateFrom = document.getElementById("dateFrom").value;
+    const dateTo = document.getElementById("dateTo").value;
 
-  document.querySelectorAll(".btn-reject").forEach(btn => {
-    btn.addEventListener("click", function () {
-      const row = this.closest("tr");
-      row.querySelector("td:nth-child(6)").innerHTML = '<span class="badge bg-danger">Rejected</span>';
-      this.disabled = true;
-      row.querySelector(".btn-approve").disabled = true;
+    const params = new URLSearchParams({
+      librarian,
+      type,
+      resource,
+      dateFrom,
+      dateTo
     });
-  });
+
+    fetch(`http://localhost:3000/admin/get-reports?${params}`)
+      .then(res => res.json())
+      .then(data => {
+        const table = document.getElementById("reportTable");
+        table.innerHTML = '';
+
+        if (data.length === 0) {
+          table.innerHTML = `<tr><td colspan="7" class="text-center">No reports found</td></tr>`;
+          return;
+        }
+
+        data.forEach(report => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+            <td>${report.librarian_name}</td>
+            <td>${report.report_type}</td>
+            <td>${report.resource_type || '-'}</td>
+            <td>${new Date(report.report_date).toLocaleDateString()}</td>
+            <td>${report.summary}</td>
+            <td><span class="badge ${getStatusBadge(report.status)}">${capitalize(report.status)}</span></td>
+            <td>
+              ${report.status === 'pending' ? `
+                <button class="btn btn-sm btn-approve" onclick="updateStatus(${report.id}, 'approved', this)">Approve</button>
+                <button class="btn btn-sm btn-reject" onclick="updateStatus(${report.id}, 'rejected', this)">Reject</button>
+              ` : `<button class="btn btn-sm btn-secondary" disabled>${capitalize(report.status)}</button>`}
+            </td>
+          `;
+          table.appendChild(row);
+        });
+      })
+      .catch(err => {
+        console.error('Error loading reports:', err);
+      });
+  }
+
+  function updateStatus(reportId, status, btn) {
+    fetch(`http://localhost:3000/admin/update-report-status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: reportId, status })
+    })
+    .then(res => res.json())
+    .then(response => {
+      if (response.success) {
+        loadReports(); // Reload table to reflect changes
+      } else {
+        alert('Update failed');
+      }
+    });
+  }
+
+  function getStatusBadge(status) {
+    switch (status) {
+      case 'approved': return 'bg-success';
+      case 'rejected': return 'bg-danger';
+      case 'pending':
+      default: return 'bg-warning';
+    }
+  }
+
+  function capitalize(word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }
+
+  function toggleResourceDropdown() {
+    const type = document.getElementById("reportType").value;
+    document.getElementById("resourceTypeGroup").style.display = type === "resource" ? "block" : "none";
+  }
 </script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    loadLibrarians();
+    loadReports();
+  });
+
+  function loadLibrarians() {
+    fetch('http://localhost:3000/admin/librarians')
+      .then(res => res.json())
+      .then(librarians => {
+        const librarianSelect = document.getElementById('librarian');
+        librarians.forEach(lib => {
+          const option = document.createElement('option');
+          option.value = lib.name;
+          option.textContent = lib.name;
+          librarianSelect.appendChild(option);
+        });
+      })
+      .catch(err => console.error('Failed to load librarian list:', err));
+  }
+
+  // ... loadReports and other functions remain the same
+</script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

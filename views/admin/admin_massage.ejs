@@ -2,168 +2,154 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Messages & Feedback</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Admin: Librarian Messages & Reports</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
       background: #f8f9fa;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #0d6efd;
-      color: white;
-      padding: 15px;
-      text-align: center;
-    }
-    .container {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
     }
-    .card {
-      background: #ffffff;
+    .message-card {
+      background: white;
       border-radius: 10px;
-      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       margin-bottom: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      padding: 20px;
     }
-    .notification {
-      background: #e9f1ff;
-      margin: 10px 0;
-      padding: 15px;
-      border-left: 5px solid #0d6efd;
-      border-radius: 5px;
-      cursor: pointer;
+    .message-header {
+      font-weight: 600;
+      font-size: 1.2rem;
     }
-    .notification-content {
-      display: none;
+    .message-meta {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    .message-content {
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+    .report-files ul {
+      padding-left: 20px;
+    }
+    .reply {
+      background: #e7f3ff;
+      border-left: 3px solid #0d6efd;
+      padding: 8px 12px;
       margin-top: 10px;
-      border-top: 1px solid #ccc;
-      padding-top: 10px;
+      border-radius: 6px;
     }
-    .notification.open .notification-content {
-      display: block;
+    .reply-meta {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #333;
     }
-    .reply-box textarea {
-      height: 60px;
+    textarea.reply-input {
+      width: 100%;
+      resize: vertical;
+      min-height: 60px;
+      margin-top: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      padding: 8px;
     }
-    .reply-box {
-      margin-top: 10px;
+    .btn-reply {
+      margin-top: 8px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h2>Messages & Feedback Panel</h2>
-  </header>
-
   <div class="container">
-
-    <!-- Send Feedback -->
-    <div class="card">
-      <h5>Send Feedback</h5>
-      <label for="recipient" class="form-label">Send To:</label>
-      <select class="form-select" id="recipient">
-        <option value="all">All Librarians</option>
-        <option value="lib1">Librarian 1</option>
-        <option value="lib2">Librarian 2</option>
-      </select>
-
-      <label for="email" class="form-label mt-2">Your Email:</label>
-      <input type="email" class="form-control" id="email" placeholder="example@domain.com">
-
-      <label for="message" class="form-label mt-2">Message:</label>
-      <textarea class="form-control" id="message" rows="3" placeholder="Type your message..."></textarea>
-
-      <button class="btn btn-primary mt-3" onclick="sendMessage()">Send</button>
-    </div>
-
-    <!-- Replies -->
-    <div class="card">
-      <h5>Replies</h5>
-      <div id="replies">
-        <p><strong>Librarian 1:</strong> We've received your message. Thank you!</p>
-        <p><strong>Librarian 2:</strong> We are working on your request.</p>
-      </div>
-    </div>
-
-    <!-- Notifications -->
-    <div class="card">
-      <h5>Notification Center</h5>
-
-      <div class="notification" onclick="toggleNotification(this)">
-        <strong>New Feedback</strong> from Student A
-        <div class="notification-content">
-          <p><strong>Details:</strong> Could you extend the library hours?</p>
-          <div class="reply-box">
-            <label>Reply:</label>
-            <textarea class="form-control" placeholder="Write a reply..."></textarea>
-            <button class="btn btn-sm btn-success mt-2" onclick="replyToNotification(event)">Send Reply</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="notification" onclick="toggleNotification(this)">
-        <strong>Message</strong> from Librarian 2
-        <div class="notification-content">
-          <p><strong>Details:</strong> Need help with book categorization.</p>
-          <div class="reply-box">
-            <label>Reply:</label>
-            <textarea class="form-control" placeholder="Write a reply..."></textarea>
-            <button class="btn btn-sm btn-success mt-2" onclick="replyToNotification(event)">Send Reply</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="notification" onclick="toggleNotification(this)">
-        <strong>Approval Request</strong> for Book Purchase
-        <div class="notification-content">
-          <p><strong>Details:</strong> Request to approve purchase of 15 reference books.</p>
-          <div class="reply-box">
-            <label>Reply/Approval Note:</label>
-            <textarea class="form-control" placeholder="Approve and respond..."></textarea>
-            <button class="btn btn-sm btn-primary mt-2" onclick="replyToNotification(event)">Approve & Reply</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
+    <h2 class="mb-4">📩 Admin Panel: Librarian Messages & Reports</h2>
+    <div id="messagesContainer">Loading messages...</div>
   </div>
 
   <script>
-    function toggleNotification(element) {
-      element.classList.toggle("open");
+    const container = document.getElementById('messagesContainer');
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     }
 
-    function sendMessage() {
-      const recipient = document.getElementById("recipient").value;
-      const email = document.getElementById("email").value;
-      const message = document.getElementById("message").value.trim();
+    async function fetchMessages() {
+      try {
+        const res = await fetch('/admin/librarian-messages'); // <-- replace with your real endpoint
+        const messages = await res.json();
+        renderMessages(messages);
+      } catch (error) {
+        container.innerHTML = `<div class="alert alert-danger">Failed to load messages.</div>`;
+        console.error(error);
+      }
+    }
 
-      if (email === "" || message === "") {
-        alert("Please enter your email and message.");
+    function renderMessages(messages) {
+      container.innerHTML = '';
+      if (messages.length === 0) {
+        container.innerHTML = `<div class="text-muted">No messages yet.</div>`;
         return;
       }
 
-      alert(`Message sent to ${recipient === "all" ? "All Librarians" : recipient}:\n\n"${message}"`);
-      document.getElementById("message").value = "";
-      document.getElementById("email").value = "";
+      messages.forEach(msg => {
+        const card = document.createElement('div');
+        card.className = 'message-card';
+
+        const filesHTML = msg.files?.length
+          ? `<div class="report-files"><strong>📎 Attachments:</strong><ul>${msg.files.map(f => `<li><a href="${f.url}" target="_blank">${f.name}</a></li>`).join('')}</ul></div>`
+          : '';
+
+        const repliesHTML = msg.replies?.length
+          ? msg.replies.map(r => `
+              <div class="reply">
+                <div class="reply-meta">${r.adminName} <small>${r.time}</small></div>
+                <div>${escapeHtml(r.text)}</div>
+              </div>`).join('')
+          : '<div class="text-muted">No replies yet.</div>';
+
+        card.innerHTML = `
+          <div class="message-header">${msg.librarianName} <span class="text-muted">[${msg.messageType}]</span></div>
+          <div class="message-meta">${msg.timestamp}</div>
+          <div class="message-content">${escapeHtml(msg.content)}</div>
+          ${filesHTML}
+          <div class="reply-section mt-3">
+            <strong>Replies:</strong>
+            <div class="replies-container">${repliesHTML}</div>
+            <textarea class="reply-input" placeholder="Write your reply..."></textarea>
+            <button class="btn btn-sm btn-primary btn-reply">Reply</button>
+          </div>
+        `;
+
+        const replyBtn = card.querySelector('.btn-reply');
+        replyBtn.addEventListener('click', async () => {
+          const textarea = card.querySelector('.reply-input');
+          const replyText = textarea.value.trim();
+          if (!replyText) return alert('Please enter a reply.');
+
+          // Post reply (you must build this endpoint)
+          const response = await fetch(`/admin/reply-message/${msg.id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: replyText })
+          });
+
+          if (response.ok) {
+            textarea.value = '';
+            fetchMessages(); // Refresh after sending
+          } else {
+            alert('Failed to send reply.');
+          }
+        });
+
+        container.appendChild(card);
+      });
     }
 
-    function replyToNotification(event) {
-      event.stopPropagation(); // Prevent notification toggle
-      const replyBox = event.target.closest('.reply-box');
-      const textarea = replyBox.querySelector('textarea');
-      const replyText = textarea.value.trim();
-
-      if (replyText === "") {
-        alert("Please write a reply before sending.");
-        return;
-      }
-
-      alert(`Reply sent:\n\n"${replyText}"`);
-      textarea.value = "";
-    }
+    fetchMessages();
+    setInterval(fetchMessages, 5000); // Auto-refresh every 5 seconds
   </script>
 </body>
 </html>

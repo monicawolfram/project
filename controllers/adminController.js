@@ -253,17 +253,148 @@ exports.viewAllUsers = async (req, res) => {
     res.status(500).json({ error: 'Failed to load users' });
   }
 };
+exports.getReports = async (req, res) => {
+  try {
+    const { librarian, type, resource, dateFrom, dateTo } = req.query;
 
+    let sql = `SELECT * FROM reports WHERE 1=1`;
+    const values = [];
 
+    if (librarian) {
+      sql += ` AND librarian_name = ?`;
+      values.push(librarian);
+    }
+    if (type) {
+      sql += ` AND report_type = ?`;
+      values.push(type);
+    }
+    if (resource && type === 'resource') {
+      sql += ` AND resource_type = ?`;
+      values.push(resource);
+    }
+    if (dateFrom) {
+      sql += ` AND report_date >= ?`;
+      values.push(dateFrom);
+    }
+    if (dateTo) {
+      sql += ` AND report_date <= ?`;
+      values.push(dateTo);
+    }
 
+    sql += ` ORDER BY report_date DESC`;
 
+    const [rows] = await db.execute(sql, values);
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching reports:', err);
+    res.status(500).json([]);
+  }
+};
 
+exports.updateReportStatus = async (req, res) => {
+  const { id, status } = req.body;
+  try {
+    await db.execute(`UPDATE reports SET status = ? WHERE id = ?`, [status, id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error updating status:', err);
+    res.json({ success: false });
+  }
+};
+// Fetch all librarian names
+exports.getLibrarianList = async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      `SELECT DISTINCT name FROM users WHERE role = 'librarian' ORDER BY name`
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching librarians:", err);
+    res.status(500).json({ error: "Failed to fetch librarian list" });
+  }
+};
+exports.getAllLibrarianMessages = async (req, res) => {
+  try {
+    const [messages] = await db.execute(`
+      SELECT lm.id, lm.librarian_name, lm.message_type, lm.content, lm.timestamp
+      FROM librarian_messages lm
+      ORDER BY lm.timestamp DESC
+    `);
 
+    const messageIds = messages.map(m => m.id);
+    let files = [], replies = [];
 
+    if (messageIds.length > 0) {
+      [files] = await db.execute(`
+        SELECT * FROM librarian_files WHERE message_id IN (?)
+      `, [messageIds]);
 
+      [replies] = await db.execute(`
+        SELECT * FROM admin_replies WHERE message_id IN (?)
+      `, [messageIds]);
+    }
 
+    // Attach files and replies
+    const result = messages.map(msg => ({
+      ...msg,
+      files: files.filter(f => f.message_id === msg.id).map(f => ({
+        name: f.filename,
+        url: `/uploads/${f.filename}`
+      })),
+      replies: replies.filter(r => r.message_id === msg.id).map(r => ({
+        adminName: r.admin_name,
+        text: r.reply,
+        time: r.timestamp.toISOString().slice(0, 16).replace('T', ' ')
+      }))
+    }));
 
+    res.json(result);
+  } catch (err) {
+    console.error('Error fetching messages:', err);
+    res.status(500).json({ error: 'Failed to fetch messages' });
+  }
+};
+exports.replyToLibrarianMessage = async (req, res) => {
+  const messageId = req.params.id;
+  const { text } = req.body;
+  const adminName = 'Admin'; // You could get this from session or auth token
 
+  if (!text) return res.status(400).json({ error: 'Reply text is required.' });
+
+  try {
+    await db.execute(`
+      INSERT INTO admin_replies (message_id, admin_name, reply)
+      VALUES (?, ?, ?)
+    `, [messageId, adminName, text]);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error replying to message:', err);
+    res.status(500).json({ error: 'Failed to save reply' });
+  }
+};
+
+exports.getAllSupportRequests = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`SELECT * FROM it_support_issues ORDER BY date DESC`);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Error' });
+  }
+};
+
+exports.updateStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  try {
+    await db.execute(`UPDATE it_support_issues SET status = ? WHERE id = ?`, [status, id]);
+    res.json({ message: 'Status updated successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Status update failed' });
+  }
+};
 
 exports.getLibrarianActivities = async (req, res) => {
   try {
@@ -280,4 +411,60 @@ exports.getLibrarianActivities = async (req, res) => {
   }
 };
 
+exports.getAllResources = async (req, res) => {
+  const { resourceType, status } = req.query;
+
+  let conditions = [];
+  if (resourceType) {
+    conditions.push(`resource_type = '${resourceType}'`);
+  }
+  if (status) {
+    conditions.push(`status = '${status}'`);
+  }
+
+  let whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : '';
+
+  try {
+    const [rows] = await db.execute(`
+      SELECT * FROM (
+        SELECT id, title AS resource_name, 'book' AS resource_type, status, date_added FROM books WHERE is_deleted = 'no'
+        UNION ALL
+        SELECT id, title AS resource_name, 'paper' AS resource_type, status, date_added FROM papers WHERE is_deleted = 'no'
+        UNION ALL
+        SELECT id, title AS resource_name, 'project' AS resource_type, status, date_added FROM projects WHERE is_deleted = 'no'
+      ) AS combined
+      ${whereClause}
+      ORDER BY date_added DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to load resources' });
+  }
+};
+
+exports.updateResourceStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status) {
+    return res.status(400).json({ error: 'Status is required' });
+  }
+
+  try {
+    const [result] = await db.execute(
+      `UPDATE resources SET status = ? WHERE id = ?`,
+      [status, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Resource not found' });
+    }
+
+    res.json({ message: 'Status updated successfully' });
+  } catch (error) {
+    console.error('Error updating status:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 

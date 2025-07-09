@@ -85,21 +85,7 @@
             <th>Action</th>
           </tr>
         </thead>
-        <tbody id="itSupportTable">
-          <tr>
-            <td>Grace M.</td>
-            <td>Software</td>
-            <td>High</td>
-            <td>2025-04-17</td>
-            <td>Library system login error</td>
-            <td><span class="badge badge-pending">Pending</span></td>
-            <td>
-              <button class="btn btn-sm btn-success me-1" onclick="changeStatus(this, 'resolved')">Resolve</button>
-              <button class="btn btn-sm btn-danger" onclick="changeStatus(this, 'rejected')">Reject</button>
-              <button class="btn btn-sm btn-info ms-1" data-bs-toggle="modal" data-bs-target="#viewModal">View</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody id="itSupportTable"></tbody>
       </table>
     </div>
   </div>
@@ -113,16 +99,7 @@
         <h5 class="modal-title" id="viewModalLabel">Issue Details</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <p><strong>Submitted by:</strong> Grace M.</p>
-        <p><strong>Issue Type:</strong> Software</p>
-        <p><strong>Priority:</strong> High</p>
-        <p><strong>Date Submitted:</strong> 2025-04-17</p>
-        <p><strong>Description:</strong> The librarian cannot log in to the system due to a server error. Please assist.</p>
-        <hr>
-        <label for="adminReply">Reply Message</label>
-        <textarea id="adminReply" class="form-control" rows="3" placeholder="Enter your response..."></textarea>
-      </div>
+      <div class="modal-body" id="modalContent"></div>
       <div class="modal-footer">
         <button class="btn btn-success" onclick="sendReply()">Send Reply</button>
         <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -131,36 +108,66 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-  function changeStatus(button, newStatus) {
-    const row = button.closest("tr");
-    const statusCell = row.querySelector("td:nth-child(6)");
-    if (newStatus === "resolved") {
-      statusCell.innerHTML = '<span class="badge badge-resolved">Resolved</span>';
-    } else if (newStatus === "rejected") {
-      statusCell.innerHTML = '<span class="badge badge-rejected">Rejected</span>';
-    }
-    row.querySelectorAll("button").forEach(btn => btn.disabled = true);
+  async function loadSupportRequests() {
+    const res = await fetch('/admin/support');
+    const data = await res.json();
+    const tbody = document.getElementById('itSupportTable');
+    tbody.innerHTML = '';
+
+    data.forEach(item => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${item.submitted_by}</td>
+        <td>${item.type}</td>
+        <td>${item.priority}</td>
+        <td>${formatDate(item.date)}</td>
+        <td>${item.description}</td>
+        <td><span class="badge ${getBadgeClass(item.status)}">${capitalize(item.status)}</span></td>
+        <td>
+          <button class="btn btn-sm btn-success me-1" onclick="updateStatus(${item.id}, 'resolved')">Resolve</button>
+          <button class="btn btn-sm btn-danger" onclick="updateStatus(${item.id}, 'rejected')">Reject</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
   }
 
-  function sendReply() {
-    const reply = document.getElementById("adminReply").value.trim();
-    if (reply === "") {
-      alert("Please enter a reply before sending.");
-      return;
+  async function updateStatus(id, newStatus) {
+    const res = await fetch(`/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+
+    if (res.ok) {
+      alert(`Status updated to ${newStatus}`);
+      loadSupportRequests();
+    } else {
+      alert('Failed to update status');
     }
-    alert("Reply sent:\n" + reply);
-    document.getElementById("adminReply").value = "";
-    const modal = bootstrap.Modal.getInstance(document.getElementById("viewModal"));
-    modal.hide();
   }
 
-  document.getElementById("filterForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    alert("Filter applied (connect this to backend API).");
-  });
+  function getBadgeClass(status) {
+    if (status === 'pending') return 'badge-pending';
+    if (status === 'resolved') return 'badge-resolved';
+    if (status === 'rejected') return 'badge-rejected';
+    return 'bg-secondary';
+  }
+
+  function capitalize(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleString();
+  }
+
+  document.addEventListener('DOMContentLoaded', loadSupportRequests);
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

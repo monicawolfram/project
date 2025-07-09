@@ -24,6 +24,30 @@ router.delete('/delete-users-bulk', adminController.deleteUsersBulk);
 router.patch('/approve-users-bulk', adminController.approvePendingUsers);
 router.put('/update-users-bulk', adminController.updateUsersBulk);
 router.get('/view-users', adminController.viewAllUsers);
+router.get('/get-reports', adminController.getReports);
+router.post('/update-report-status', adminController.updateReportStatus);
+router.get('/librarians', adminController.getLibrarianList);
+router.get('/librarian-messages', adminController.getAllLibrarianMessages);
+router.post('/reply-message/:id', adminController.replyToLibrarianMessage);
+router.get('/support', adminController.getAllSupportRequests);
+router.patch('/:id/status', adminController.updateStatus);
+router.get('/resources', adminController.getAllResources);  // ?resourceType=&status=
+router.put('/:id/status', adminController.updateResourceStatus);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //
 router.get('/admin_account', adminController.admin_account);
 router.get('/admin_users', adminController.admin_users);
