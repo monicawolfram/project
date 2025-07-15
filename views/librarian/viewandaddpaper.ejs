@@ -455,7 +455,7 @@
     <label class="form-label">Paper Code</label>
     <div class="input-group">
       <input type="text" class="form-control" name="paper_code" id="paperCode" readonly required>
-      <button type="button" class="btn btn-primary" onclick="generateCode()">Generate Code</button>
+       <button href="#" class="btn btn-secondary" onclick="generateCode()">Generate Code</button>
     </div>
   </div>
 
@@ -532,7 +532,7 @@
   </div>
 
 <script>
-  async function generatePaperCode() {
+  async function generateCode() {
     try {
       const res = await fetch('/librarian/generate-paper-code');
       const data = await res.json();
