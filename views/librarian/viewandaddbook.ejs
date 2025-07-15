@@ -414,12 +414,19 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 
+<script>
+  async function generateCode() {
+    try {
+      const res = await fetch('/librarian/generate-book-code');
+      const data = await res.json();
+      document.getElementById("bookCode").value = data.bookCode;
+    } catch (err) {
+      console.error('Failed to generate book code:', err);
+      alert('Could not generate book code. Please try again.');
+    }
+  }
+</script>
 
-    <script>
-        function generateCode() {
-            document.getElementById("bookCode").value = "BK" + Math.floor(1000 + Math.random() * 9000);
-        }
-    </script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

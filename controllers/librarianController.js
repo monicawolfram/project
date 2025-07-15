@@ -1345,5 +1345,32 @@ exports.addUser = async (req, res) => {
   }
 };
 
+exports.generateBookCode = async (req, res) => {
+  try {
+    // Get the latest book_code ordered descending
+    const [rows] = await db.execute(`
+      SELECT book_code 
+      FROM books 
+      WHERE book_code LIKE 'BK____' 
+      ORDER BY book_code DESC 
+      LIMIT 1
+    `);
+
+    let newCode = 'BK0001';
+
+    if (rows.length > 0 && rows[0].book_code) {
+      const lastCode = rows[0].book_code; // e.g. 'BK0035'
+      const numericPart = parseInt(lastCode.slice(2), 10); // Get '0035' -> 35
+      const nextNumber = numericPart + 1;
+      newCode = 'BK' + String(nextNumber).padStart(4, '0'); // 'BK0036'
+    }
+
+    res.json({ bookCode: newCode });
+  } catch (error) {
+    console.error('Error generating book code:', error);
+    res.status(500).json({ error: 'Failed to generate book code' });
+  }
+};
+
 
 

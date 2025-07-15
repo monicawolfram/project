@@ -10,8 +10,6 @@ const authenticateLibrarian = (req, res, next) => {
 
 // Routes
 router.get('/dashboard', authenticateLibrarian, librarianController.dashboard);
-// router.get('/manage-resources', authenticateLibrarian, librarianController.manageResources);
-// router.post('/respond-feedback', authenticateLibrarian, librarianController.respondFeedback);
 router.get('/books/available', librarianController.getAvailableBooks);
 router.get('/books', authenticateLibrarian, librarianController.getBooks);
 router.get('/search/book', librarianController.searchBooks);
@@ -31,13 +29,7 @@ router.get('/librarians', librarianController.getAllLibrarians);
 
 router.put('/task/:id', librarianController.updateTask);
 
-// APPROVE/REJECT task
-//router.put('/status/:id', librarianController.updateStatus);
 
-// ADD or UPDATE comment
-//router.put('/comment/:id', librarianController.updateComment);
-
-// ATTACHMENTS
 router.post('/attachment/:id', librarianController.addAttachment);
 router.delete('/attachment/:id/:attachmentId', librarianController.removeAttachment);
 router.put('/attachment/:id/:attachmentId', librarianController.renameAttachment);
@@ -85,6 +77,7 @@ router.get('/students', librarianController.getStudentUsers);
 router.get('/librarians', librarianController.getLibrarianUsers);
 router.get('/view-users', librarianController.getAllUsers);
 router.post('/add-user', upload.single('photo'), librarianController.addUser);
+router.get('/generate-book-code', librarianController.generateBookCode);
 
 
 
