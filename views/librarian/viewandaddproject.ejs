@@ -532,15 +532,17 @@
 
 
  <script>
-  function generateProjectCode() {
-    const input = document.getElementById("projectCode");
-    if (!input) {
-      console.error("Project Code input not found");
-      return;
+   async function generateProjectCode() {
+    try {
+      const res = await fetch('/librarian/generate-project-code');
+      const data = await res.json();
+      document.getElementById("projectCode").value = data.projectCode;
+    } catch (err) {
+      console.error('Failed to generate project code:', err);
+      alert('Could not generate project code. Please try again.');
     }
-    input.value = "PR" + Math.floor(1000 + Math.random() * 9000);
   }
-</script>
+ </script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

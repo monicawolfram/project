@@ -532,12 +532,17 @@
   </div>
 
 <script>
-  function generateCode() {
-    document.getElementById("paperCode").value =
-      "BK" + Math.floor(1000 + Math.random() * 9000);
+  async function generatePaperCode() {
+    try {
+      const res = await fetch('/librarian/generate-paper-code');
+      const data = await res.json();
+      document.getElementById("paperCode").value = data.paperCode;
+    } catch (err) {
+      console.error('Failed to generate paper code:', err);
+      alert('Could not generate paper code. Please try again.');
+    }
   }
 </script>
-
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

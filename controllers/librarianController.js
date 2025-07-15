@@ -1371,6 +1371,56 @@ exports.generateBookCode = async (req, res) => {
     res.status(500).json({ error: 'Failed to generate book code' });
   }
 };
+exports.generatePaperCode = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT paper_code 
+      FROM papers 
+      WHERE paper_code LIKE 'PP____' 
+      ORDER BY paper_code DESC 
+      LIMIT 1
+    `);
+
+    let newCode = 'PP0001';
+
+    if (rows.length > 0 && rows[0].paper_code) {
+      const lastCode = rows[0].paper_code;
+      const numericPart = parseInt(lastCode.slice(2), 10);
+      const nextNumber = numericPart + 1;
+      newCode = 'PP' + String(nextNumber).padStart(4, '0');
+    }
+
+    res.json({ paperCode: newCode });
+  } catch (error) {
+    console.error('Error generating paper code:', error);
+    res.status(500).json({ error: 'Failed to generate paper code' });
+  }
+};
+exports.generateProjectCode = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT project_code 
+      FROM projects 
+      WHERE project_code LIKE 'PJ____' 
+      ORDER BY project_code DESC 
+      LIMIT 1
+    `);
+
+    let newCode = 'PJ0001';
+
+    if (rows.length > 0 && rows[0].project_code) {
+      const lastCode = rows[0].project_code;
+      const numericPart = parseInt(lastCode.slice(2), 10);
+      const nextNumber = numericPart + 1;
+      newCode = 'PJ' + String(nextNumber).padStart(4, '0');
+    }
+
+    res.json({ projectCode: newCode });
+  } catch (error) {
+    console.error('Error generating project code:', error);
+    res.status(500).json({ error: 'Failed to generate project code' });
+  }
+};
 
 exports.getRequestsByResourceCode = async (req, res) => {
   const { code } = req.params;
