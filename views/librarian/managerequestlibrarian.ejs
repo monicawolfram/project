@@ -162,10 +162,13 @@
         </div>
 
         <!-- Filter by Reg No -->
-        <div class="mb-3 d-flex gap-2 align-items-center">
-          <input type="text" id="filterUserId" class="form-control w-25" placeholder="Filter by Reg No" oninput="loadRequests()">
-          <button class="btn btn-outline-secondary" onclick="document.getElementById('filterUserId').value=''; loadRequests();">Clear</button>
-        </div>
+       <div class="mb-3 d-flex gap-2 align-items-center">
+        <input type="text" id="filterUserId" class="form-control w-25" placeholder="Filter by Reg No" oninput="loadRequests()">
+        <button class="btn btn-outline-secondary" onclick="document.getElementById('filterUserId').value=''; document.getElementById('filterBarcode').value=''; loadRequests();">Clear</button>
+
+        <button class="btn btn-success" onclick="startScan()">📷 Scan</button>
+        <input type="text" id="filterBarcode" class="form-control w-25" placeholder="Scan Resource Code" style="display:none;" oninput="scanAndFetchResource()" />
+      </div>
 
         <!-- Tabs -->
         <div class="tabs" id="requestTabs">
@@ -330,6 +333,35 @@
       console.log("Done.");
     }
   }
+</script>
+
+<script>
+  function startScan() {
+  const barcodeInput = document.getElementById("filterBarcode");
+  barcodeInput.style.display = "inline-block";
+  barcodeInput.value = '';
+  barcodeInput.focus();
+}
+
+async function scanAndFetchResource() {
+  const resourceCode = document.getElementById("filterBarcode").value.trim();
+  if (!resourceCode) return;
+
+  try {
+    const res = await fetch(`/librarian/requests/resource-by-code/${encodeURIComponent(resourceCode)}`);
+    const result = await res.json();
+
+    if (result.success && result.requests.length > 0) {
+      displayRequests(result.requests);
+    } else {
+      alert("No matching resource requests found.");
+    }
+  } catch (err) {
+    console.error("Scan fetch error:", err);
+    alert("Error fetching resource by code.");
+  }
+}
+
 </script>
 </body>
 </html>

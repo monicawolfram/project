@@ -80,6 +80,9 @@ router.post('/add-user', upload.single('photo'), librarianController.addUser);
 router.get('/generate-book-code', librarianController.generateBookCode);
 
 
+router.get('/requests/resource-by-code/:code', librarianController.getRequestsByResourceCode);
+
+
 
 
 

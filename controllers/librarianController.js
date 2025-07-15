@@ -1372,5 +1372,35 @@ exports.generateBookCode = async (req, res) => {
   }
 };
 
+exports.getRequestsByResourceCode = async (req, res) => {
+  const { code } = req.params;
+
+  try {
+    // 1. Find resource type (book, paper, project)
+    const [[resource]] = await db.execute(
+      `SELECT 'book' AS type, title FROM books WHERE book_code = ? AND is_deleted = 'no'
+       UNION
+       SELECT 'paper', title FROM papers WHERE paper_code = ? AND is_deleted = 'no'
+       UNION
+       SELECT 'project', title FROM projects WHERE project_code = ? AND is_deleted = 'no'`,
+      [code, code, code]
+    );
+
+    if (!resource) {
+      return res.json({ success: false, message: "No resource found" });
+    }
+
+    // 2. Now fetch matching requests
+    const [requests] = await db.execute(
+      `SELECT * FROM resource_requests WHERE resource_type = ? AND title = ? ORDER BY id DESC`,
+      [resource.type, resource.title]
+    );
+
+    res.json({ success: true, requests });
+  } catch (error) {
+    console.error("Error fetching by scanned code:", error);
+    res.status(500).json({ success: false, message: "Error searching resource" });
+  }
+};
 
 
