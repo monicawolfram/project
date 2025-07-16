@@ -337,32 +337,53 @@
 
 <script>
   function startScan() {
-  const barcodeInput = document.getElementById("filterBarcode");
-  barcodeInput.style.display = "inline-block";
-  barcodeInput.value = '';
-  barcodeInput.focus();
-}
-
-async function scanAndFetchResource() {
-  const resourceCode = document.getElementById("filterBarcode").value.trim();
-  if (!resourceCode) return;
-
-  try {
-    const res = await fetch(`/librarian/requests/resource-by-code/${encodeURIComponent(resourceCode)}`);
-    const result = await res.json();
-
-    if (result.success && result.requests.length > 0) {
-      displayRequests(result.requests);
-    } else {
-      alert("No matching resource requests found.");
-    }
-  } catch (err) {
-    console.error("Scan fetch error:", err);
-    alert("Error fetching resource by code.");
+    const barcodeInput = document.getElementById("filterBarcode");
+    barcodeInput.style.display = "inline-block";
+    barcodeInput.value = '';
+    barcodeInput.focus();
   }
-}
 
+  async function scanAndFetchResource() {
+    const resourceCode = document.getElementById("filterBarcode").value.trim();
+    if (!resourceCode) return;
+
+    try {
+      const res = await fetch(`/librarian/requests/resource-by-code/${encodeURIComponent(resourceCode)}`);
+      const result = await res.json();
+
+      if (result.success) {
+        const { resource, requests } = result;
+
+        if (requests.length > 0) {
+          // Optional: Display scanned resource info
+          console.log("Scanned Resource:", resource);
+
+          // Optional UI update
+          const infoContainer = document.getElementById("scannedResourceInfo");
+          if (infoContainer) {
+            infoContainer.innerHTML = `
+              <div class="alert alert-info">
+                <strong>Resource:</strong> ${resource.title} (${resource.type.toUpperCase()})<br>
+                <strong>Code:</strong> ${resource.code}
+              </div>
+            `;
+          }
+
+          displayRequests(requests);
+        } else {
+          alert("No borrow requests found for this resource.");
+        }
+
+      } else {
+        alert(result.message || "No matching resource found.");
+      }
+    } catch (err) {
+      console.error("Scan fetch error:", err);
+      alert("Error fetching resource by code.");
+    }
+  }
 </script>
+
 
 </body>
 </html>

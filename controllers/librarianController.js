@@ -1426,31 +1426,63 @@ exports.getRequestsByResourceCode = async (req, res) => {
   const { code } = req.params;
 
   try {
-    // 1. Find resource type (book, paper, project)
-    const [[resource]] = await db.execute(
-      `SELECT 'book' AS type, title FROM books WHERE book_code = ? AND is_deleted = 'no'
-       UNION
-       SELECT 'paper', title FROM papers WHERE paper_code = ? AND is_deleted = 'no'
-       UNION
-       SELECT 'project', title FROM projects WHERE project_code = ? AND is_deleted = 'no'`,
-      [code, code, code]
-    );
-
-    if (!resource) {
-      return res.json({ success: false, message: "No resource found" });
+    if (!code || code.length < 2) {
+      return res.status(400).json({ success: false, message: "Invalid code format." });
     }
 
-    // 2. Now fetch matching requests
+    const prefix = code.substring(0, 2).toUpperCase(); // Get 'BK', 'PP', 'PR'
+    let type = '';
+    let resource = null;
+    let title = '';
+
+    if (prefix === 'BK') {
+      type = 'book';
+      const [[book]] = await db.execute(
+        `SELECT book_code AS code, title FROM books WHERE book_code = ? AND is_deleted = 'no'`,
+        [code]
+      );
+      if (book) {
+        resource = book;
+        title = book.title;
+      }
+    } else if (prefix === 'PP') {
+      type = 'paper';
+      const [[paper]] = await db.execute(
+        `SELECT paper_code AS code, title FROM papers WHERE paper_code = ? AND is_deleted = 'no'`,
+        [code]
+      );
+      if (paper) {
+        resource = paper;
+        title = paper.title;
+      }
+    } else if (prefix === 'PR') {
+      type = 'project';
+      const [[project]] = await db.execute(
+        `SELECT project_code AS code, title FROM projects WHERE project_code = ? AND is_deleted = 'no'`,
+        [code]
+      );
+      if (project) {
+        resource = project;
+        title = project.title;
+      }
+    } else {
+      return res.status(400).json({ success: false, message: "Unrecognized code prefix." });
+    }
+
+    if (!resource) {
+      return res.json({ success: false, message: "No resource found with this code." });
+    }
+
+    // Fetch requests matching the code and type
     const [requests] = await db.execute(
-      `SELECT * FROM resource_requests WHERE resource_type = ? AND title = ? ORDER BY id DESC`,
-      [resource.type, resource.title]
+      `SELECT * FROM borrow_requests WHERE resource_type = ? ORDER BY id DESC`,
+      [type, code]
     );
 
-    res.json({ success: true, requests });
+    res.json({ success: true, resource: { ...resource, type }, requests });
+
   } catch (error) {
-    console.error("Error fetching by scanned code:", error);
-    res.status(500).json({ success: false, message: "Error searching resource" });
+    console.error("Error fetching resource by code:", error);
+    res.status(500).json({ success: false, message: error });
   }
 };
-
-

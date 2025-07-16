@@ -412,6 +412,16 @@ exports.registerUser = async (req, res) => {
       });
     }
 
+    // 🔍 Check if reg_no already exists
+    const [existing] = await db.execute('SELECT reg_no FROM users WHERE reg_no = ?', [reg_no]);
+
+    if (existing.length > 0) {
+      return res.status(409).json({
+        error: 'Registration number already exists. Please use a different one.'
+      });
+    }
+
+    // ✅ Proceed to insert if reg_no is unique
     const sql = `
       INSERT INTO users 
       (name, reg_no, department, program, college, year, role, gender, phone_no, photo, is_approved) 
@@ -429,7 +439,7 @@ exports.registerUser = async (req, res) => {
       gender,
       phone_no,
       photoFilename,
-      'no' // default value for is_approved
+      'no' // default for is_approved
     ];
 
     console.log('📦 Inserting user:', values);
