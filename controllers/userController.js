@@ -207,6 +207,7 @@ exports.profile = async (req, res) => {
   try { 
     const sessionUser = req.session.user;
 
+
     if (!sessionUser || !sessionUser.reg_no) {
       return res.status(401).json({ success: false, message: 'Unauthorized: User session not found' });
     }
