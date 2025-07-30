@@ -26,24 +26,46 @@ exports.rules_and_regulation = (req, res) => {
 exports.books = (req, res) => {
  res.render('user/books');
 };
-exports.Logout = (req, res) => {
-  // If using express-session
-  if (req.session) {
-    req.session.destroy(err => {
-      if (err) {
-        console.error("Error destroying session during logout:", err);
-        // Still redirect even if error destroying session
+
+
+exports.Logout = async (req, res) => {
+  try {
+    const sessionUser = req.session.user;
+
+    if (sessionUser && sessionUser.reg_no) {
+      const reg_no = sessionUser.reg_no;
+      const today = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
+      const timeOut = new Date().toTimeString().split(' ')[0]; // 'HH:MM:SS'
+
+      // Update today's attendance record with time_out
+      await db.execute(
+        `UPDATE attendance
+         SET time_out = ?
+         WHERE reg_no = ? AND date = ?`,
+        [timeOut, reg_no, today]
+      );
+    }
+
+    // Destroy session after updating attendance
+    if (req.session) {
+      req.session.destroy(err => {
+        if (err) {
+          console.error("Error destroying session during logout:", err);
+          return res.redirect('/');
+        }
+        res.clearCookie('connect.sid', { path: '/' });
         return res.redirect('/');
-      }
-      // Clear cookie if any (optional, depending on your setup)
-      res.clearCookie('connect.sid', { path: '/' });
-      return res.redirect('/');
-    });
-  } else {
-    // No session? Just redirect
+      });
+    } else {
+      res.redirect('/');
+    }
+
+  } catch (error) {
+    console.error("Error during logout/attendance update:", error);
     res.redirect('/');
   }
 };
+
 
 exports.cs = (req, res) => {
  res.render('user/cs');
