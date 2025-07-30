@@ -190,7 +190,26 @@
     </main>
   </div>
 </div>
+
+
+<!-- Book Details Modal -->
+<div class="modal fade" id="bookDetailsModal" tabindex="-1" aria-labelledby="bookDetailsLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="bookDetailsLabel">Scanned Resource Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="bookDetailsBody">
+        <!-- Content will be inserted by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
   let currentStatus = 'all';
   let debounceTimer;
@@ -348,29 +367,40 @@
     if (!resourceCode) return;
 
     try {
+      if(resourceCode.length < 6) {
+        return;
+      }
       const res = await fetch(`/librarian/requests/resource-by-code/${encodeURIComponent(resourceCode)}`);
       const result = await res.json();
 
       if (result.success) {
         const { resource, requests } = result;
 
-        if (requests.length > 0) {
-          // Optional: Display scanned resource info
-          console.log("Scanned Resource:", resource);
+if (requests.length > 0) {
+  // Display scanned resource info in modal
+  const modalBody = document.getElementById("bookDetailsBody");
+  modalBody.innerHTML = `
+    <div class="row">
+      <div class="col-md-4">
+        <img src="/uploads/books/${resource.image}" alt="${resource.title}" class="img-fluid rounded border" />
+      </div>
+      <div class="col-md-8">
+        <p><strong>Title:</strong> ${resource.title}</p>
+        <p><strong>Author:</strong> ${resource.author}</p>
+        <p><strong>Code:</strong> ${resource.code}</p>
+        <p><strong>Type:</strong> ${resource.type}</p>
+        <p><strong>Status:</strong> ${resource.status}</p>
+      </div>
+    </div>
+  `;
 
-          // Optional UI update
-          const infoContainer = document.getElementById("scannedResourceInfo");
-          if (infoContainer) {
-            infoContainer.innerHTML = `
-              <div class="alert alert-info">
-                <strong>Resource:</strong> ${resource.title} (${resource.type.toUpperCase()})<br>
-                <strong>Code:</strong> ${resource.code}
-              </div>
-            `;
-          }
+  // Show modal
+  const bookModal = new bootstrap.Modal(document.getElementById('bookDetailsModal'));
+  bookModal.show();
 
-          displayRequests(requests);
-        } else {
+  displayRequests(requests);
+}
+ else {
           alert("No borrow requests found for this resource.");
         }
 
@@ -380,8 +410,13 @@
     } catch (err) {
       console.error("Scan fetch error:", err);
       alert("Error fetching resource by code.");
-    }
+    }finally {
+    // Clear and re-focus for next scan
+    // barcodeInput.value = '';
+    // barcodeInput.focus();
   }
+  }
+  
 </script>
 
 

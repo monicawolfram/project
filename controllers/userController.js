@@ -487,29 +487,52 @@ exports.getBooksByDepartment = async (req, res) => {
   const dept = req.params.department;
 
   try {
+    // Get reg_no from session (make sure user is logged in)
+    const regNo = req.session?.user?.reg_no;
+    if (!regNo) {
+      // If no reg_no in session, redirect or handle unauthorized
+      return res.redirect('/login'); // or other appropriate action
+    }
+
+    
+    const [users] = await db.execute(
+      "SELECT * FROM users WHERE reg_no = ? LIMIT 1",
+      [regNo]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).send('User not found.');
+    }
+
+    const borrowerId = users[0].reg_no;
+    const borrowerName = users[0].name;
+
+    // Now query books
     const [books] = await db.execute(
       "SELECT * FROM books WHERE department = ? AND is_deleted = 'no' ORDER BY title ASC",
       [dept]
     );
 
-    if (books.length === 0) {
-      return res.render('user/book_list', { books: [], department: dept, message: 'No books found.' });
-    }
-
-    res.render('user/book_list', {
+    return res.render('user/book_list', {
       books: books,
       department: dept,
-      message: null
+      message: books.length === 0 ? 'No books found.' : null,
+      borrowerId,
+      borrowerName
     });
+
   } catch (err) {
-    console.error('❌ Error fetching books:', err);
+    console.error('❌ Error in getBooksByDepartment:', err);
     res.status(500).render('user/book_list', {
       books: [],
       department: dept,
-      message: 'Failed to fetch books.'
+      message: 'Failed to fetch books.',
+      borrowerId: null,
+      borrowerName: null
     });
   }
 };
+
 
 
 exports.viewBooksByDepartment = (req, res) => {
@@ -647,16 +670,24 @@ exports.getProjectsByDepartment = async (req, res) => {
   }
 };
 exports.submitBorrow = async (req, res) => {
-  const { borrower_id, borrower_name, resource_type, borrow_date, return_date } = req.body;
+  const {
+    borrower_id,
+    borrower_name,
+    resource_type,
+    resource_code, // <-- added
+    borrow_date,
+    return_date
+  } = req.body;
 
-  if (!borrower_id || !borrower_name || !resource_type || !borrow_date || !return_date) {
+  // Check all required fields
+  if (!borrower_id || !borrower_name || !resource_type || !resource_code || !borrow_date || !return_date) {
     return res.json({ success: false, error: 'All fields are required' });
   }
 
   const query = `
     INSERT INTO borrow_requests 
-    (borrower_id, borrower_name, resource_type, borrow_date, return_date, status)
-    VALUES (?, ?, ?, ?, ?, 'Pending')
+    (borrower_id, borrower_name, resource_type, resource_code, borrow_date, return_date, status)
+    VALUES (?, ?, ?, ?, ?, ?, 'Pending')
   `;
 
   try {
@@ -664,11 +695,11 @@ exports.submitBorrow = async (req, res) => {
       borrower_id,
       borrower_name,
       resource_type,
+      resource_code,  // <-- added
       borrow_date,
-      return_date,
+      return_date
     ]);
 
-    // Send success response with dynamic redirect
     res.json({ success: true, redirect: `/user/borrowed-resources/${borrower_id}` });
 
   } catch (err) {
@@ -676,6 +707,7 @@ exports.submitBorrow = async (req, res) => {
     res.json({ success: false, error: 'Database error' });
   }
 };
+
 // Route: POST /user/set-session
 exports.setSession = async (req, res) => {
   const { reg_no } = req.body;

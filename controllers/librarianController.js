@@ -1430,41 +1430,31 @@ exports.getRequestsByResourceCode = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid code format." });
     }
 
-    const prefix = code.substring(0, 2).toUpperCase(); // Get 'BK', 'PP', 'PR'
+    const prefix = code.substring(0, 2).toUpperCase();
     let type = '';
     let resource = null;
-    let title = '';
 
     if (prefix === 'BK') {
       type = 'book';
       const [[book]] = await db.execute(
-        `SELECT book_code AS code, title FROM books WHERE book_code = ? AND is_deleted = 'no'`,
+        `SELECT * FROM books WHERE book_code = ? AND is_deleted = 'no'`,
         [code]
       );
-      if (book) {
-        resource = book;
-        title = book.title;
-      }
+      if (book) resource = book;
     } else if (prefix === 'PP') {
       type = 'paper';
       const [[paper]] = await db.execute(
         `SELECT paper_code AS code, title FROM papers WHERE paper_code = ? AND is_deleted = 'no'`,
         [code]
       );
-      if (paper) {
-        resource = paper;
-        title = paper.title;
-      }
+      if (paper) resource = paper;
     } else if (prefix === 'PR') {
       type = 'project';
       const [[project]] = await db.execute(
         `SELECT project_code AS code, title FROM projects WHERE project_code = ? AND is_deleted = 'no'`,
         [code]
       );
-      if (project) {
-        resource = project;
-        title = project.title;
-      }
+      if (project) resource = project;
     } else {
       return res.status(400).json({ success: false, message: "Unrecognized code prefix." });
     }
@@ -1473,16 +1463,15 @@ exports.getRequestsByResourceCode = async (req, res) => {
       return res.json({ success: false, message: "No resource found with this code." });
     }
 
-    // Fetch requests matching the code and type
     const [requests] = await db.execute(
-      `SELECT * FROM borrow_requests WHERE resource_type = ? ORDER BY id DESC`,
-      [type, code]
+      `SELECT * FROM borrow_requests WHERE resource_code = ? ORDER BY id DESC`,
+      [code]
     );
 
     res.json({ success: true, resource: { ...resource, type }, requests });
-
   } catch (error) {
     console.error("Error fetching resource by code:", error);
-    res.status(500).json({ success: false, message: error });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
