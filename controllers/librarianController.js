@@ -1444,14 +1444,14 @@ exports.getRequestsByResourceCode = async (req, res) => {
     } else if (prefix === 'PP') {
       type = 'paper';
       const [[paper]] = await db.execute(
-        `SELECT paper_code AS code, title FROM papers WHERE paper_code = ? AND is_deleted = 'no'`,
+        `SELECT * FROM papers WHERE paper_code = ? AND is_deleted = 'no'`,
         [code]
       );
       if (paper) resource = paper;
     } else if (prefix === 'PR') {
       type = 'project';
       const [[project]] = await db.execute(
-        `SELECT project_code AS code, title FROM projects WHERE project_code = ? AND is_deleted = 'no'`,
+        `SELECT * FROM projects WHERE project_code = ? AND is_deleted = 'no'`,
         [code]
       );
       if (project) resource = project;
@@ -1474,4 +1474,24 @@ exports.getRequestsByResourceCode = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+exports.approveRequest = async (req, res) => {
+  const { code } = req.params;
+
+  try {
+    const [result] = await db.execute(
+      `UPDATE requests SET status = 'approved' WHERE resource_code = ?`,
+      [code]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Request not found.' });
+    }
+
+    res.json({ success: true, message: 'Request approved successfully.' });
+  } catch (error) {
+    console.error('Approve error:', error);
+    res.status(500).json({ success: false, message: 'Server error.' });
+  }
+};
+
 

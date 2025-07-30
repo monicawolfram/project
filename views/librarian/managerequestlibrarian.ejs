@@ -378,21 +378,28 @@
 
 if (requests.length > 0) {
   // Display scanned resource info in modal
-  const modalBody = document.getElementById("bookDetailsBody");
-  modalBody.innerHTML = `
-    <div class="row">
-      <div class="col-md-4">
-        <img src="/uploads/books/${resource.image}" alt="${resource.title}" class="img-fluid rounded border" />
-      </div>
-      <div class="col-md-8">
-        <p><strong>Title:</strong> ${resource.title}</p>
-        <p><strong>Author:</strong> ${resource.author}</p>
-        <p><strong>Code:</strong> ${resource.code}</p>
-        <p><strong>Type:</strong> ${resource.type}</p>
-        <p><strong>Status:</strong> ${resource.status}</p>
-      </div>
+ const modalBody = document.getElementById("bookDetailsBody");
+modalBody.innerHTML = `
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <img src="/uploads/books/${resource.image}" alt="${resource.title}" class="img-fluid rounded border" />
     </div>
-  `;
+    <div class="col-md-8">
+      <p><strong>Title:</strong> ${resource.title}</p>
+      <p><strong>Author:</strong> ${resource.author}</p>
+      <p><strong>Code:</strong> ${resource.code}</p>
+      <p><strong>Type:</strong> ${resource.type}</p>
+      <p><strong>Status:</strong> ${resource.status}</p>
+    </div>
+  </div>
+
+  <div class="text-end">
+    <button class="btn btn-success" onclick="approveRequest('${resource.code}')">
+      <i class="fa fa-check-circle"></i> Approve
+    </button>
+  </div>
+`;
+
 
   // Show modal
   const bookModal = new bootstrap.Modal(document.getElementById('bookDetailsModal'));
@@ -417,6 +424,33 @@ if (requests.length > 0) {
   }
   }
   
+</script>
+<script>
+  async function approveRequest(code) {
+    if (!confirm(`Are you sure you want to approve the request ${code}?`)) return;
+
+    try {
+      const res = await fetch(`/librarian/requests/approve/${code}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert('Request approved successfully!');
+        // Optionally, refresh the request list or close modal
+        location.reload(); // or update the modal content only
+      } else {
+        alert('Failed to approve request: ' + data.message);
+      }
+    } catch (err) {
+      console.error('Error approving request:', err);
+      alert('An error occurred while approving the request.');
+    }
+  }
 </script>
 
 
