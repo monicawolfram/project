@@ -584,6 +584,7 @@ exports.addPaper = async (req, res) => {
     conn.release();
   }
 };
+
 exports.getPaperByCodeOrTitle = (req, res) => {
   const searchValue = req.params.search;
 
@@ -694,7 +695,7 @@ exports.addProject = async (req, res) => {
       project_code, shelf_no, draw_no, year
     } = req.body;
 
-    // Basic field validation (optional but helpful)
+   
     if (!title || !author || !department || !date_added || !project_code || !shelf_no || !draw_no || !year) {
       return res.status(400).json({ message: 'Please fill in all required fields.' });
     }
@@ -712,10 +713,23 @@ exports.addProject = async (req, res) => {
       project_code, shelf_no, draw_no, year, project_image
     ]);
 
-    res.json({ message: 'Project added successfully!' });
+   
+    //REDIRECT TO DIFFERE NT ROUTE
+    res.redirect('/librarian/viewandaddproject');
+
   } catch (err) {
     console.error("Error in addProject:", err);
     res.status(500).json({ message: 'Error adding project' });
+  }
+};
+
+exports.getAllProjects = async (req, res) => {
+  try {
+    const [projects] = await db.execute('SELECT * FROM projects ORDER BY created_at DESC');
+    res.json(projects);
+  } catch (err) {
+    console.error('❌ Error fetching projects:', err);
+    res.status(500).json({ error: 'Failed to fetch projects.' });
   }
 };
 exports.getProjectByCodeOrTitle = async (req, res) => {
@@ -759,22 +773,31 @@ exports.deleteProject = async (req, res) => {
 exports.getAvailableProjects = async (req, res) => {
   try {
     const sql = `
-      SELECT title, author, year, image_url, file_url 
-      FROM projects 
+      SELECT id, title, author, year, department, image
+      FROM projects
       WHERE is_deleted = 0 AND is_borrowed = 0
       ORDER BY date_added DESC
     `;
 
     const [projects] = await db.execute(sql);
 
-    console.log('Projects fetched:', projects); // <-- Add this to debug
+    const formatted = projects.map(project => ({
+      id: project.id,
+      title: project.title,
+      author: project.author,
+      year: project.year,
+      department: project.department,
+      image: project.image || 'default.jpg'
+    }));
 
-    res.json(projects);
+    res.json(formatted);
   } catch (err) {
     console.error('Error fetching available projects:', err);
     res.status(500).json({ message: 'Error fetching available projects' });
   }
 };
+
+
 exports.getDeletedProjects = async (req, res) => {
   try {
     const [projects] = await db.query(`

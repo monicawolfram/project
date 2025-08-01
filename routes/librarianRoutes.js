@@ -36,6 +36,8 @@ router.put('/attachment/:id/:attachmentId', librarianController.renameAttachment
 
 
 router.post('/papers/add', upload.single('paper_image'), librarianController.addPaper);
+router.get('/projects', librarianController.getAllProjects);
+
 router.get('/papers/:search', librarianController.getPaperByCodeOrTitle);
 router.delete('/papers/:search', librarianController.deletePaper);
 router.get('/available-papers', librarianController.getAvailablePapers);

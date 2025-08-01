@@ -583,44 +583,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  // Load Available Projects
-  fetch('/librarian/projects/available')
-    .then(response => response.json())
-    .then(projects => {
-      const projectList = document.getElementById('availableProjectsList');
-      projectList.innerHTML = '';
 
-      if (!Array.isArray(projects) || projects.length === 0) {
-        projectList.innerHTML = '<p class="text-muted text-center w-100">No available projects found.</p>';
-        return;
-      }
-
-      projects.forEach(proj => {
-        const card = document.createElement('div');
-        card.className = 'col-md-4 mb-3';
-        card.innerHTML = `
-          <div class="card h-100 shadow-sm">
-            <img src="/uploads/projects/${proj.image || 'default.jpg'}" class="card-img-top" alt="${proj.title}" style="height: 200px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title">${proj.title}</h5>
-              <h6 class="card-subtitle mb-2 text-muted">${proj.author}</h6>
-              <p class="card-text"><strong>Department:</strong> ${proj.department || 'N/A'}</p>
-              <p class="card-text"><strong>Year:</strong> ${proj.year || 'N/A'}</p>
-            </div>
-          </div>
-        `;
-        projectList.appendChild(card);
-      });
-    })
-    .catch(err => {
-      console.error('Error fetching projects:', err);
-      document.getElementById('availableProjectsList').innerHTML =
-        '<p class="text-danger text-center">Error loading projects.</p>';
-    });
-});
-</script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -812,6 +775,23 @@ document.addEventListener("DOMContentLoaded", () => {
         '<p class="text-danger">Error loading updated projects.</p>';
     });
 });
+</script>
+
+
+<script>
+fetch('/librarian/projects/add', {
+  method: 'POST',
+  body: formData
+})
+.then(res => res.json())
+.then(data => {
+   window.location.href = '/librarian/projects'; 
+  // if (data.message) {
+  //   alert(data.message);
+   
+  // }
+});
+
 </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
