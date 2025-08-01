@@ -369,27 +369,27 @@ exports.payFine = async (req, res) => {
 };
 
 exports.getPaymentHistoryFromSession = (req, res) => {
-  if (!req.session || !req.session.user || !req.session.user.reg_no) {
+  if (!req.session || !req.session.user || !req.session.user.student_id) {
     return res.status(401).json({ error: "Unauthorized. Please log in." });
   }
 
-  const regNo = req.session.user.reg_no;
+  const studentId = req.session.user.student_id;
 
   const query = `
     SELECT 
-      users.reg_no AS studentId,
-      users.full_name AS studentName,
+      users.student_id AS studentId,
+      users.student_name AS studentName,
       payments.payment_date AS date,
       payments.amount,
       payments.payment_method AS method,
       payments.status
     FROM payments
     JOIN users ON payments.user_id = users.id
-    WHERE users.reg_no = ?
+    WHERE users.student_id = ?
     ORDER BY payments.payment_date DESC
   `;
 
-  db.query(query, [regNo], (err, results) => {
+  db.query(query, [studentId], (err, results) => {
     if (err) {
       console.error("Error fetching payments:", err);
       return res.status(500).json({ error: "Database error" });
@@ -398,6 +398,7 @@ exports.getPaymentHistoryFromSession = (req, res) => {
     res.json(results);
   });
 };
+
 
 exports.registerUser = async (req, res) => {
   try {
