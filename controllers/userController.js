@@ -253,10 +253,6 @@ exports.sendFeedback = (req, res) => {
   });
 };
 
-
-
-
-
 exports.getUserByReg_no = async (req, res) => {
   const reg_no = req.query.reg;  // <-- get from query param 'reg'
   if (!reg_no) {
@@ -289,7 +285,6 @@ exports.getUserByReg_no = async (req, res) => {
   }
 };
 
-// Controller: getFlatAttendance.js
 exports.getFlatAttendance = async (req, res) => {
   try {
     const { regNo } = req.params;
@@ -316,8 +311,6 @@ exports.getFlatAttendance = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
-
 
 exports.getBorrowedResources = async (req, res) => {
   const regNo = req.params.userId;
@@ -347,9 +340,6 @@ exports.getBorrowedResources = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-
-
 
 exports.payFine = async (req, res) => {
   const { borrowerID, resourceType, resourceId, paymentMethod } = req.body;
@@ -416,18 +406,26 @@ exports.registerUser = async (req, res) => {
 
     const photoFilename = req.file ? req.file.filename : null;
 
-    // Collect missing fields dynamically
     const missingFields = [];
+
+    // Always required
     if (!name) missingFields.push('name');
     if (!reg_no) missingFields.push('reg_no');
-    if (!department) missingFields.push('department');
-    if (!program) missingFields.push('program');
     if (!college) missingFields.push('college');
-    if (!year) missingFields.push('year');
     if (!role) missingFields.push('role');
     if (!gender) missingFields.push('gender');
     if (!phone_no) missingFields.push('phone_no');
     if (!photoFilename) missingFields.push('photo');
+
+    // Conditionally required based on role
+    const roleUpper = role?.toUpperCase();
+    const requiresAcademicFields = roleUpper === 'STUDENT' || roleUpper === 'GUEST';
+
+    if (requiresAcademicFields) {
+      if (!department) missingFields.push('department');
+      if (!program) missingFields.push('program');
+      if (!year) missingFields.push('year');
+    }
 
     if (missingFields.length > 0) {
       return res.status(400).json({
@@ -438,14 +436,13 @@ exports.registerUser = async (req, res) => {
 
     // 🔍 Check if reg_no already exists
     const [existing] = await db.execute('SELECT reg_no FROM users WHERE reg_no = ?', [reg_no]);
-
     if (existing.length > 0) {
       return res.status(409).json({
         error: 'Registration number already exists. Please use a different one.'
       });
     }
 
-    // ✅ Proceed to insert if reg_no is unique
+    // ✅ Proceed to insert
     const sql = `
       INSERT INTO users 
       (name, reg_no, department, program, college, year, role, gender, phone_no, photo, is_approved) 
@@ -455,19 +452,18 @@ exports.registerUser = async (req, res) => {
     const values = [
       name,
       reg_no,
-      department,
-      program,
+      department || null,
+      program || null,
       college,
-      year,
+      year || null,
       role,
       gender,
       phone_no,
       photoFilename,
-      'no' // default for is_approved
+      'no' // is_approved
     ];
 
     console.log('📦 Inserting user:', values);
-
     await db.execute(sql, values);
 
     res.json({
@@ -480,6 +476,7 @@ exports.registerUser = async (req, res) => {
     res.status(500).json({ error: 'Something went wrong while registering the user.' });
   }
 };
+
 
 exports.getBookDepartments = async (req, res) => {
   try {

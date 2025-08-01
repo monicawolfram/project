@@ -1401,18 +1401,18 @@ exports.generateProjectCode = async (req, res) => {
     const [rows] = await db.execute(`
       SELECT project_code 
       FROM projects 
-      WHERE project_code LIKE 'PJ____' 
+      WHERE project_code LIKE 'PR____' 
       ORDER BY project_code DESC 
       LIMIT 1
     `);
 
-    let newCode = 'PJ0001';
+    let newCode = 'PR0001';
 
     if (rows.length > 0 && rows[0].project_code) {
       const lastCode = rows[0].project_code;
       const numericPart = parseInt(lastCode.slice(2), 10);
       const nextNumber = numericPart + 1;
-      newCode = 'PJ' + String(nextNumber).padStart(4, '0');
+      newCode = 'PR' + String(nextNumber).padStart(4, '0');
     }
 
     res.json({ projectCode: newCode });
