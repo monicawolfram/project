@@ -407,8 +407,9 @@ exports.registerUser = async (req, res) => {
     const photoFilename = req.file ? req.file.filename : null;
 
     const missingFields = [];
+    const roleUpper = role?.toUpperCase();
 
-    // Always required
+    // Basic required fields
     if (!name) missingFields.push('name');
     if (!reg_no) missingFields.push('reg_no');
     if (!college) missingFields.push('college');
@@ -417,16 +418,14 @@ exports.registerUser = async (req, res) => {
     if (!phone_no) missingFields.push('phone_no');
     if (!photoFilename) missingFields.push('photo');
 
-    // Conditionally required based on role
-    const roleUpper = role?.toUpperCase();
-    const requiresAcademicFields = roleUpper === 'STUDENT' || roleUpper === 'GUEST';
-
+    const requiresAcademicFields = ['STUDENT', 'GUEST'].includes(roleUpper);
     if (requiresAcademicFields) {
       if (!department) missingFields.push('department');
       if (!program) missingFields.push('program');
       if (!year) missingFields.push('year');
     }
 
+    // Return if any required fields are missing
     if (missingFields.length > 0) {
       return res.status(400).json({
         error: 'Missing required registration fields',
@@ -434,21 +433,43 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    // 🔍 Check if reg_no already exists
-    const [existing] = await db.execute('SELECT reg_no FROM users WHERE reg_no = ?', [reg_no]);
-    if (existing.length > 0) {
-      return res.status(409).json({
-        error: 'Registration number already exists. Please use a different one.'
+    // 🔠 Name validation: at least 2 words
+    const nameWords = name.trim().split(/\s+/);
+    if (nameWords.length < 2) {
+      return res.status(400).json({
+        error: 'Please enter at least two names (e.g., First and Last name).'
       });
     }
 
-    // ✅ Proceed to insert
+    // 🔢 reg_no validation:
+    if (roleUpper === 'STUDENT') {
+      if (!/^\d{11}$/.test(reg_no)) {
+        return res.status(400).json({
+          error: 'Wrong registration number please try Again.'
+        });
+      }
+    } else {
+      if (reg_no.length < 5) {
+        return res.status(400).json({
+          error: 'Wrong registration number please try Again.'
+        });
+      }
+    }
+
+    // 🔍 Check for duplicates
+    const [existing] = await db.execute('SELECT reg_no FROM users WHERE reg_no = ?', [reg_no]);
+    if (existing.length > 0) {
+      return res.status(409).json({
+        error: 'Registration number already exists.'
+      });
+    }
+
+    // ✅ Insert
     const sql = `
       INSERT INTO users 
       (name, reg_no, department, program, college, year, role, gender, phone_no, photo, is_approved) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-
     const values = [
       name,
       reg_no,
@@ -460,22 +481,22 @@ exports.registerUser = async (req, res) => {
       gender,
       phone_no,
       photoFilename,
-      'no' // is_approved
+      'no'
     ];
 
-    console.log('📦 Inserting user:', values);
     await db.execute(sql, values);
 
-    res.json({
+    return res.status(201).json({
       success: true,
-      message: 'User registered successfully'
+      message: 'User registered successfully.'
     });
 
   } catch (err) {
     console.error('❌ Registration error:', err);
-    res.status(500).json({ error: 'Something went wrong while registering the user.' });
+    return res.status(500).json({ error: 'Something went wrong while registering the user.' });
   }
 };
+
 
 
 exports.getBookDepartments = async (req, res) => {
