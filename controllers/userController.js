@@ -574,9 +574,6 @@ exports.getBooksByDepartment = async (req, res) => {
     });
   }
 };
-
-
-
 exports.viewBooksByDepartment = (req, res) => {
   const dept = req.params.department;
   res.redirect(`/user/books/${dept}`);
@@ -610,30 +607,58 @@ exports.getPaperDepartments = async (req, res) => {
     res.status(500).json({ error: 'Failed to load paper departments' });
   }
 };
-
 exports.getPapersByDepartment = async (req, res) => {
-  const department = req.params.department;
+  const dept = req.params.department;
 
   try {
-    const [papers] = await db.query('SELECT * FROM papers WHERE department = ?', [department]);
-
-    if (papers.length === 0) {
-      return res.render('user/paper_list', { papers: [], department, message: 'No papers available for this department.' });
+    // Get reg_no from session (check if user logged in)
+    const regNo = req.session?.user?.reg_no;
+    if (!regNo) {
+      return res.redirect('/login');
     }
 
-    // Pass message as null when papers found
-    res.render('user/paper_list', { papers, department, message: null });
-  } catch (error) {
-    console.error(error);
-    res.render('user/paper_list', { papers: [], department, message: 'Failed to load papers.' });
+    // Fetch user info
+    const [users] = await db.execute(
+      "SELECT * FROM users WHERE reg_no = ? LIMIT 1",
+      [regNo]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).send('User not found.');
+    }
+
+    const borrowerId = users[0].reg_no;
+    const borrowerName = users[0].name;
+
+    // Fetch papers for this department
+    const [papers] = await db.execute(
+      "SELECT * FROM papers WHERE department = ? AND is_deleted = 'no' ORDER BY title ASC",
+      [dept]
+    );
+
+    return res.render('user/paper_list', {
+      papers: papers,
+      department: dept,
+      message: papers.length === 0 ? 'No papers found.' : null,
+      borrowerId,
+      borrowerName
+    });
+
+  } catch (err) {
+    console.error('❌ Error in getPapersByDepartment:', err);
+    res.status(500).render('user/paper_list', {
+      papers: [],
+      department: dept,
+      message: 'Failed to fetch papers.',
+      borrowerId: null,
+      borrowerName: null
+    });
   }
 };
-
 exports.viewPapersByDepartment = (req, res) => {
   const dept = req.params.department;
-  res.redirect(`/user/show-papers/${dept}`);
+  res.redirect(`/user/papers/${dept}`);
 };
-
 
 exports.getProjectDepartments = async (req, res) => {
   try {

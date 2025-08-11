@@ -32,9 +32,12 @@ router.post('/pay-fine', userController.payFine);
 router.get('/payments', userController.getPaymentHistoryFromSession);
 router.post('/register', upload.single('photo'), userController.registerUser);
 
-router.get('/papers', userController.papers); // optional static view
+
+router.get('/papers', userController.papers);
 router.get('/papers/departments', userController.getPaperDepartments);
-router.get('/show-papers/:department', userController.getPapersByDepartment);
+router.get('/papers/:department', userController.getPapersByDepartment);
+router.get('/show-papers/:department', userController.viewPapersByDepartment);
+
 
 router.get('/projects', userController.projects);
 router.get('/projects/departments', userController.getProjectDepartments);

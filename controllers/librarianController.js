@@ -501,193 +501,6 @@ exports.renameAttachment = (req, res) => {
   });
 };
 
-
-
-exports.addPaper = async (req, res) => {
-  const {
-    title,
-    author,
-    department,
-    date_added,
-    paper_code,
-    shelf_no,
-    draw_no,
-    year,
-    to_json
-  } = req.body;
-
-  const paper_image = req.file ? req.file.filename : null;
-  const isJson = to_json === 'true';
-
-  const conn = await db.getConnection();
-
-  try {
-    await conn.beginTransaction();
-
-    // 1. Insert department only if it doesn't exist
-    const checkDeptSQL = `SELECT * FROM departments WHERE name = ?`;
-    const [deptRows] = await conn.execute(checkDeptSQL, [department]);
-
-    if (deptRows.length === 0) {
-      const insertDeptSQL = `
-        INSERT INTO departments (name, image, page)
-        VALUES (?, ?, ?)
-      `;
-
-      const imagePath = `/uploads/papers/${paper_image}`; // use paper's uploaded image
-      const page = department.toLowerCase(); // assume page naming convention
-
-      await conn.execute(insertDeptSQL, [department, imagePath, page]);
-    }
-
-    // 2. Insert paper
-    const insertPaperSQL = `
-      INSERT INTO papers
-      (title, author, department, date_added, paper_code, shelf_no, draw_no, year, image, status, is_deleted, is_borrowed)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no', 'no')
-    `;
-
-    const paperValues = [
-      title, author, department, date_added,
-      paper_code, shelf_no, draw_no, year, paper_image
-    ];
-
-    await conn.execute(insertPaperSQL, paperValues);
-
-    await conn.commit();
-
-    if (isJson) {
-      return res.json({ status: 'success', message: 'Paper and department added successfully!' });
-    } else {
-      return res.redirect('/librarian/papers');
-    }
-
-  } catch (err) {
-    await conn.rollback();
-    console.error('❌ Transaction Error:', err.sqlMessage || err);
-
-    let errorMessage = 'Something went wrong while saving the paper. Please try again later.';
-
-    if (err.code === 'ER_BAD_NULL_ERROR') {
-      errorMessage = 'Please fill all required fields.';
-    } else if (err.code === 'ER_DUP_ENTRY') {
-      errorMessage = 'A paper with the same code already exists.';
-    }
-
-    if (isJson) {
-      return res.status(400).json({ status: 'error', error: errorMessage });
-    } else {
-      return res.redirect('/librarian/papers');
-    }
-
-  } finally {
-    conn.release();
-  }
-};
-
-exports.getPaperByCodeOrTitle = (req, res) => {
-  const searchValue = req.params.search;
-
-  const sql = `SELECT * FROM papers WHERE paper_code = ? OR title = ? LIMIT 1`;
-  db.query(sql, [searchValue, searchValue], (err, results) => {
-    if (err) {
-      console.error('Error retrieving paper:', err);
-      return res.status(500).json({ error: 'Failed to retrieve paper' });
-    }
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Paper not found' });
-    }
-
-    res.json(results[0]);
-  });
-};
-exports.deletePaper = (req, res) => {
-  const searchValue = req.params.search;
-
-  const sql = `DELETE FROM papers WHERE paper_code = ? OR title = ?`;
-  db.query(sql, [searchValue, searchValue], (err, result) => {
-    if (err) {
-      console.error('Error deleting paper:', err);
-      return res.status(500).json({ error: 'Failed to delete paper' });
-    }
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'Paper not found or already deleted' });
-    }
-
-    res.json({ message: 'Paper removed successfully' });
-  });
-};
-exports.getAvailablePapers = async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT * FROM papers WHERE status = 'available'");
-    res.json(rows);
-  } catch (error) {
-    console.error("Error fetching available papers:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
-exports.getDeletedPapers = async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT * FROM papers WHERE status = 'deleted'");
-    res.json(rows);
-  } catch (err) {
-    console.error("Failed to fetch deleted papers:", err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
-exports.getBorrowedPapers = async (req, res) => {
-  try {
-    const [rows] = await db.query(`
-      SELECT papers.*, users.name AS borrower_name
-      FROM papers
-      JOIN borrowed_resources ON borrowed_resources.resource_id = papers.id
-        AND borrowed_resources.resource_type = 'paper'
-      JOIN users ON users.id = borrowed_resources.user_id
-      WHERE borrowed_resources.status = 'borrowed'
-    `);
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch borrowed papers' });
-  }
-};
-
-exports.getPaperDepartments = async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT DISTINCT department FROM papers");
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch departments' });
-  }
-};
-exports.getNewPapers = async (req, res) => {
-  try {
-    const [rows] = await db.query(`
-      SELECT * FROM papers 
-      WHERE date_added >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-      AND status = 'available'
-    `);
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch new papers' });
-  }
-};
-exports.getUpdatedPapers = async (req, res) => {
-  try {
-    const [rows] = await db.query(`
-      SELECT * FROM papers 
-      WHERE updated_at >= DATE_SUB(CURDATE(), INTERVAL 5 DAY)
-      AND status = 'available'
-    `);
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch updated papers' });
-  }
-};
-
-
 exports.addProject = async (req, res) => {
   try {
     const {
@@ -796,8 +609,6 @@ exports.getAvailableProjects = async (req, res) => {
     res.status(500).json({ message: 'Error fetching available projects' });
   }
 };
-
-
 exports.getDeletedProjects = async (req, res) => {
   try {
     const [projects] = await db.query(`
@@ -1518,3 +1329,293 @@ exports.approveRequest = async (req, res) => {
 };
 
 
+exports.getAvailablePapers = async (req, res) => {
+  try {
+    const [results] = await db.execute(
+      "SELECT id, title, author, department, shelf_no, draw_no,  image FROM papers WHERE status = 'available' AND is_deleted = 'no'"
+    );
+
+    const formatted = results.map(paper => ({
+      id: paper.id,
+      title: paper.title,
+      author: paper.author,
+      department: paper.department,
+      shelf_no: paper.shelf_no,
+      draw_no: paper.draw_no,
+      image: paper.image || 'default-paper.png'
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error('Error fetching papers:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+};
+exports.getPapers = async (req, res) => {
+  try {
+    const { department, is_borrowed } = req.query;
+    let query = 'SELECT * FROM papers WHERE is_deleted = ?';
+    let params = ['no'];
+
+    if (department) {
+      query += ' AND department = ?';
+      params.push(department);
+    }
+    if (is_borrowed) {
+      query += ' AND is_borrowed = ?';
+      params.push(is_borrowed);
+    }
+
+    const [results] = await db.query(query, params);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+exports.searchPapers = async (req, res) => {
+  try {
+    const q = req.query.q || '';
+    const [rows] = await db.execute(
+      "SELECT id, paper_code, title, author FROM papers WHERE paper_code LIKE ? OR title LIKE ?",
+      [`%${q}%`, `%${q}%`]
+    );
+    res.json({ success: true, papers: rows });
+  } catch (err) {
+    console.error("Database query failed:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+exports.getDeletedPapers = async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      "SELECT id, title, author, department, shelf_no, draw_no, paper_code, deleted_at, image_url AS image FROM papers WHERE is_deleted = 'yes'"
+    );
+    const formatted = rows.map(paper => ({
+      id: paper.id,
+      title: paper.title,
+      author: paper.author,
+      department: paper.department,
+      shelf_no: paper.shelf_no,
+      draw_no: paper.draw_no,
+      paper_code: paper.paper_code,
+      deleted_at: paper.deleted_at ? new Date(paper.deleted_at).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }) : 'Not specified',
+      image: paper.image || 'default-paper.png'
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error('Error fetching deleted papers:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+};
+exports.deletePaper = async (req, res) => {
+  try {
+    const paperId = req.params.id;
+    const [result] = await db.execute(
+      "UPDATE papers SET is_deleted = 'yes', deleted_at = NOW() WHERE id = ?",
+      [paperId]
+    );
+    if (result.affectedRows > 0) {
+      res.json({ success: true, message: "Paper marked as deleted." });
+    } else {
+      res.json({ success: false, message: "Paper not found." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+exports.removePaper = async (req, res) => {
+  try {
+    const paperId = req.params.id;
+    const [paperRows] = await db.execute("SELECT image_url FROM papers WHERE id = ?", [paperId]);
+    if (paperRows.length === 0) return res.status(404).json({ success: false, message: "Paper not found." });
+
+    const imageFile = paperRows[0].image_url;
+    if (imageFile) {
+      const imgPath = path.join(__dirname, '../uploads/papers/', imageFile);
+      if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+    }
+
+    const [result] = await db.execute("DELETE FROM papers WHERE id = ?", [paperId]);
+    if (result.affectedRows > 0) {
+      res.json({ success: true, message: "Paper permanently deleted." });
+    } else {
+      res.json({ success: false, message: "Paper not found." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+exports.getBorrowedPapers = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT id AS paper_id, title, author, image_url AS image, borrowed_by, borrowed_at, return_at, status
+      FROM papers
+      WHERE is_borrowed = 'yes' AND is_deleted = 'no'
+      ORDER BY borrowed_at DESC
+    `);
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    console.error('Error fetching borrowed papers:', err.message);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+exports.getDepartmentsCatalogs = async (req, res) => {
+  try {
+  
+    const [rows] = await db.execute(`
+      SELECT 
+        department,
+        title,
+        author,
+        year,
+        paper_code AS code,
+        status,
+        'paper' AS type,
+         image
+      FROM papers
+      WHERE is_deleted = 'no'
+      ORDER BY department, title
+    `);
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    console.error("Error fetching department catalogs:", err.message);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+exports.getPaperById = async (req, res) => {
+  try {
+    const paperId = req.params.id;
+    const [rows] = await db.execute("SELECT * FROM papers WHERE id = ? AND is_deleted = 'no'", [paperId]);
+    if (rows.length === 0) return res.status(404).json({ message: 'Paper not found' });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+exports.addPaper = async (req, res) => {
+  const {
+    title, author, department, date_added,
+    paper_code, shelf_no, draw_no, year, toJson
+  } = req.body;
+
+  const paper_image = req.file ? req.file.filename : null;
+  const isJson = toJson === 'true';
+
+  const conn = await db.getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    // Insert department if not exists
+    const [deptRows] = await conn.execute("SELECT * FROM departments WHERE name = ?", [department]);
+
+    if (deptRows.length === 0) {
+      const imagePath = `/uploads/papers/${paper_image}`;
+      const page = department.toLowerCase();
+      await conn.execute(
+        "INSERT INTO departments (name, image, page) VALUES (?, ?, ?)",
+        [department, imagePath, page]
+      );
+    }
+
+    // Insert paper
+    await conn.execute(
+      `INSERT INTO papers 
+        (title, author, department, date_added, paper_code, shelf_no, draw_no, year,  status, is_deleted, is_borrowed) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no', 'no')`,
+      [title, author, department, date_added, paper_code, shelf_no, draw_no, year, paper_image]
+    );
+
+    await conn.commit();
+
+    if (isJson) {
+      return res.json({ status: 'success', message: 'Paper and department added successfully!' });
+    } else {
+      return res.redirect('/librarian/viewandaddpaper');
+    }
+  } catch (err) {
+    await conn.rollback();
+    console.error('Transaction Error:', err.sqlMessage || err.message);
+
+    let errorMessage = 'Something went wrong while saving the paper. Please try again later.';
+    if (err.code === 'ER_BAD_NULL_ERROR') errorMessage = 'Please fill all required fields.';
+    else if (err.code === 'ER_DUP_ENTRY') errorMessage = 'A paper with the same code already exists.';
+
+    if (isJson) {
+      return res.status(400).json({ status: 'error', error: errorMessage });
+    } else {
+      return res.redirect('/librarian/viewandaddpaper');
+    }
+  } finally {
+    conn.release();
+  }
+};
+exports.updatePaper = async (req, res) => {
+  const paperId = req.params.id;
+  const {
+    title, author, department, date_added,
+    paper_code, shelf_no, draw_no, year, toJson
+  } = req.body;
+
+  const paper_image = req.file ? req.file.filename : null;
+  const isJson = toJson === 'true';
+
+  const conn = await db.getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    // Update department if needed
+    const [deptRows] = await conn.execute("SELECT * FROM departments WHERE name = ?", [department]);
+    if (deptRows.length === 0) {
+      const imagePath = `/uploads/papers/${paper_image || 'default-paper.png'}`;
+      const page = department.toLowerCase();
+      await conn.execute("INSERT INTO departments (name, image, page) VALUES (?, ?, ?)", [department, imagePath, page]);
+    }
+
+    // Update paper details
+    let updateSQL = `UPDATE papers SET title=?, author=?, department=?, date_added=?, paper_code=?, shelf_no=?, draw_no=?, year=?`;
+    const params = [title, author, department, date_added, paper_code, shelf_no, draw_no, year];
+
+    if (paper_image) {
+      updateSQL += `, image=?`;
+      params.push(paper_image);
+    }
+
+    updateSQL += ` WHERE id = ?`;
+    params.push(paperId);
+
+    await conn.execute(updateSQL, params);
+
+    await conn.commit();
+
+    if (isJson) {
+      return res.json({ status: 'success', message: 'Paper updated successfully!' });
+    } else {
+      return res.redirect('/librarian/viewandaddpaper');
+    }
+  } catch (err) {
+    await conn.rollback();
+    console.error('Transaction Error:', err.sqlMessage || err.message);
+
+    let errorMessage = 'Something went wrong while updating the paper. Please try again later.';
+    if (err.code === 'ER_BAD_NULL_ERROR') errorMessage = 'Please fill all required fields.';
+    else if (err.code === 'ER_DUP_ENTRY') errorMessage = 'A paper with the same code already exists.';
+
+    if (isJson) {
+      return res.status(400).json({ status: 'error', error: errorMessage });
+    } else {
+      return res.redirect('/librarian/viewandaddpaper');
+    }
+  } finally {
+    conn.release();
+  }
+};

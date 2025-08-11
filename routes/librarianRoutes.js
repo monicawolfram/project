@@ -24,29 +24,31 @@ router.get('/add-book',  authenticateLibrarian, librarianController.getAddBookFo
 router.delete('/remove/book/:id', authenticateLibrarian, librarianController.removeBook); // Spread the array
 router.get('/borrowed/books', authenticateLibrarian, librarianController.getBorrowedBooks);
 router.get('/departments/catalogs', librarianController.getDepartmentsCatalogs)
-
 router.get('/librarians', librarianController.getAllLibrarians);
-
 router.put('/task/:id', librarianController.updateTask);
-
-
 router.post('/attachment/:id', librarianController.addAttachment);
 router.delete('/attachment/:id/:attachmentId', librarianController.removeAttachment);
 router.put('/attachment/:id/:attachmentId', librarianController.renameAttachment);
 
 
-router.post('/papers/add', upload.single('paper_image'), librarianController.addPaper);
+// Papers routes
+router.get('/papers/available', librarianController.getAvailablePapers);
+router.get('/papers', authenticateLibrarian, librarianController.getPapers);
+router.get('/search/paper', librarianController.searchPapers);
+router.get('/deleted-papers', authenticateLibrarian, librarianController.getDeletedPapers);
+router.delete('/delete/paper/:id', authenticateLibrarian, librarianController.deletePaper);
+router.get('/papers/:id', authenticateLibrarian, librarianController.getPaperById);
+router.post('/papers/add', authenticateLibrarian, upload.single('paper_image'), librarianController.addPaper);
+router.put('/papers/:id', authenticateLibrarian, upload.single('paper_image'), librarianController.updatePaper);
+router.delete('/remove/paper/:id', authenticateLibrarian, librarianController.removePaper);
+router.get('/borrowed/papers', authenticateLibrarian, librarianController.getBorrowedPapers);
+router.get('/departments/catalogs', librarianController.getDepartmentsCatalogs);
+
+
+
+
+
 router.get('/projects', librarianController.getAllProjects);
-
-router.get('/papers/:search', librarianController.getPaperByCodeOrTitle);
-router.delete('/papers/:search', librarianController.deletePaper);
-router.get('/available-papers', librarianController.getAvailablePapers);
-router.get('/deleted-papers', librarianController.getDeletedPapers);
-router.get('/borrowed-papers', librarianController.getBorrowedPapers);
-router.get('/paper-departments', librarianController.getPaperDepartments);
-router.get('/new-papers', librarianController.getNewPapers);
-router.get('/updated-papers', librarianController.getUpdatedPapers);
-
 router.post('/projects/add', upload.single('project_image'), librarianController.addProject);
 router.get('/projects/:code_or_title', librarianController.getProjectByCodeOrTitle);
 router.delete('/projects/:code_or_title', librarianController.deleteProject);
