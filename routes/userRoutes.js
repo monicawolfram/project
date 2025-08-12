@@ -41,7 +41,7 @@ router.get('/show-papers/:department', userController.viewPapersByDepartment);
 
 router.get('/projects', userController.projects);
 router.get('/projects/departments', userController.getProjectDepartments);
-router.get('/show-projects/:department', userController.showProjectsByDepartment);
+router.get('/show-projects/:department', userController.viewProjectsByDepartment);
 router.get('/projects/:department', userController.getProjectsByDepartment);
 
 

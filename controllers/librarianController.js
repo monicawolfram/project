@@ -1388,68 +1388,79 @@ exports.updatePaper = async (req, res) => {
 };
 exports.addPaper = async (req, res) => {
   const {
-    title,
-    author,
-    department,
-    date_added,
-    paper_code,
-    shelf_no,
-    draw_no,
-    year,
-    to_json
+    title, author, department, date_added,
+    paper_code, shelf_no, draw_no, year, toJson
   } = req.body;
 
   const paper_image = req.file ? req.file.filename : null;
-  const isJson = to_json === 'true';
+  const isJson = toJson === 'true';
 
   const conn = await db.getConnection();
 
   try {
     await conn.beginTransaction();
 
-    // Insert department if not exists
-    const [deptRows] = await conn.execute("SELECT * FROM departments WHERE name = ?", [department]);
+    // 1. Insert department only if it doesn't exist
+    const checkDeptSQL = `SELECT * FROM departments WHERE name = ?`;
+    const [deptRows] = await conn.execute(checkDeptSQL, [department]);
+
     if (deptRows.length === 0) {
+      const insertDeptSQL = `
+        INSERT INTO departments (name, image, page)
+        VALUES (?, ?, ?)
+      `;
+
       const imagePath = `/uploads/papers/${paper_image || 'default-paper.png'}`;
       const page = department.toLowerCase();
-      await conn.execute(
-        "INSERT INTO departments (name, image, page) VALUES (?, ?, ?)",
-        [department, imagePath, page]
-      );
+
+      await conn.execute(insertDeptSQL, [department, imagePath, page]);
     }
 
-    // Insert paper
-    await conn.execute(
-      `INSERT INTO papers 
-        (title, author, department, date_added, paper_code, shelf_no, draw_no, year, image, status, is_deleted) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no')`,
-      [title, author, department, date_added, paper_code, shelf_no, draw_no, year, paper_image]
-    );
+    // 2. Insert paper
+    const insertPaperSQL = `
+      INSERT INTO papers 
+      (title, author, department, date_added, paper_code, shelf_no, draw_no, year, image, status, is_deleted) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no')
+    `;
+
+    const paperValues = [
+      title, author, department, date_added,
+      paper_code, shelf_no, draw_no, year, paper_image
+    ];
+
+    await conn.execute(insertPaperSQL, paperValues);
 
     await conn.commit();
 
     if (isJson) {
       return res.json({ status: 'success', message: 'Paper and department added successfully!' });
     } else {
-      return res.redirect('/librarian/managepapers');
+      return res.redirect('/librarian/viewandaddpaper');
     }
+
   } catch (err) {
     await conn.rollback();
-    console.error('Transaction Error:', err.sqlMessage || err.message);
+    console.error('❌ Transaction Error:', err.sqlMessage || err.message);
 
     let errorMessage = 'Something went wrong while saving the paper. Please try again later.';
-    if (err.code === 'ER_BAD_NULL_ERROR') errorMessage = 'Please fill all required fields.';
-    else if (err.code === 'ER_DUP_ENTRY') errorMessage = 'A paper with the same code already exists.';
+
+    if (err.code === 'ER_BAD_NULL_ERROR') {
+      errorMessage = 'Please fill all required fields.';
+    } else if (err.code === 'ER_DUP_ENTRY') {
+      errorMessage = 'A paper with the same code already exists.';
+    }
 
     if (isJson) {
       return res.status(400).json({ status: 'error', error: errorMessage });
     } else {
-      return res.redirect('/librarian/managepapers');
+      return res.redirect('/libraria/viewandaddpaper');
     }
+
   } finally {
     conn.release();
   }
 };
+
 
 
 
@@ -1691,60 +1702,81 @@ exports.updateProject = async (req, res) => {
 exports.addProject = async (req, res) => {
   const {
     title, author, department, date_added,
-    project_code, shelf_no, draw_no, year, to_json
+    project_code, shelf_no, draw_no, year, toJson
   } = req.body;
 
   const project_image = req.file ? req.file.filename : null;
-  const isJson = to_json === 'true';
+  const isJson = toJson === 'true';
 
   const conn = await db.getConnection();
 
   try {
     await conn.beginTransaction();
 
-    // Insert department if not exists
-    const [deptRows] = await conn.execute("SELECT * FROM departments WHERE name = ?", [department]);
+    // 1. Insert department only if it doesn't exist
+    const checkDeptSQL = `SELECT * FROM departments WHERE name = ?`;
+    const [deptRows] = await conn.execute(checkDeptSQL, [department]);
+
     if (deptRows.length === 0) {
+      const insertDeptSQL = `
+        INSERT INTO departments (name, image, page)
+        VALUES (?, ?, ?)
+      `;
+
       const imagePath = `/uploads/projects/${project_image || 'default-project.png'}`;
       const page = department.toLowerCase();
-      await conn.execute(
-        "INSERT INTO departments (name, image, page) VALUES (?, ?, ?)",
-        [department, imagePath, page]
-      );
+
+      await conn.execute(insertDeptSQL, [department, imagePath, page]);
     }
 
-    // Insert project
-    await conn.execute(
-      `INSERT INTO projects 
-        (title, author, department, date_added, project_code, shelf_no, draw_no, year, image, status, is_deleted) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no')`,
-      [title, author, department, date_added, project_code, shelf_no, draw_no, year, project_image]
-    );
+    // 2. Insert project
+    const insertProjectSQL = `
+      INSERT INTO projects 
+      (title, author, department, date_added, project_code, shelf_no, draw_no, year, image, status, is_deleted) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no')
+    `;
+
+    const projectValues = [
+      title, author, department, date_added,
+      project_code, shelf_no, draw_no, year, project_image
+    ];
+
+    await conn.execute(insertProjectSQL, projectValues);
 
     await conn.commit();
 
     if (isJson) {
       return res.json({ status: 'success', message: 'Project and department added successfully!' });
     } else {
-      return res.redirect('/librarian/manageprojects');
+      return res.redirect('/librarian/viewandaddproject');
     }
+
   } catch (err) {
     await conn.rollback();
-    console.error('Transaction Error:', err.sqlMessage || err.message);
+    console.error('❌ Transaction Error:', err.sqlMessage || err.message);
 
     let errorMessage = 'Something went wrong while saving the project. Please try again later.';
-    if (err.code === 'ER_BAD_NULL_ERROR') errorMessage = 'Please fill all required fields.';
-    else if (err.code === 'ER_DUP_ENTRY') errorMessage = 'A project with the same code already exists.';
+
+    if (err.code === 'ER_BAD_NULL_ERROR') {
+      errorMessage = 'Please fill all required fields.';
+    } else if (err.code === 'ER_DUP_ENTRY') {
+      errorMessage = 'A project with the same code already exists.';
+    }
 
     if (isJson) {
       return res.status(400).json({ status: 'error', error: errorMessage });
     } else {
-      return res.redirect('/librarian/manageprojects');
+      return res.redirect('/librarian/viewandaddproject');
     }
+
   } finally {
     conn.release();
   }
 };
+
+
+
+
 
 
 
