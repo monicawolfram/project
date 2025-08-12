@@ -1,538 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Librarian - Manage Projects</title>
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
-  <link
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    rel="stylesheet"
-  />
-  <style>
-    body {
-      background: url('library-bg.jpg') no-repeat center center fixed;
-      background-size: cover;
-      font-family: Arial, sans-serif;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Librarian - Manage Projects</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: url('library-bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
 
-    .sidebar {
-      background-color: white;
-      min-height: 100vh;
-      padding: 20px;
-      border-radius: 15px;
-    }
+        .sidebar {
+            background-color: white;
+            min-height: 100vh;
+            padding: 20px;
+            border-radius: 15px;
+        }
 
-    .sidebar img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-    }
+        .sidebar img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .sidebar .nav-link {
+            color: black;
+            font-size: 18px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
 
-    .sidebar .nav-link {
-      color: black;
-      font-size: 18px;
-      padding: 10px 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
+        .sidebar .nav-link:hover {
+            background-color: green;
+            color: white;
+            border-radius: 8px;
+        }
 
-    .sidebar .nav-link:hover {
-      background-color: green;
-      color: white;
-      border-radius: 8px;
-    }
+        .sidebar .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
 
-    .sidebar .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+        .nav-link {
+            color: rgb(19, 19, 19);
+            font-size: 18px;
+            padding: 10px 15px;
+            text-align: left;
+        }
 
-    .nav-link {
-      color: rgb(19, 19, 19);
-      font-size: 18px;
-      padding: 10px 15px;
-      text-align: left;
-    }
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
 
-    .nav-link:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
+        .content-container {
+            background: rgba(161, 247, 122, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
 
-    .content-container {
-      background: rgba(161, 247, 122, 0.9);
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
+        .tab-content {
+            padding: 15px;
+        }
 
-    .tab-content {
-      padding: 15px;
-    }
-
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      background: white;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-  </style>
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container-fluid">
+<div class="container-fluid">
     <div class="row">
-      <!-- Sidebar -->
-      <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-        <div class="logo-container">
-          <img src="/images/sjcet.png" alt="SJCET Logo" />
-          <h4>SJUCET Library</h4>
-        </div>
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link" href="librarian_home.ejs"
-              ><i class="fas fa-home"></i> Home</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="librarian_category.ejs"
-              ><i class="fas fa-book"></i> Manage Catalog</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="managerequestlibrarian.ejs"
-              ><i class="fas fa-tasks"></i> Manage Requests</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="manageinventorylibrarian.ejs"
-              ><i class="fas fa-boxes"></i> Manage Inventory</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="massageandfeedback.ejs"
-              ><i class="fas fa-comments"></i> Messages & Feedback</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="generatereport.ejs"
-              ><i class="fas fa-chart-bar"></i> Generate Reports</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="Itsupport.ejs"
-              ><i class="fas fa-tools"></i> IT Support</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="manageusers.ejs"
-              ><i class="fas fa-users"></i> Manage Users</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="managefines.ejs"
-              ><i class="fas fa-money-bill-wave"></i> Manage Fines</a
-            >
-          </li>
-        </ul>
-      </nav>
-
-      <!-- Main Content -->
-      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <!-- Top Bar -->
-        <div class="top-bar d-flex justify-content-between align-items-center">
-          <input
-            type="text"
-            class="form-control w-25"
-            placeholder="Search here"
-            id="searchInput"
-            onkeyup="filterProjects()"
-          />
-          <div class="d-flex align-items-center">
-            <!-- Notification Dropdown -->
-            <div class="dropdown me-3">
-              <button
-                class="btn btn-light dropdown-toggle"
-                type="button"
-                id="notificationDropdown"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i class="fas fa-bell"></i>
-              </button>
-              <ul
-                class="dropdown-menu dropdown-menu-end"
-                aria-labelledby="notificationDropdown"
-              >
-                <li>
-                  <a class="dropdown-item" href="booknotification.ejs"
-                    >New project added</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="requestnotification.ejs"
-                    >Request pending approval</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="systemnotification.ejs"
-                    >System maintenance scheduled</a
-                  >
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li class="text-center">
-                  <a class="dropdown-item" href="viewallnotification.ejs"
-                    >View all</a
-                  >
-                </li>
-              </ul>
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="logo-container">
+                <img src="/public/images/sjcet.png" alt="SJCET Logo" />
+                <h4>SJUCET Library</h4>
             </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="/librarian/librarian_home"><i class="fas fa-home"></i> Home</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/librarian/librarian_category"><i class="fas fa-book"></i> Manage Catalog</a></li>
+                <li class="nav-item"><a class="nav-link" href="/librarian/managerequestlibrarian"><i class="fas fa-tasks"></i> Manage Requests</a></li>
+                <li class="nav-item"><a class="nav-link" href="/librarian/manageinventorylibrarian"><i class="fas fa-boxes"></i> Manage Inventory</a></li>
+                <li class="nav-item"><a class="nav-link" href="/librarian/massageandfeedback"><i class="fas fa-comments"></i> Messages & Feedback</a></li>
+                <li class="nav-item"><a class="nav-link" href="/librarian/generatereport"><i class="fas fa-chart-bar"></i> Generate Reports</a></li>
+                <li class="nav-item"><a class="nav-link" href="/librarian/Itsupport"><i class="fas fa-tools"></i> IT Support</a></li>
+                <li class="nav-item"><a class="nav-link" href="/librarian/manageusers"><i class="fas fa-users"></i> Manage Users</a></li>
+                <li class="nav-item"><a class="nav-link" href="/librarian/managefines"><i class="fas fa-money-bill-wave"></i> Manage Fines</a></li>
+            </ul>
+        </nav>
 
-            <!-- User Dropdown -->
-            <div class="dropdown">
-              <button
-                class="btn btn-light dropdown-toggle"
-                type="button"
-                id="userDropdown"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i class="fas fa-user"></i>
-              </button>
-              <ul
-                class="dropdown-menu dropdown-menu-end"
-                aria-labelledby="userDropdown"
-              >
-                <li>
-                  <a class="dropdown-item" href="librarian_account.ejs"
-                    >Librarian Account</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="admin_account.ejs">Admin Account</a>
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <a
-                    class="dropdown-item text-danger"
-                    href="librarian_interface.ejs"
-                    >Logout</a
-                  >
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Top Bar -->
+            <div class="top-bar d-flex justify-content-between align-items-center">
+                <input type="text" class="form-control w-25" placeholder="Search here" id="searchInput" onkeyup="filterProjects()" />
+                <div class="d-flex align-items-center">
+                    <!-- Notification Dropdown -->
+                    <div class="dropdown me-3">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
+                            <li><a class="dropdown-item" href="/librarian/projectnotification">New project added</a></li>
+                            <li><a class="dropdown-item" href="/librarian/requestnotification">Request pending approval</a></li>
+                            <li><a class="dropdown-item" href="/librarian/systemnotification">System maintenance scheduled</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-center" href="/librarian/viewallnotification">View all</a></li>
+                        </ul>
+                    </div>
 
-        <div class="content-container">
-          <h2 class="text-center mb-4">Librarian Dashboard - Manage Projects</h2>
-
-          <ul class="nav nav-tabs" id="libraryTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button
-                class="nav-link active"
-                id="viewprojects-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#viewprojects"
-                type="button"
-                role="tab"
-                aria-controls="viewprojects"
-                aria-selected="true"
-              >
-                View Projects
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button
-                class="nav-link"
-                id="addprojects-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#addprojects"
-                type="button"
-                role="tab"
-                aria-controls="addprojects"
-                aria-selected="false"
-              >
-                Add Projects
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button
-                class="nav-link"
-                id="removeprojects-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#removeprojects"
-                type="button"
-                role="tab"
-                aria-controls="removeprojects"
-                aria-selected="false"
-              >
-                Remove Projects
-              </button>
-            </li>
-          </ul>
-
-          <div class="tab-content mt-3" id="libraryTabsContent">
-            <!-- View Projects Tab -->
-            <div
-              class="tab-pane fade show active"
-              id="viewprojects"
-              role="tabpanel"
-              aria-labelledby="viewprojects-tab"
-            >
-              <ul
-                class="nav nav-pills mb-3"
-                id="viewProjectsTabs"
-                role="tablist"
-              >
-                <li class="nav-item" role="presentation">
-<button
-  class="nav-link active"
-  id="availableprojects-tab"
-  data-bs-toggle="pill"
-  data-bs-target="#availableprojects"
-  type="button"
-  role="tab"
-  aria-controls="availableprojects"
-  aria-selected="true"
-  onclick="loadAvailableProjects()"
->
-  Available Projects
-</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button
-                    class="nav-link"
-                    id="deletedprojects-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#deletedprojects"
-                    type="button"
-                    role="tab"
-                    aria-controls="deletedprojects"
-                    aria-selected="false"
-                  >
-                    Deleted Projects
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button
-                    class="nav-link"
-                    id="borrowedprojects-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#borrowedprojects"
-                    type="button"
-                    role="tab"
-                    aria-controls="borrowedprojects"
-                    aria-selected="false"
-                  >
-                    Borrowed Projects
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button
-                    class="nav-link"
-                    id="departments-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#departments"
-                    type="button"
-                    role="tab"
-                    aria-controls="departments"
-                    aria-selected="false"
-                  >
-                    Departments
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button
-                    class="nav-link"
-                    id="newprojects-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#newprojects"
-                    type="button"
-                    role="tab"
-                    aria-controls="newprojects"
-                    aria-selected="false"
-                  >
-                    New Projects
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button
-                    class="nav-link"
-                    id="updatedprojects-tab"
-                    data-bs-toggle="pill"
-                    data-bs-target="#updatedprojects"
-                    type="button"
-                    role="tab"
-                    aria-controls="updatedprojects"
-                    aria-selected="false"
-                  >
-                    Recently Updated Projects
-                  </button>
-                </li>
-              </ul>
-
-              <div class="tab-content" id="viewProjectsTabsContent">
-                <div class="tab-pane fade show active" id="availableprojects">
-  <div id="availableProjectsList" class="row"></div>
-</div>
-                <div class="tab-pane fade" id="deletedprojects">
-  <div id="deletedProjectsList" class="row"></div>
-</div>
-                <div class="tab-pane fade" id="borrowedprojects">
-  <div id="borrowedProjectsList" class="row"></div>
-</div>
-                <div class="tab-pane fade" id="departments">
-  <div id="projectDepartments" class="row"></div>
-</div>
-                <!-- Recently Added Projects -->
-<div
-  class="tab-pane fade"
-  id="newprojects"
-  role="tabpanel"
-  aria-labelledby="newprojects-tab"
->
-  <div id="recentProjectsList" class="row"></div>
-</div>
-
-<!-- Recently Updated Projects -->
-<div
-  class="tab-pane fade"
-  id="updatedprojects"
-  role="tabpanel"
-  aria-labelledby="updatedprojects-tab"
->
-  <div id="updatedProjectsList" class="row"></div>
-</div>
-
-              </div>
-            </div>
-
-            <!-- Add Projects Tab -->
-            <div
-              class="tab-pane fade"
-              id="addprojects"
-              role="tabpanel"
-              aria-labelledby="addprojects-tab"
-            >
-              <h4 class="text-center mb-3">Add a New Project</h4>
- <form id="addProjectForm" method="POST" action="/librarian/projects/add" enctype="multipart/form-data">
-  <div class="mb-3">
-    <label class="form-label">Project Cover Image</label>
-    <input type="file" class="form-control" name="project_image" accept="image/*" required>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Title</label>
-    <input type="text" class="form-control" name="title" required>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Author</label>
-    <input type="text" class="form-control" name="author" required>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Department</label>
-    <input type="text" class="form-control" name="department" required>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Date</label>
-    <input type="date" class="form-control" name="date_added" required>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Project Code</label>
-    <div class="input-group">
-      <input type="text" id="projectCode" name="project_code" placeholder="Project Code" readonly autocomplete="off" required class="form-control" />
-      <button type="button" class="btn btn-outline-secondary" onclick="generateProjectCode()">Generate</button>
-    </div>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Shelf Number</label>
-    <input type="number" class="form-control" name="shelf_no" required>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Drawer Number</label>
-    <input type="number" class="form-control" name="draw_no" required>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Year</label>
-    <input type="number" class="form-control" name="year" required>
-  </div>
-
-  <input type="hidden" name="to_json" value="true">
-
-  <button type="submit" class="btn btn-success">Submit</button>
-</form>
-
-            </div>
-
-            <!-- Remove Projects Tab -->
-            <div
-              class="tab-pane fade"
-              id="removeprojects"
-              role="tabpanel"
-              aria-labelledby="removeprojects-tab"
-            >
-              <h4 class="text-center mb-3">Remove a Project</h4>
-              <form id="removeProjectForm" onsubmit="event.preventDefault(); searchProject();">
-                <div class="mb-3">
-                  <label for="searchProjectInput" class="form-label"
-                    >Enter Project Code or Title</label
-                  >
-                  <div class="input-group">
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="searchProjectInput"
-                      required
-                    />
-                    <button
-                      type="submit"
-                      class="btn btn-secondary"
-                    >
-                      Search
-                    </button>
-                  </div>
+                    <!-- User Dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/librarian/librarian_account">Librarian Account</a></li>
+                            <li><a class="dropdown-item" href="/librarian/admin_account">Admin Account</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="/librarian/librarian_interface">Logout</a></li>
+                        </ul>
+                    </div>
                 </div>
-              </form>
-
-              <div id="projectDetails" class="mb-3 d-none">
-                <p><strong>Title:</strong> <span id="projectTitleDisplay"></span></p>
-                <p><strong>Author:</strong> <span id="projectAuthorDisplay"></span></p>
-                <button
-                  type="button"
-                  class="btn btn-danger"
-                  onclick="removeProject()"
-                >
-                  Remove Project
-                </button>
-              </div>
             </div>
-          </div>
-        </div>
-      </main>
+
+            <div class="content-container">
+                <h2 class="text-center mb-4">Librarian Dashboard - Manage Projects</h2>
+
+                <ul class="nav nav-tabs" id="libraryTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="viewprojects-tab" data-bs-toggle="tab" data-bs-target="#viewProjects" type="button" role="tab" aria-controls="viewProjects" aria-selected="true">View Projects</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="addprojects-tab" data-bs-toggle="tab" data-bs-target="#addProjects" type="button" role="tab" aria-controls="addProjects" aria-selected="false">Add Projects</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="removeprojects-tab" data-bs-toggle="tab" data-bs-target="#removeProjects" type="button" role="tab" aria-controls="removeProjects" aria-selected="false">Remove Projects</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-3" id="libraryTabsContent">
+                    <!-- View Projects Tab -->
+                    <div class="tab-pane fade show active" id="viewProjects" role="tabpanel" aria-labelledby="viewprojects-tab">
+                        <ul class="nav nav-pills mb-3" id="viewProjectsTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="availableProjects-tab" data-bs-toggle="pill" data-bs-target="#availableProjects" type="button" role="tab" aria-controls="availableProjects" aria-selected="true" onclick="loadAvailableProjects()">Available Projects</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="deletedProjects-tab" data-bs-toggle="pill" data-bs-target="#deletedProjects" type="button" role="tab" aria-controls="deletedProjects" aria-selected="false">Deleted Projects</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="borrowedProjects-tab" data-bs-toggle="pill" data-bs-target="#borrowedProjects" type="button" role="tab" aria-controls="borrowedProjects" aria-selected="false">Borrowed Projects</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="departments-tab" data-bs-toggle="pill" data-bs-target="#departments" type="button" role="tab" aria-controls="departments" aria-selected="false">Departments</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="newProjects-tab" data-bs-toggle="pill" data-bs-target="#newProjects" type="button" role="tab" aria-controls="newProjects" aria-selected="false">New Projects</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="updatedProjects-tab" data-bs-toggle="pill" data-bs-target="#updatedProjects" type="button" role="tab" aria-controls="updatedProjects" aria-selected="false">Recently Updated Projects</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="viewProjectsTabsContent">
+                            <div class="tab-pane fade show active" id="availableProjects" role="tabpanel" aria-labelledby="availableProjects-tab">
+                                <div id="availableProjectsList" class="row"></div>
+                            </div>
+                            <div class="tab-pane fade" id="deletedProjects" role="tabpanel" aria-labelledby="deletedProjects-tab">
+                                <div id="deletedProjectsList" class="row"></div>
+                            </div>
+                            <div class="tab-pane fade" id="borrowedProjects" role="tabpanel" aria-labelledby="borrowedProjects-tab">
+                                <div id="borrowedProjectsList" class="row"></div>
+                            </div>
+                            <div class="tab-pane fade" id="departments" role="tabpanel" aria-labelledby="departments-tab">
+                                <div id="departmentsList" class="row"></div>
+                            </div>
+                            <div class="tab-pane fade" id="newProjects" role="tabpanel" aria-labelledby="newProjects-tab">
+                                <p>Recently added projects will be displayed here.</p>
+                            </div>
+                            <div class="tab-pane fade" id="updatedProjects" role="tabpanel" aria-labelledby="updatedProjects-tab">
+                                <p>Recently updated project details will be displayed here.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Projects Tab -->
+                    <div class="tab-pane fade" id="addProjects" role="tabpanel" aria-labelledby="addprojects-tab">
+                        <h4 class="text-center">Add a New Project</h4>
+                        <form id="addProjectForm" method="POST" action="/librarian/projects/add" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label class="form-label">Project Cover Image</label>
+                                <input type="file" class="form-control" name="project_image" accept="image/*" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <input type="text" class="form-control" name="title" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Author</label>
+                                <input type="text" class="form-control" name="author" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Department</label>
+                                <input type="text" class="form-control" name="department" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-control" name="date_added" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Project Code</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="project_code" id="projectCode" readonly required />
+                                    <button type="button" class="btn btn-primary" onclick="generateCode()">Generate Code</button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Shelf Number</label>
+                                <input type="number" class="form-control" name="shelf_no" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Drawer Number</label>
+                                <input type="number" class="form-control" name="draw_no" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Year</label>
+                                <input type="number" class="form-control" name="year" required />
+                            </div>
+                            <input type="hidden" name="to_json" value="true" />
+                            <button type="submit" class="btn btn-success">Submit</button>
+                        </form>
+                    </div>
+
+                    <!-- Remove Projects Tab -->
+                    <div class="tab-pane fade" id="removeProjects" role="tabpanel" aria-labelledby="removeprojects-tab">
+                        <h4 class="text-center">Remove a Project</h4>
+                        <!-- Search Form -->
+                        <form onsubmit="return false;">
+                            <div class="mb-3">
+                                <label class="form-label">Enter Project Code or Title</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="searchProject" placeholder="Project code or title" />
+                                    <a href="#" class="btn btn-secondary" onclick="searchProject(); return false;">Search</a>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Results Table -->
+                        <div id="searchResults" class="d-none">
+                            <h5>Search Results</h5>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Project Code</th>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-  </div>
+</div>
 
 
+<script>
+  // Load available projects dynamically and render cards
+  function loadAvailableProjects() {
+    const container = document.getElementById('availableProjectsList');
+    container.innerHTML = '<p class="text-center text-muted w-100">Loading projects...</p>';
 
- <script>
-   async function generateProjectCode() {
+    fetch('/librarian/projects/available')
+      .then(res => res.json())
+      .then(projects => {
+        container.innerHTML = '';
+
+        if (!Array.isArray(projects) || projects.length === 0) {
+          container.innerHTML = '<p class="text-muted text-center w-100">No available projects found.</p>';
+          return;
+        }
+
+        projects.forEach(project => {
+          const card = document.createElement('div');
+          card.className = 'col-md-4 mb-3';
+          card.innerHTML = `
+            <div class="card h-100 shadow-sm">
+              <img src="/uploads/projects/${project.image_url || 'default.jpg'}" class="card-img-top" alt="${project.title}" style="height: 200px; object-fit: cover;" />
+              <div class="card-body">
+                <h5 class="card-title">${project.title}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">${project.author}</h6>
+                <p class="card-text"><strong>Department:</strong> ${project.department}</p>
+                <p class="card-text"><strong>Drawer No:</strong> ${project.draw_no}</p>
+                <p class="card-text"><strong>Shelf No:</strong> ${project.shelf_no}</p>
+                <p class="card-text"><strong>Year:</strong> ${project.year}</p>
+              </div>
+            </div>`;
+          container.appendChild(card);
+        });
+      })
+      .catch(err => {
+        console.error('Error fetching projects:', err);
+        container.innerHTML = '<p class="text-danger text-center w-100">Error loading projects.</p>';
+      });
+  }
+
+  
+  async function generateCode() {
     try {
       const res = await fetch('/librarian/generate-project-code');
       const data = await res.json();
@@ -542,258 +335,102 @@
       alert('Could not generate project code. Please try again.');
     }
   }
- </script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  // Load Available Projects
-  fetch('/librarian/projects/available')
-    .then(response => response.json())
-    .then(projects => {
-      const projectList = document.getElementById('availableProjectsList');
-      projectList.innerHTML = '';
+  // Search projects by code or title for removal/hiding
+  function searchProject() {
+    const query = document.getElementById('searchProject').value.trim();
+    if (!query) {
+      alert('Please enter a project code or title.');
+      return;
+    }
 
-      if (!Array.isArray(projects) || projects.length === 0) {
-        projectList.innerHTML = '<p class="text-muted text-center w-100">No available projects found.</p>';
-        return;
-      }
+    fetch(`/librarian/search/project?q=${encodeURIComponent(query)}`)
+      .then(res => res.json())
+      .then(data => {
+        const resultsSection = document.getElementById('searchResults');
+        const tbody = document.getElementById('resultsTableBody');
+        tbody.innerHTML = '';
 
-      projects.forEach(proj => {
-        const card = document.createElement('div');
-        card.className = 'col-md-4 mb-3';
-        card.innerHTML = `
-          <div class="card h-100 shadow-sm">
-            <img src="/uploads/projects/${proj.image || 'default.jpg'}" class="card-img-top" alt="${proj.title}" style="height: 200px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title">${proj.title}</h5>
-              <h6 class="card-subtitle mb-2 text-muted">${proj.author}</h6>
-              <p class="card-text"><strong>Department:</strong> ${proj.department || 'N/A'}</p>
-              <p class="card-text"><strong>Year:</strong> ${proj.year || 'N/A'}</p>
-            </div>
-          </div>
-        `;
-        projectList.appendChild(card);
+        if (data.success && data.projects.length > 0) {
+          data.projects.forEach(project => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${project.project_code}</td>
+              <td>${project.title}</td>
+              <td>${project.author}</td>
+              <td>
+                <button class="btn btn-warning btn-sm" onclick="softDeleteProject(${project.id})" title="Hide Project">
+                  <i class="fas fa-ban"></i>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="hardDeleteProject(${project.id})" title="Delete Project">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>`;
+            tbody.appendChild(row);
+          });
+          resultsSection.classList.remove('d-none');
+        } else {
+          alert('No projects found.');
+          resultsSection.classList.add('d-none');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Something went wrong while searching.');
       });
-    })
-    .catch(err => {
-      console.error('Error fetching projects:', err);
-      document.getElementById('availableProjectsList').innerHTML =
-        '<p class="text-danger text-center">Error loading projects.</p>';
-    });
-});
-</script>
+  }
 
+  // Soft delete (hide) a project
+  function softDeleteProject(projectId) {
+    if (!confirm('Are you sure you want to hide this project?')) return;
 
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  fetch('/librarian/projects/deleted')
-    .then(res => res.json())
-    .then(projects => {
-      const container = document.getElementById("deletedProjectsList");
-      container.innerHTML = '';
-
-      if (!Array.isArray(projects) || projects.length === 0) {
-        container.innerHTML = '<p class="text-center text-muted">No deleted projects found.</p>';
-        return;
-      }
-
-      projects.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'col-md-4 mb-3';
-        card.innerHTML = `
-          <div class="card shadow-sm h-100">
-            <img src="/uploads/projects/${p.image || 'default.jpg'}" class="card-img-top" style="height: 200px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title">${p.title}</h5>
-              <p><strong>Author:</strong> ${p.author}</p>
-              <p><strong>Department:</strong> ${p.department}</p>
-              <p><strong>Year:</strong> ${p.year}</p>
-              <p><strong>Deleted At:</strong> ${p.deleted_at || 'N/A'}</p>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
+    fetch(`/librarian/delete/project/${projectId}`, { method: 'DELETE' })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message || 'Project hidden.');
+        searchProject();
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Failed to hide project.');
       });
-    })
-    .catch(err => {
-      console.error('Error loading deleted projects:', err);
-      document.getElementById("deletedProjectsList").innerHTML =
-        '<p class="text-danger">Failed to load deleted projects.</p>';
-    });
-});
-</script>
+  }
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  fetch('/librarian/projects/borrowed')
-    .then(res => res.json())
-    .then(data => {
-      const container = document.getElementById("borrowedProjectsList");
-      container.innerHTML = '';
+  // Hard delete a project permanently
+  function hardDeleteProject(projectId) {
+    if (!confirm('Are you sure you want to permanently delete this project?')) return;
 
-      if (!Array.isArray(data) || data.length === 0) {
-        container.innerHTML = `<p class="text-muted">No borrowed projects found.</p>`;
-        return;
-      }
-
-      data.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'col-md-4 mb-3';
-        card.innerHTML = `
-          <div class="card shadow h-100">
-            <img src="/uploads/projects/${p.image || 'default.jpg'}" class="card-img-top" style="height: 200px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title">${p.title}</h5>
-              <p><strong>Author:</strong> ${p.author}</p>
-              <p><strong>Borrowed By:</strong> ${p.borrower_name}</p>
-              <p><strong>Borrowed At:</strong> ${p.borrowed_at ? new Date(p.borrowed_at).toLocaleDateString() : 'N/A'}</p>
-              <p><strong>Return At:</strong> ${p.return_at ? new Date(p.return_at).toLocaleDateString() : 'N/A'}</p>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
+    fetch(`/librarian/remove/project/${projectId}`, { method: 'DELETE' })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message || 'Project permanently deleted.');
+        searchProject();
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Failed to permanently delete project.');
       });
-    })
-    .catch(err => {
-      console.error("Error fetching borrowed projects:", err);
-      document.getElementById("borrowedProjectsList").innerHTML =
-        `<p class="text-danger">Error loading borrowed projects.</p>`;
+  }
+
+  // Optional: filter visible project cards live by search input
+  function filterProjects() {
+    const filter = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('#availableProjectsList .card');
+
+    cards.forEach(card => {
+      const title = card.querySelector('.card-title').textContent.toLowerCase();
+      const author = card.querySelector('.card-subtitle').textContent.toLowerCase();
+      card.parentElement.style.display = (title.includes(filter) || author.includes(filter)) ? '' : 'none';
     });
-});
-</script>
+  }
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  fetch('/librarian/departments/catalogs')
-    .then(res => res.json())
-    .then(data => {
-      const container = document.getElementById("projectDepartments");
-
-      if (!Array.isArray(data) || data.length === 0) {
-        container.innerHTML = `<p class="text-muted">No departmental project catalogs found.</p>`;
-        return;
-      }
-
-      const grouped = {};
-
-      data.forEach(item => {
-        if (!grouped[item.department]) grouped[item.department] = [];
-        grouped[item.department].push(item);
-      });
-
-      container.innerHTML = Object.entries(grouped).map(([dept, projects]) => `
-        <div class="col-12 mb-4">
-          <h3 class="text-primary">${dept}</h3>
-          <div class="row">
-            ${projects.map(p => `
-              <div class="col-md-4">
-                <div class="card shadow-sm mb-3">
-                  <img src="/uploads/projects/${p.image || 'default.jpg'}" class="card-img-top" alt="${p.title}" style="height: 180px; object-fit: cover;">
-                  <div class="card-body">
-                    <h5 class="card-title">${p.title}</h5>
-                    <p class="card-text">
-                      <strong>Author:</strong> ${p.author}<br>
-                      <strong>Year:</strong> ${p.year}<br>
-                      <strong>Status:</strong> ${p.status}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `).join('');
-    })
-    .catch(err => {
-      console.error("Error fetching project departments:", err);
-      document.getElementById("projectDepartments").innerHTML =
-        `<p class="text-danger">Error loading department catalog.</p>`;
-    });
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  // Load Recently Added Projects
-  fetch('/librarian/projects/recent')
-    .then(res => res.json())
-    .then(data => {
-      const container = document.getElementById("recentProjectsList");
-      if (!Array.isArray(data) || data.length === 0) {
-        container.innerHTML = '<p class="text-muted">No recently added projects found.</p>';
-        return;
-      }
-
-      container.innerHTML = data.map(p => `
-        <div class="col-md-4 mb-3">
-          <div class="card h-100 shadow-sm">
-            <img src="/uploads/projects/${p.image || 'default.jpg'}" class="card-img-top" style="height: 200px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title">${p.title}</h5>
-              <p class="card-text"><strong>Author:</strong> ${p.author}</p>
-              <p class="card-text"><strong>Year:</strong> ${p.year}</p>
-              <p class="card-text"><strong>Added:</strong> ${new Date(p.date_added).toLocaleDateString()}</p>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    })
-    .catch(err => {
-      console.error("Error fetching recent projects:", err);
-      document.getElementById("recentProjectsList").innerHTML =
-        '<p class="text-danger">Error loading recently added projects.</p>';
-    });
-
-  // Load Recently Updated Projects
-  fetch('/librarian/projects/updated')
-    .then(res => res.json())
-    .then(data => {
-      const container = document.getElementById("updatedProjectsList");
-      if (!Array.isArray(data) || data.length === 0) {
-        container.innerHTML = '<p class="text-muted">No recently updated projects found.</p>';
-        return;
-      }
-
-      container.innerHTML = data.map(p => `
-        <div class="col-md-4 mb-3">
-          <div class="card h-100 shadow-sm">
-            <img src="/uploads/projects/${p.image || 'default.jpg'}" class="card-img-top" style="height: 200px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title">${p.title}</h5>
-              <p class="card-text"><strong>Author:</strong> ${p.author}</p>
-              <p class="card-text"><strong>Year:</strong> ${p.year}</p>
-              <p class="card-text"><strong>Updated:</strong> ${new Date(p.updated_at).toLocaleDateString()}</p>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    })
-    .catch(err => {
-      console.error("Error fetching updated projects:", err);
-      document.getElementById("updatedProjectsList").innerHTML =
-        '<p class="text-danger">Error loading updated projects.</p>';
-    });
-});
+  // Load projects on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    loadAvailableProjects();
+  });
 </script>
 
 
-<script>
-fetch('/librarian/projects/add', {
-  method: 'POST',
-  body: formData
-})
-.then(res => res.json())
-.then(data => {
-   window.location.href = '/librarian/projects'; 
-  // if (data.message) {
-  //   alert(data.message);
-   
-  // }
-});
-
-</script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

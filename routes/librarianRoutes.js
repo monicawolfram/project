@@ -1,12 +1,31 @@
 const express = require('express');
 const router = express.Router();
 const librarianController = require('../controllers/librarianController');
-const upload = require('../config/upload'); // adjust path
+const multer = require('multer');
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, '../public/uploads/books');
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage });
+
+module.exports = upload;
 
 // Middleware for authentication (example placeholder)
 const authenticateLibrarian = (req, res, next) => {
   next();
 };
+
+
+
+
+
 
 // Routes
 router.get('/dashboard', authenticateLibrarian, librarianController.dashboard);
@@ -45,19 +64,22 @@ router.get('/borrowed/papers', authenticateLibrarian, librarianController.getBor
 router.get('/departments/catalogs', librarianController.getDepartmentsCatalogs);
 
 
-
-
-
-router.get('/projects', librarianController.getAllProjects);
-router.post('/projects/add', upload.single('project_image'), librarianController.addProject);
-router.get('/projects/:code_or_title', librarianController.getProjectByCodeOrTitle);
-router.delete('/projects/:code_or_title', librarianController.deleteProject);
+// PROJECT ROUTES
 router.get('/projects/available', librarianController.getAvailableProjects);
-router.get('/deleted-projects', librarianController.getDeletedProjects);
-router.get('/borrowed-projects', librarianController.getBorrowedProjects);
-router.get('/departments/catalogs', librarianController.getDepartmentCatalogs);
-router.get('/new-projects', librarianController.getNewProjects);
-router.get('/updated-projects', librarianController.getUpdatedProjects);
+router.get('/projects', authenticateLibrarian, librarianController.getProjects);
+router.get('/search/project', librarianController.searchProjects);
+router.get('/deleted-projects', authenticateLibrarian, librarianController.getDeletedProjects);
+router.delete('/delete/project/:id', authenticateLibrarian, librarianController.deleteProject);
+router.get('/projects/:id', authenticateLibrarian, librarianController.getProjectById);
+router.post('/projects/add', authenticateLibrarian, upload.single('project_image'), librarianController.addProject);
+router.put('/projects/:id', authenticateLibrarian, upload.single('project_image'), librarianController.updateProject);
+router.delete('/remove/project/:id', authenticateLibrarian, librarianController.removeProject);
+router.get('/borrowed/projects', authenticateLibrarian, librarianController.getBorrowedProjects);
+router.get('/departments/projects', librarianController.getDepartmentsProjects);
+
+
+
+
 router.get('/requests/all', librarianController.getAllRequests);
 router.post('/requests/add', librarianController.addRequest);
 router.put('/requests/update-status', librarianController.updateRequestStatus);

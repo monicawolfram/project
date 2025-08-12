@@ -152,8 +152,6 @@ exports.Attendance = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
- 
 exports.borrowing = (req, res) => {
  res.render('user/borrowing');
 };
@@ -659,7 +657,6 @@ exports.viewPapersByDepartment = (req, res) => {
   const dept = req.params.department;
   res.redirect(`/user/papers/${dept}`);
 };
-
 exports.getProjectDepartments = async (req, res) => {
   try {
     const [rows] = await db.execute(`
@@ -671,41 +668,45 @@ exports.getProjectDepartments = async (req, res) => {
     res.status(500).json({ error: 'Failed to load departments' });
   }
 };
+
+async function getProjectsByDepartment(department) {
+  const trimmedDept = department.trim();
+  const [rows] = await db.execute(
+    `SELECT * FROM projects 
+     WHERE LOWER(TRIM(department)) = LOWER(?) 
+       AND status = 'available' 
+       AND is_deleted = 'no'`,
+    [trimmedDept]
+  );
+  return rows;
+}
+
 exports.showProjectsByDepartment = async (req, res) => {
-  const dept = req.params.department;
-
   try {
-    // Use LOWER for case insensitive match & trim
-    const [projects] = await db.execute(
-      `SELECT id, title, author, year, image 
-       FROM projects 
-       WHERE LOWER(TRIM(department)) = LOWER(TRIM(?)) AND is_deleted = 'no' 
-       ORDER BY date_added DESC`,
-      [dept.trim()]
-    );
-
-    if (projects.length === 0) {
-      return res.render('user/project_list', {
-        projects: [],
-        department: dept,
-        message: 'No projects found for this department.'
-      });
+    const department = req.params.department;
+    if (!department) {
+      return res.status(400).send('Department parameter is required');
     }
 
+    const projects = await getProjectsByDepartment(department);
+
+    const borrowerId = req.user?.reg_no || '';
+    const borrowerName = req.user?.name || '';
+
     res.render('user/project_list', {
+      department,
       projects,
-      department: dept,
-      message: null
+      borrowerId,
+      borrowerName,
+      message: projects.length === 0 ? 'No projects found for this department.' : null,
     });
   } catch (err) {
-    console.error('❌ Error fetching projects:', err);
-    res.status(500).render('user/project_list', {
-      projects: [],
-      department: dept,
-      message: 'Failed to fetch projects.'
-    });
+    console.error('Error in showProjectsByDepartment:', err);
+    res.status(500).send('Server error');
   }
 };
+
+
 
 exports.viewProjectsByDepartment = (req, res) => {
   const dept = req.params.department;
@@ -736,6 +737,8 @@ exports.getProjectsByDepartment = async (req, res) => {
     res.status(500).json({ message: 'Error loading projects' });
   }
 };
+
+
 exports.submitBorrow = async (req, res) => {
   const {
     borrower_id,

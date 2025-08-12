@@ -501,182 +501,7 @@ exports.renameAttachment = (req, res) => {
   });
 };
 
-exports.addProject = async (req, res) => {
-  try {
-    const {
-      title, author, department, date_added,
-      project_code, shelf_no, draw_no, year
-    } = req.body;
 
-   
-    if (!title || !author || !department || !date_added || !project_code || !shelf_no || !draw_no || !year) {
-      return res.status(400).json({ message: 'Please fill in all required fields.' });
-    }
-
-    const project_image = req.file ? req.file.filename : 'default.jpg';
-
-    const sql = `
-      INSERT INTO projects 
-        (title, author, department, date_added, project_code, shelf_no, draw_no, year, image) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    await db.execute(sql, [
-      title, author, department, date_added,
-      project_code, shelf_no, draw_no, year, project_image
-    ]);
-
-   
-    //REDIRECT TO DIFFERE NT ROUTE
-    res.redirect('/librarian/viewandaddproject');
-
-  } catch (err) {
-    console.error("Error in addProject:", err);
-    res.status(500).json({ message: 'Error adding project' });
-  }
-};
-
-exports.getAllProjects = async (req, res) => {
-  try {
-    const [projects] = await db.execute('SELECT * FROM projects ORDER BY created_at DESC');
-    res.json(projects);
-  } catch (err) {
-    console.error('❌ Error fetching projects:', err);
-    res.status(500).json({ error: 'Failed to fetch projects.' });
-  }
-};
-exports.getProjectByCodeOrTitle = async (req, res) => {
-  try {
-    const keyword = req.params.code_or_title;
-
-    const [rows] = await db.execute(
-      `SELECT * FROM projects WHERE project_code = ? OR title = ? LIMIT 1`,
-      [keyword, keyword]
-    );
-
-    if (rows.length === 0) {
-      return res.json({ message: 'Project not found.' });
-    }
-
-    res.json(rows[0]);
-  } catch (err) {
-    console.error("Error in getProjectByCodeOrTitle:", err);
-    res.status(500).json({ message: 'Error fetching project' });
-  }
-};
-exports.deleteProject = async (req, res) => {
-  try {
-    const keyword = req.params.code_or_title;
-
-    const [result] = await db.execute(
-      `DELETE FROM projects WHERE project_code = ? OR title = ?`,
-      [keyword, keyword]
-    );
-
-    if (result.affectedRows === 0) {
-      return res.json({ message: 'Project not found or already deleted.' });
-    }
-
-    res.json({ message: 'Project deleted successfully.' });
-  } catch (err) {
-    console.error("Error in deleteProject:", err);
-    res.status(500).json({ message: 'Error deleting project' });
-  }
-};
-exports.getAvailableProjects = async (req, res) => {
-  try {
-    const sql = `
-      SELECT id, title, author, year, department, image
-      FROM projects
-      WHERE is_deleted = 0 AND is_borrowed = 0
-      ORDER BY date_added DESC
-    `;
-
-    const [projects] = await db.execute(sql);
-
-    const formatted = projects.map(project => ({
-      id: project.id,
-      title: project.title,
-      author: project.author,
-      year: project.year,
-      department: project.department,
-      image: project.image || 'default.jpg'
-    }));
-
-    res.json(formatted);
-  } catch (err) {
-    console.error('Error fetching available projects:', err);
-    res.status(500).json({ message: 'Error fetching available projects' });
-  }
-};
-exports.getDeletedProjects = async (req, res) => {
-  try {
-    const [projects] = await db.query(`
-      SELECT * FROM projects
-      WHERE is_deleted = 'yes'
-      ORDER BY deleted_at DESC
-    `);
-    res.json(projects);
-  } catch (err) {
-    console.error('❌ Failed to fetch deleted projects:', err);
-    res.status(500).json({ error: 'Failed to load deleted projects' });
-  }
-};
-exports.getBorrowedProjects = async (req, res) => {
-  try {
-    const [rows] = await db.query(`
-      SELECT p.*, u.name AS borrower_name, br.borrowed_at, br.return_at
-      FROM borrowed_resources br
-      JOIN projects p ON p.id = br.resource_id
-      JOIN users u ON u.id = br.user_id
-      WHERE br.resource_type = 'project'
-      ORDER BY br.borrowed_at DESC
-    `);
-    res.json(rows);
-  } catch (err) {
-    console.error('❌ Failed to fetch borrowed projects:', err);
-    res.status(500).json({ error: 'Failed to fetch borrowed projects' });
-  }
-};
-exports.getDepartmentCatalogs = async (req, res) => {
-  try {
-    const [rows] = await db.query(`SELECT * FROM your_catalog_table WHERE is_deleted = 'no'`);
-    res.json({ success: true, data: rows });
-  } catch (error) {
-    console.error('Error fetching department catalogs:', error);
-    res.status(500).json({ success: false, message: 'Failed to load department catalogs.' });
-  }
-};
-exports.getNewProjects = async (req, res) => {
-  try {
-    const [projects] = await db.query(`
-      SELECT * FROM projects
-      WHERE is_deleted = 'no'
-      ORDER BY date_added DESC
-      LIMIT 10
-    `);
-    res.json(projects);
-  } catch (err) {
-    console.error('❌ Failed to fetch new projects:', err);
-    res.status(500).json({ error: 'Failed to load new projects' });
-  }
-};
-exports.getUpdatedProjects = async (req, res) => {
-  try {
-    const [projects] = await db.query(`
-      SELECT * FROM projects
-      WHERE is_deleted = 'no'
-      ORDER BY last_updated DESC
-      LIMIT 10
-    `);
-    res.json(projects);
-  } catch (err) {
-    console.error('❌ Failed to fetch updated projects:', err);
-    res.status(500).json({ error: 'Failed to load updated projects' });
-  }
-};
-
-// GET: All borrow requests
 exports.getAllRequests = async (req, res) => {
   const regNo = req.query.reg_no;
 
@@ -1500,64 +1325,6 @@ exports.getPaperById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-exports.addPaper = async (req, res) => {
-  const {
-    title, author, department, date_added,
-    paper_code, shelf_no, draw_no, year, toJson
-  } = req.body;
-
-  const paper_image = req.file ? req.file.filename : null;
-  const isJson = toJson === 'true';
-
-  const conn = await db.getConnection();
-
-  try {
-    await conn.beginTransaction();
-
-    // Insert department if not exists
-    const [deptRows] = await conn.execute("SELECT * FROM departments WHERE name = ?", [department]);
-
-    if (deptRows.length === 0) {
-      const imagePath = `/uploads/papers/${paper_image}`;
-      const page = department.toLowerCase();
-      await conn.execute(
-        "INSERT INTO departments (name, image, page) VALUES (?, ?, ?)",
-        [department, imagePath, page]
-      );
-    }
-
-    // Insert paper
-    await conn.execute(
-      `INSERT INTO papers 
-        (title, author, department, date_added, paper_code, shelf_no, draw_no, year,  status, is_deleted, is_borrowed) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no', 'no')`,
-      [title, author, department, date_added, paper_code, shelf_no, draw_no, year, paper_image]
-    );
-
-    await conn.commit();
-
-    if (isJson) {
-      return res.json({ status: 'success', message: 'Paper and department added successfully!' });
-    } else {
-      return res.redirect('/librarian/viewandaddpaper');
-    }
-  } catch (err) {
-    await conn.rollback();
-    console.error('Transaction Error:', err.sqlMessage || err.message);
-
-    let errorMessage = 'Something went wrong while saving the paper. Please try again later.';
-    if (err.code === 'ER_BAD_NULL_ERROR') errorMessage = 'Please fill all required fields.';
-    else if (err.code === 'ER_DUP_ENTRY') errorMessage = 'A paper with the same code already exists.';
-
-    if (isJson) {
-      return res.status(400).json({ status: 'error', error: errorMessage });
-    } else {
-      return res.redirect('/librarian/viewandaddpaper');
-    }
-  } finally {
-    conn.release();
-  }
-};
 exports.updatePaper = async (req, res) => {
   const paperId = req.params.id;
   const {
@@ -1619,3 +1386,370 @@ exports.updatePaper = async (req, res) => {
     conn.release();
   }
 };
+exports.addPaper = async (req, res) => {
+  const {
+    title,
+    author,
+    department,
+    date_added,
+    paper_code,
+    shelf_no,
+    draw_no,
+    year,
+    to_json
+  } = req.body;
+
+  const paper_image = req.file ? req.file.filename : null;
+  const isJson = to_json === 'true';
+
+  const conn = await db.getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    // Insert department if not exists
+    const [deptRows] = await conn.execute("SELECT * FROM departments WHERE name = ?", [department]);
+    if (deptRows.length === 0) {
+      const imagePath = `/uploads/papers/${paper_image || 'default-paper.png'}`;
+      const page = department.toLowerCase();
+      await conn.execute(
+        "INSERT INTO departments (name, image, page) VALUES (?, ?, ?)",
+        [department, imagePath, page]
+      );
+    }
+
+    // Insert paper
+    await conn.execute(
+      `INSERT INTO papers 
+        (title, author, department, date_added, paper_code, shelf_no, draw_no, year, image, status, is_deleted) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no')`,
+      [title, author, department, date_added, paper_code, shelf_no, draw_no, year, paper_image]
+    );
+
+    await conn.commit();
+
+    if (isJson) {
+      return res.json({ status: 'success', message: 'Paper and department added successfully!' });
+    } else {
+      return res.redirect('/librarian/managepapers');
+    }
+  } catch (err) {
+    await conn.rollback();
+    console.error('Transaction Error:', err.sqlMessage || err.message);
+
+    let errorMessage = 'Something went wrong while saving the paper. Please try again later.';
+    if (err.code === 'ER_BAD_NULL_ERROR') errorMessage = 'Please fill all required fields.';
+    else if (err.code === 'ER_DUP_ENTRY') errorMessage = 'A paper with the same code already exists.';
+
+    if (isJson) {
+      return res.status(400).json({ status: 'error', error: errorMessage });
+    } else {
+      return res.redirect('/librarian/managepapers');
+    }
+  } finally {
+    conn.release();
+  }
+};
+
+
+
+
+
+
+
+exports.getAvailableProjects = async (req, res) => {
+  try {
+    const [results] = await db.execute(
+      "SELECT id, title, author, department, shelf_no, draw_no, image FROM projects WHERE status = 'available' AND is_deleted = 'no'"
+    );
+
+    const formatted = results.map(project => ({
+      id: project.id,
+      title: project.title,
+      author: project.author,
+      department: project.department,
+      shelf_no: project.shelf_no,
+      draw_no: project.draw_no,
+      image: project.image || 'default-project.png'
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error('Error fetching projects:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+};
+exports.getProjects = async (req, res) => {
+  try {
+    const { department, is_borrowed } = req.query;
+    let query = 'SELECT * FROM projects WHERE is_deleted = ?';
+    let params = ['no'];
+
+    if (department) {
+      query += ' AND department = ?';
+      params.push(department);
+    }
+    if (is_borrowed) {
+      query += ' AND is_borrowed = ?';
+      params.push(is_borrowed);
+    }
+
+    const [results] = await db.query(query, params);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+exports.searchProjects = async (req, res) => {
+  try {
+    const q = req.query.q || '';
+    const [rows] = await db.execute(
+      "SELECT id, project_code, title, author FROM projects WHERE project_code LIKE ? OR title LIKE ?",
+      [`%${q}%`, `%${q}%`]
+    );
+    res.json({ success: true, projects: rows });
+  } catch (err) {
+    console.error("Database query failed:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+exports.getDeletedProjects = async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      "SELECT id, title, author, department, shelf_no, draw_no, project_code, deleted_at, image FROM projects WHERE is_deleted = 'yes'"
+    );
+    const formatted = rows.map(project => ({
+      id: project.id,
+      title: project.title,
+      author: project.author,
+      department: project.department,
+      shelf_no: project.shelf_no,
+      draw_no: project.draw_no,
+      project_code: project.project_code,
+      deleted_at: project.deleted_at ? new Date(project.deleted_at).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }) : 'Not specified',
+      image: project.image || 'default-project.png'
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error('Error fetching deleted projects:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+};
+exports.deleteProject = async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const [result] = await db.execute(
+      "UPDATE projects SET is_deleted = 'yes', deleted_at = NOW() WHERE id = ?",
+      [projectId]
+    );
+    if (result.affectedRows > 0) {
+      res.json({ success: true, message: "Project marked as deleted." });
+    } else {
+      res.json({ success: false, message: "Project not found." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+exports.removeProject = async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const [rows] = await db.execute("SELECT image FROM projects WHERE id = ?", [projectId]);
+    if (rows.length === 0) return res.status(404).json({ success: false, message: "Project not found." });
+
+    const imageFile = rows[0].image;
+    if (imageFile) {
+      const imgPath = path.join(__dirname, '../uploads/projects/', imageFile);
+      if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+    }
+
+    const [result] = await db.execute("DELETE FROM projects WHERE id = ?", [projectId]);
+    if (result.affectedRows > 0) {
+      res.json({ success: true, message: "Project permanently deleted." });
+    } else {
+      res.json({ success: false, message: "Project not found." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+exports.getBorrowedProjects = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT id AS project_id, title, author, image, borrowed_by, borrowed_at, return_at, status
+      FROM projects
+      WHERE is_borrowed = 'yes' AND is_deleted = 'no'
+      ORDER BY borrowed_at DESC
+    `);
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    console.error('Error fetching borrowed projects:', err.message);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+exports.getDepartmentsProjects = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT 
+        department,
+        title,
+        author,
+        year,
+        project_code AS code,
+        status,
+        'project' AS type,
+        image
+      FROM projects
+      WHERE is_deleted = 'no'
+      ORDER BY department, title
+    `);
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    console.error("Error fetching department catalogs:", err.message);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+exports.getProjectById = async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const [rows] = await db.execute("SELECT * FROM projects WHERE id = ? AND is_deleted = 'no'", [projectId]);
+    if (rows.length === 0) return res.status(404).json({ message: 'Project not found' });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+exports.updateProject = async (req, res) => {
+  const projectId = req.params.id;
+  const {
+    title, author, department, date_added,
+    project_code, shelf_no, draw_no, year, toJson
+  } = req.body;
+
+  const project_image = req.file ? req.file.filename : null;
+  const isJson = toJson === 'true';
+
+  const conn = await db.getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    // Ensure department exists
+    const [deptRows] = await conn.execute("SELECT * FROM departments WHERE name = ?", [department]);
+    if (deptRows.length === 0) {
+      const imagePath = `/uploads/projects/${project_image || 'default-project.png'}`;
+      const page = department.toLowerCase();
+      await conn.execute("INSERT INTO departments (name, image, page) VALUES (?, ?, ?)", [department, imagePath, page]);
+    }
+
+    // Update project
+    let updateSQL = `UPDATE projects SET title=?, author=?, department=?, date_added=?, project_code=?, shelf_no=?, draw_no=?, year=?`;
+    const params = [title, author, department, date_added, project_code, shelf_no, draw_no, year];
+
+    if (project_image) {
+      updateSQL += `, image=?`;
+      params.push(project_image);
+    }
+
+    updateSQL += ` WHERE id = ?`;
+    params.push(projectId);
+
+    await conn.execute(updateSQL, params);
+
+    await conn.commit();
+
+    if (isJson) {
+      return res.json({ status: 'success', message: 'Project updated successfully!' });
+    } else {
+      return res.redirect('/librarian/manageprojects');
+    }
+  } catch (err) {
+    await conn.rollback();
+    console.error('Transaction Error:', err.sqlMessage || err.message);
+
+    let errorMessage = 'Something went wrong while updating the project. Please try again later.';
+    if (err.code === 'ER_BAD_NULL_ERROR') errorMessage = 'Please fill all required fields.';
+    else if (err.code === 'ER_DUP_ENTRY') errorMessage = 'A project with the same code already exists.';
+
+    if (isJson) {
+      return res.status(400).json({ status: 'error', error: errorMessage });
+    } else {
+      return res.redirect('/librarian/manageprojects');
+    }
+  } finally {
+    conn.release();
+  }
+};
+exports.addProject = async (req, res) => {
+  const {
+    title, author, department, date_added,
+    project_code, shelf_no, draw_no, year, to_json
+  } = req.body;
+
+  const project_image = req.file ? req.file.filename : null;
+  const isJson = to_json === 'true';
+
+  const conn = await db.getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    // Insert department if not exists
+    const [deptRows] = await conn.execute("SELECT * FROM departments WHERE name = ?", [department]);
+    if (deptRows.length === 0) {
+      const imagePath = `/uploads/projects/${project_image || 'default-project.png'}`;
+      const page = department.toLowerCase();
+      await conn.execute(
+        "INSERT INTO departments (name, image, page) VALUES (?, ?, ?)",
+        [department, imagePath, page]
+      );
+    }
+
+    // Insert project
+    await conn.execute(
+      `INSERT INTO projects 
+        (title, author, department, date_added, project_code, shelf_no, draw_no, year, image, status, is_deleted) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available', 'no')`,
+      [title, author, department, date_added, project_code, shelf_no, draw_no, year, project_image]
+    );
+
+    await conn.commit();
+
+    if (isJson) {
+      return res.json({ status: 'success', message: 'Project and department added successfully!' });
+    } else {
+      return res.redirect('/librarian/manageprojects');
+    }
+  } catch (err) {
+    await conn.rollback();
+    console.error('Transaction Error:', err.sqlMessage || err.message);
+
+    let errorMessage = 'Something went wrong while saving the project. Please try again later.';
+    if (err.code === 'ER_BAD_NULL_ERROR') errorMessage = 'Please fill all required fields.';
+    else if (err.code === 'ER_DUP_ENTRY') errorMessage = 'A project with the same code already exists.';
+
+    if (isJson) {
+      return res.status(400).json({ status: 'error', error: errorMessage });
+    } else {
+      return res.redirect('/librarian/manageprojects');
+    }
+  } finally {
+    conn.release();
+  }
+};
+
+
+
+
+
+
+
+
