@@ -1134,24 +1134,55 @@ exports.getRequestsByResourceCode = async (req, res) => {
   }
 };
 exports.approveRequest = async (req, res) => {
-  const { code } = req.params;
+  let { code } = req.params;
 
   try {
+    // Clean and validate code
+    code = code.trim().toUpperCase();
+
+    if (!code || code.length < 2) {
+      return res.status(400).json({ success: false, message: "Invalid code format." });
+    }
+
+    const prefix = code.substring(0, 2);
+    let type = '';
+
+    if (prefix === 'BK') {
+      type = 'book';
+    } else if (prefix === 'PP') {
+      type = 'paper';
+    } else if (prefix === 'PR') {
+      type = 'project';
+    } else {
+      return res.status(400).json({ success: false, message: "Unrecognized code prefix." });
+    }
+
     const [result] = await db.execute(
-      `UPDATE requests SET status = 'approved' WHERE resource_code = ?`,
+      `UPDATE borrow_requests 
+       SET status = 'approved' 
+       WHERE resource_code = ? AND status = 'Pending'`,
       [code]
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Request not found.' });
+      return res.status(404).json({
+        success: false,
+        message: 'Request not found or already approved.'
+      });
     }
 
-    res.json({ success: true, message: 'Request approved successfully.' });
+    res.json({
+      success: true,
+      message: `Request for ${type} approved successfully.`
+    });
+
   } catch (error) {
-    console.error('Approve error:', error);
-    res.status(500).json({ success: false, message: 'Server error.' });
+    console.error("Approve error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
 
 
 exports.getAvailablePapers = async (req, res) => {

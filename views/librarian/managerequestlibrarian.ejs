@@ -377,6 +377,8 @@
         const { resource, requests } = result;
 
 if (requests.length > 0) {
+
+  console.log(resource);
   // Display scanned resource info in modal
  const modalBody = document.getElementById("bookDetailsBody");
 modalBody.innerHTML = `
@@ -387,14 +389,14 @@ modalBody.innerHTML = `
     <div class="col-md-8">
       <p><strong>Title:</strong> ${resource.title}</p>
       <p><strong>Author:</strong> ${resource.author}</p>
-      <p><strong>Code:</strong> ${resource.code}</p>
+      <p><strong>Code:</strong> ${resource.book_code}</p>
       <p><strong>Type:</strong> ${resource.type}</p>
       <p><strong>Status:</strong> ${resource.status}</p>
     </div>
   </div>
 
   <div class="text-end">
-    <button class="btn btn-success" onclick="approveRequest('${resource.code}')">
+    <button class="btn btn-success" onclick="approveRequest('${resource.book_code}')">
       <i class="fa fa-check-circle"></i> Approve
     </button>
   </div>
@@ -426,11 +428,11 @@ modalBody.innerHTML = `
   
 </script>
 <script>
-  async function approveRequest(code) {
-    if (!confirm(`Are you sure you want to approve the request ${code}?`)) return;
+  async function approveRequest(requestId) {
+    if (!confirm(`Are you sure you want to approve request ID ${requestId}?`)) return;
 
     try {
-      const res = await fetch(`/librarian/requests/approve/${code}`, {
+      const res = await fetch(`/librarian/requests/approve/${requestId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -440,18 +442,19 @@ modalBody.innerHTML = `
       const data = await res.json();
 
       if (data.success) {
-        alert('Request approved successfully!');
-        // Optionally, refresh the request list or close modal
-        location.reload(); // or update the modal content only
+        alert('✅ Request approved successfully!');
+        // Refresh only the part of the page or reload entirely
+        location.reload();
       } else {
-        alert('Failed to approve request: ' + data.message);
+        alert('❌ Failed to approve request: ' + data.message);
       }
     } catch (err) {
       console.error('Error approving request:', err);
-      alert('An error occurred while approving the request.');
+      alert('⚠️ An error occurred while approving the request.');
     }
   }
 </script>
+
 
 
 </body>
