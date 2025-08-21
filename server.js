@@ -4,6 +4,7 @@ const PORT = 3000;
 const path = require('path');
 const session = require('express-session');
 const flash = require('express-flash');
+require('dotenv').config();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -45,3 +46,27 @@ app.use('/librarian', librarianRoutes);
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
+
+// const twilio = require("twilio");
+
+// const client = twilio(
+//   process.env.TWILIO_SID,
+//   process.env.TWILIO_AUTH_TOKEN
+// );
+
+
+// async function sendSMS(to, body) {
+//   try {
+//     const message = await client.messages.create({
+//       body: body,
+//       from: process.env.TWILIO_PHONE,
+//       to: to   // must be E.164 format e.g. +255674843431
+//     });
+//     console.log("Message sent:", message.sid);
+//   } catch (err) {
+//     console.error("SMS Error:", err);
+//   }
+// }
+
+// sendSMS("+255756460024", "Hello from Twilio!");
+

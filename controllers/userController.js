@@ -1,6 +1,7 @@
 const db = require('../db');
 const path = require('path');
 const faq = require('../utils/faqAnswers');
+const { sendSms } = require('../utils/nextsms');
 
 exports.dashboard = (req, res) => {
   res.json({ message: 'User Dashboard' });
@@ -388,6 +389,8 @@ exports.getPaymentHistoryFromSession = (req, res) => {
 };
 
 
+
+
 exports.registerUser = async (req, res) => {
   try {
     const {
@@ -399,70 +402,89 @@ exports.registerUser = async (req, res) => {
       year,
       role,
       gender,
-      phone_no
+      phone_no,
     } = req.body;
 
     const photoFilename = req.file ? req.file.filename : null;
-
     const missingFields = [];
     const roleUpper = role?.toUpperCase();
 
     // Basic required fields
-    if (!name) missingFields.push('name');
-    if (!reg_no) missingFields.push('reg_no');
-    if (!college) missingFields.push('college');
-    if (!role) missingFields.push('role');
-    if (!gender) missingFields.push('gender');
-    if (!phone_no) missingFields.push('phone_no');
-    if (!photoFilename) missingFields.push('photo');
+    if (!name) missingFields.push("name");
+    if (!reg_no) missingFields.push("reg_no");
+    if (!college) missingFields.push("college");
+    if (!role) missingFields.push("role");
+    if (!gender) missingFields.push("gender");
+    if (!phone_no) missingFields.push("phone_no");
+    if (!photoFilename) missingFields.push("photo");
 
-    const requiresAcademicFields = ['STUDENT', 'GUEST'].includes(roleUpper);
+    const requiresAcademicFields = ["STUDENT", "GUEST"].includes(roleUpper);
     if (requiresAcademicFields) {
-      if (!department) missingFields.push('department');
-      if (!program) missingFields.push('program');
-      if (!year) missingFields.push('year');
+      if (!department) missingFields.push("department");
+      if (!program) missingFields.push("program");
+      if (!year) missingFields.push("year");
     }
 
-    // Return if any required fields are missing
+    // Return if missing
     if (missingFields.length > 0) {
       return res.status(400).json({
-        error: 'Missing required registration fields',
-        missingFields
+        error: "Missing required registration fields",
+        missingFields,
       });
     }
 
-    // 🔠 Name validation: at least 2 words
+    // Name validation
     const nameWords = name.trim().split(/\s+/);
     if (nameWords.length < 2) {
       return res.status(400).json({
-        error: 'Please enter at least two names (e.g., First and Last name).'
+        error: "Please enter at least two names (e.g., First and Last name).",
       });
     }
 
-    // 🔢 reg_no validation:
-    if (roleUpper === 'STUDENT') {
+    // Reg_no validation
+    if (roleUpper === "STUDENT") {
       if (!/^\d{11}$/.test(reg_no)) {
         return res.status(400).json({
-          error: 'Wrong registration number please try Again.'
+          error: "Wrong registration number please try Again.",
         });
       }
     } else {
       if (reg_no.length < 5) {
         return res.status(400).json({
-          error: 'Wrong registration number please try Again.'
+          error: "Wrong registration number please try Again.",
         });
       }
     }
 
-    // 🔍 Check for duplicates
-    const [existing] = await db.execute('SELECT reg_no FROM users WHERE reg_no = ?', [reg_no]);
-    if (existing.length > 0) {
-      return res.status(409).json({
-        error: 'Registration number already exists.'
+    // Phone validation (must be 0 + 9 digits = 10 digits total)
+    if (!/^0\d{9}$/.test(phone_no)) {
+      return res.status(400).json({
+        error: "Phone number must be 10 digits (e.g., 0674843431).",
       });
     }
 
-    // ✅ Insert
+    // Check duplicates
+    const [existing] = await db.execute(
+      "SELECT reg_no FROM users WHERE reg_no = ?",
+      [reg_no]
+    );
+    if (existing.length > 0) {
+      return res.status(409).json({
+        error: "Registration number already exists.",
+      });
+    }
+
+    // Send SMS
+    const smsResult = await sendSms(
+      phone_no,
+      `Welcome ${name}, your registration is successful. Your reg_no is ${reg_no}.`
+    );
+
+    if (!smsResult.success) {
+      console.warn("⚠️ SMS failed:", smsResult.error);
+    }
+
+    // Save user
     const sql = `
       INSERT INTO users 
       (name, reg_no, department, program, college, year, role, gender, phone_no, photo, is_approved) 
@@ -479,21 +501,24 @@ exports.registerUser = async (req, res) => {
       gender,
       phone_no,
       photoFilename,
-      'no'
+      "no",
     ];
 
     await db.execute(sql, values);
 
     return res.status(201).json({
       success: true,
-      message: 'User registered successfully.'
+      message: "User registered successfully.",
+      sms: smsResult, // include SMS status in response
     });
-
   } catch (err) {
-    console.error('❌ Registration error:', err);
-    return res.status(500).json({ error: 'Something went wrong while registering the user.' });
+    console.error("❌ Registration error:", err);
+    return res
+      .status(500)
+      .json({ error: "Something went wrong while registering the user." });
   }
 };
+
 
 
 
