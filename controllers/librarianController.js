@@ -1,7 +1,7 @@
 const db = require('../db');
 const path = require('path');
 const { body, param, query, validationResult } = require('express-validator'); // Include validationResult
-
+const { sendSms } = require('../utils/nextsms');
 
 exports.interface = (req, res) => {
  res.render('librarian/librarian _interface');
@@ -1157,6 +1157,7 @@ exports.approveRequest = async (req, res) => {
       return res.status(400).json({ success: false, message: "Unrecognized code prefix." });
     }
 
+    // Approve request
     const [result] = await db.execute(
       `UPDATE borrow_requests 
        SET status = 'approved' 
@@ -1171,9 +1172,47 @@ exports.approveRequest = async (req, res) => {
       });
     }
 
+    // 🔹 Get return date + registration_no from borrow_requests
+    const [borrowRows] = await db.execute(
+      `SELECT borrower_id, return_date 
+       FROM borrow_requests 
+       WHERE resource_code = ? 
+       ORDER BY id DESC LIMIT 1`,
+      [code]
+    );
+
+    if (borrowRows.length === 0) {
+      return res.status(404).json({ success: false, message: "Borrow request details not found." });
+    }
+
+    const { borrower_id, return_date } = borrowRows[0];
+
+    // 🔹 Get user phone number & name
+    const [userRows] = await db.execute(
+      `SELECT name, phone_no 
+       FROM users 
+       WHERE reg_no = ? 
+       LIMIT 1`,
+      [borrower_id]
+    );
+
+    if (userRows.length === 0) {
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    const { name, phone_no } = userRows[0];
+
+    // 🔹 Send SMS with due date
+    const smsMessage = `Hello ${name}, your request for ${type} (${code}) has been approved. Please return it by ${return_date}.`;
+    const smsResult = await sendSms(phone_no, smsMessage);
+
+    if (!smsResult.success) {
+      console.warn("⚠️ SMS failed:", smsResult.error);
+    }
+
     res.json({
       success: true,
-      message: `Request for ${type} approved successfully.`
+      message: `Request for ${type} approved successfully, SMS sent to borrower.`
     });
 
   } catch (error) {
@@ -1181,6 +1220,7 @@ exports.approveRequest = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 
 
