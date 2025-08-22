@@ -405,7 +405,7 @@ exports.registerUser = async (req, res) => {
       phone_no,
     } = req.body;
 
-    const photoFilename = req.file ? req.file.filename : null;
+    const photoFile = req.file;
     const missingFields = [];
     const roleUpper = role?.toUpperCase();
 
@@ -416,7 +416,7 @@ exports.registerUser = async (req, res) => {
     if (!role) missingFields.push("role");
     if (!gender) missingFields.push("gender");
     if (!phone_no) missingFields.push("phone_no");
-    if (!photoFilename) missingFields.push("photo");
+    if (!photoFile) missingFields.push("photo");
 
     // Academic fields required only for STUDENT and GUEST
     if (["STUDENT", "GUEST"].includes(roleUpper)) {
@@ -433,41 +433,37 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-   // ✅ Name validation
-const namePattern = /^[A-Za-z\s]+$/;
+    // ✅ File type validation (images only)
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!allowedMimeTypes.includes(photoFile.mimetype)) {
+      return res.status(400).json({
+        error: "Invalid file type. Only JPEG and PNG images are allowed.",
+      });
+    }
 
-if (!name || name.trim() === "") {
-  return res.status(400).json({
-    error: "Please enter full name",
-  });
-}
-
-if (!namePattern.test(name)) {
-  return res.status(400).json({
-    error: "Name can contain only letters and spaces. Please enter full name.",
-  });
-}
-
-const nameWords = name.trim().split(/\s+/);
-if (nameWords.length < 2) {
-  return res.status(400).json({
-    error: "Please enter both first and last name.",
-  });
-}
-
+    // ✅ Name validation
+    const namePattern = /^[A-Za-z\s]+$/;
+    if (!name || name.trim() === "") {
+      return res.status(400).json({ error: "Please enter full name" });
+    }
+    if (!namePattern.test(name)) {
+      return res.status(400).json({
+        error: "Name can contain only letters and spaces. Please enter full name.",
+      });
+    }
+    const nameWords = name.trim().split(/\s+/);
+    if (nameWords.length < 2) {
+      return res.status(400).json({ error: "Please enter both first and last name." });
+    }
 
     // Reg_no validation
     if (roleUpper === "STUDENT") {
       if (!/^\d{11}$/.test(reg_no)) {
-        return res.status(400).json({
-          error: "Wrong registration number please try again",
-        });
+        return res.status(400).json({ error: "Wrong registration number please try again" });
       }
     } else {
       if (reg_no.length < 5) {
-        return res.status(400).json({
-          error: "Wrong registration number please try again",
-        });
+        return res.status(400).json({ error: "Wrong registration number please try again" });
       }
     }
 
@@ -479,14 +475,9 @@ if (nameWords.length < 2) {
     }
 
     // Check duplicates
-    const [existing] = await db.execute(
-      "SELECT reg_no FROM users WHERE reg_no = ?",
-      [reg_no]
-    );
+    const [existing] = await db.execute("SELECT reg_no FROM users WHERE reg_no = ?", [reg_no]);
     if (existing.length > 0) {
-      return res.status(409).json({
-        error: "Registration number already exists",
-      });
+      return res.status(409).json({ error: "Registration number already exists" });
     }
 
     // Send SMS
@@ -516,7 +507,7 @@ if (nameWords.length < 2) {
       role,
       gender,
       phone_no,
-      photoFilename,
+      photoFile.filename,
       "no",
     ];
 
@@ -534,6 +525,7 @@ if (nameWords.length < 2) {
     });
   }
 };
+
 
 
 
