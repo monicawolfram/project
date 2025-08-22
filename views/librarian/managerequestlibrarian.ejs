@@ -264,6 +264,10 @@
         : data.filter(r => r.status.toLowerCase() === currentStatus);
 
       displayRequests(filtered);
+
+      // After displaying, automatically send reminders for approved requests
+      autoSendReminders(filtered);
+
     } catch (err) {
       console.error('Failed to fetch requests:', err);
       alert('Failed to load requests. Please try again later.');
@@ -291,13 +295,20 @@
       const reasonCell = currentStatus === 'pending' ? `<td>${req.reason || 'N/A'}</td>` : '';
 
       let actionButtons = `<span class="text-muted">No Action</span>`;
+
       if (req.status.toLowerCase() === "pending") {
         actionButtons = `
           <button class="btn btn-sm btn-success me-2" onclick="confirmUpdateStatus(${req.id}, 'Approved')">Approve</button>
-       
         `;
       } else if (req.status.toLowerCase() === "approved") {
-        actionButtons = `<span class="text-muted">Approved</span>`;
+        const today = new Date();
+        const returnDate = new Date(req.return_date);
+        const daysLeft = Math.ceil((returnDate - today) / (1000 * 60 * 60 * 24));
+
+        actionButtons = `
+          <span class="text-success fw-bold">Approved</span><br/>
+          <small>📅 ${daysLeft} day(s) left</small>
+        `;
       } else if (req.status.toLowerCase() === "rejected") {
         actionButtons = `<span class="text-muted">Rejected</span>`;
       }
@@ -316,6 +327,33 @@
       `;
       tbody.appendChild(row);
     });
+  }
+
+  // Automatically send reminders for approved requests 2 days before return
+  async function autoSendReminders(requests) {
+    const today = new Date();
+    const reminderDays = 2; // send reminder 2 days before return
+
+    for (const req of requests) {
+      if (req.status.toLowerCase() !== "approved") continue;
+
+      const returnDate = new Date(req.return_date);
+      const daysLeft = Math.ceil((returnDate - today) / (1000 * 60 * 60 * 24));
+
+      if (daysLeft === reminderDays) {
+        try {
+          const res = await fetch(`/librarian/requests/send-reminder/${req.id}`, { method: 'POST' });
+          const data = await res.json();
+          if (data.success) {
+            console.log(`✅ Reminder sent automatically for request ID ${req.id}`);
+          } else {
+            console.warn(`❌ Failed to send reminder for request ID ${req.id}: ${data.message}`);
+          }
+        } catch (err) {
+          console.error(`⚠️ Error sending reminder for request ID ${req.id}:`, err);
+        }
+      }
+    }
   }
 
   // Confirmation before update
@@ -345,7 +383,6 @@
   }
 
   function showLoading(show) {
-    // Optional: Add a loader element
     if (show) {
       console.log("Loading...");
     } else {
@@ -353,6 +390,8 @@
     }
   }
 </script>
+
+
 
 <script>
   function startScan() {

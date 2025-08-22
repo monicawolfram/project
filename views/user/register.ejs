@@ -97,14 +97,14 @@
       <label for="college" class="form-label">College</label>
       <input type="text" class="form-control" name="college" required />
     </div>
-    <div class="mb-3 col-md-6">
+    <div  id="departmentWrapper" class="mb-3 col-md-6">
       <label for="department" class="form-label">Department</label>
       <input type="text" class="form-control" name="department" required />
     </div>
   </div>
 
   <div class="row">
-    <div class="mb-3 col-md-6">
+    <div id="programWrapper" class="mb-3 col-md-6">
       <label for="program" class="form-label">Program</label>
        <select class="form-select" name="program" required>
         <option value="">--Select--</option>
@@ -125,7 +125,7 @@
         <option>DIPLOMA IN COMPUTER SCIENCE ENGINEERING</option>
       </select>
     </div>
-    <div class="mb-3 col-md-6">
+    <div id="yearWrapper" class="mb-3 col-md-6">
       <label for="year" class="form-label">Year of Study</label>
       <select class="form-select" name="year" required>
         <option value="">--Select--</option>
@@ -159,122 +159,113 @@
   </div>
 
 <script>
-  document.getElementById('registerForm').addEventListener('submit', function (e) {
-    e.preventDefault();
+document.getElementById('registerForm').addEventListener('submit', function (e) {
+  e.preventDefault();
 
-    const form = e.target;
-    const formData = new FormData(form);
+  const form = e.target;
+  const formData = new FormData(form);
 
-    const name = formData.get('name')?.trim();
-    const role = formData.get('role')?.trim().toUpperCase();
-    const regNo = formData.get('reg_no')?.trim();
+  const name = formData.get('name')?.trim();
+  const role = formData.get('role')?.trim().toUpperCase();
+  const regNo = formData.get('reg_no')?.trim();
 
-    // Name validation: must be letters and at least 2 words
-    const namePattern = /^[A-Za-z\s]+$/;
+// ✅ Name validation (stop if invalid)
+const namePattern = /^[A-Za-z\s]+$/;
 
-    if (!name) {
-      alert("Name is required.");
+if (!name || name.trim() === "") {
+  alert("Please enter full name");
+  return;
+}
+
+if (!namePattern.test(name)) {
+  alert("Name can contain only letters and spaces. Please enter full name.");
+  return;
+}
+
+const nameWords = name.trim().split(/\s+/);
+if (nameWords.length < 2) {
+  alert("Please enter both first and last name.");
+  return;
+}
+
+  // Reg No validation
+  if (role === 'STUDENT' || role === 'GUEST') {
+    if (!/^\d{11}$/.test(regNo)) {
+      alert("Invalid registration number. Students/guests must have exactly 11 digits.");
       return;
     }
-
-    if (!namePattern.test(name)) {
-      alert("Invalid name. Only letters and spaces are allowed (no numbers or symbols).");
+  } else {
+    if (!regNo || regNo.length < 5) {
+      alert("Invalid registration number. Staff/Librarians/Admins must have at least 5 characters.");
       return;
-    }
-
-    const nameWords = name.split(/\s+/);
-    if (nameWords.length < 2) {
-      alert("Please enter at least two names (e.g., first and last name).");
-      return;
-    }
-
-    // Reg No Validation
-    if (role === 'STUDENT' || role === 'GUEST') {
-      if (!/^\d{11}$/.test(regNo)) {
-        alert("Invalid registration number. Students and guests must have exactly 11 digits.");
-        return;
-      }
-    } else {
-      if (!regNo || regNo.length < 5) {
-        alert("Invalid registration number. Staff must have at least 5 characters.");
-        return;
-      }
-    }
-
-    // Submit form
-    fetch('/user/register', {
-      method: 'POST',
-      body: formData
-    })
-    .then(async res => {
-      const contentType = res.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        const data = await res.json();
-        if (data.error) {
-          let message = "Error: " + data.error;
-          if (data.missingFields && Array.isArray(data.missingFields)) {
-            message += "\nMissing fields: " + data.missingFields.join(', ');
-          }
-          alert(message);
-        } else if (data.success) {
-          alert(data.message);
-          window.location.href = "/user/interface";
-        } else {
-          alert("Unexpected response: " + JSON.stringify(data));
-        }
-      } else {
-        const text = await res.text();
-        console.warn("Expected JSON, got:", text);
-        alert("Server returned non-JSON response.");
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      alert("An error occurred during registration.");
-    });
-  });
-</script>
-
-
-
-
-
-
-<script>
-  
-  const roleSelect = document.querySelector('select[name="role"]');
-  const departmentField = document.querySelector('input[name="department"]');
-  const programField = document.querySelector('select[name="program"]');
-  const yearField = document.querySelector('select[name="year"]');
-
-  function updateFieldRequirements() {
-    const selectedRole = roleSelect.value.toUpperCase();
-
-    const isStudent = selectedRole === "STUDENT" || selectedRole === "GUEST";
-
-    // Toggle required attribute
-    departmentField.required = isStudent;
-    programField.required = isStudent;
-    yearField.required = isStudent;
-
-    // Optional: visually disable the fields if not required
-    departmentField.disabled = !isStudent;
-    programField.disabled = !isStudent;
-    yearField.disabled = !isStudent;
-
-    // Optional: clear values if role isn't student
-    if (!isStudent) {
-      departmentField.value = "";
-      programField.value = "";
-      yearField.value = "";
     }
   }
 
-  roleSelect.addEventListener("change", updateFieldRequirements);
+  // Submit form
+  fetch('/user/register', {
+    method: 'POST',
+    body: formData
+  })
+  .then(async res => {
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      const data = await res.json();
+      if (data.error) {
+        let message = "Error: " + data.error;
+        if (data.missingFields && Array.isArray(data.missingFields)) {
+          message += "\nMissing fields: " + data.missingFields.join(', ');
+        }
+        alert(message);
+      } else if (data.success) {
+        alert(data.message);
+        window.location.href = "/user/interface";
+      } else {
+        alert("Unexpected response: " + JSON.stringify(data));
+      }
+    } else {
+      const text = await res.text();
+      console.warn("Expected JSON, got:", text);
+      alert("Server returned non-JSON response.");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("An error occurred during registration.");
+  });
+});
 
-  // Initialize on load in case the form is prefilled
-  window.addEventListener("DOMContentLoaded", updateFieldRequirements);
+// Role-based field toggling
+const roleSelect = document.querySelector('select[name="role"]');
+const departmentWrapper = document.getElementById('departmentWrapper');
+const programWrapper = document.getElementById('programWrapper');
+const yearWrapper = document.getElementById('yearWrapper');
+
+function updateFieldRequirements() {
+  const selectedRole = roleSelect.value.toUpperCase();
+  const isStudentOrGuest = (selectedRole === "STUDENT" || selectedRole === "GUEST");
+
+  departmentWrapper.style.display = isStudentOrGuest ? "block" : "none";
+  programWrapper.style.display = isStudentOrGuest ? "block" : "none";
+  yearWrapper.style.display = isStudentOrGuest ? "block" : "none";
+
+  departmentWrapper.querySelector('input').required = isStudentOrGuest;
+  programWrapper.querySelector('select').required = isStudentOrGuest;
+  yearWrapper.querySelector('select').required = isStudentOrGuest;
+
+  if (!isStudentOrGuest) {
+    departmentWrapper.querySelector('input').value = "";
+    programWrapper.querySelector('select').value = "";
+    yearWrapper.querySelector('select').value = "";
+  }
+}
+
+roleSelect.addEventListener("change", updateFieldRequirements);
+window.addEventListener("DOMContentLoaded", updateFieldRequirements);
 </script>
+
+
+
+
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

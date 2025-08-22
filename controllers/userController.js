@@ -418,8 +418,8 @@ exports.registerUser = async (req, res) => {
     if (!phone_no) missingFields.push("phone_no");
     if (!photoFilename) missingFields.push("photo");
 
-    const requiresAcademicFields = ["STUDENT", "GUEST"].includes(roleUpper);
-    if (requiresAcademicFields) {
+    // Academic fields required only for STUDENT and GUEST
+    if (["STUDENT", "GUEST"].includes(roleUpper)) {
       if (!department) missingFields.push("department");
       if (!program) missingFields.push("program");
       if (!year) missingFields.push("year");
@@ -433,25 +433,40 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    // Name validation
-    const nameWords = name.trim().split(/\s+/);
-    if (nameWords.length < 2) {
-      return res.status(400).json({
-        error: "Please enter at least two names (e.g., First and Last name).",
-      });
-    }
+   // ✅ Name validation
+const namePattern = /^[A-Za-z\s]+$/;
+
+if (!name || name.trim() === "") {
+  return res.status(400).json({
+    error: "Please enter full name",
+  });
+}
+
+if (!namePattern.test(name)) {
+  return res.status(400).json({
+    error: "Name can contain only letters and spaces. Please enter full name.",
+  });
+}
+
+const nameWords = name.trim().split(/\s+/);
+if (nameWords.length < 2) {
+  return res.status(400).json({
+    error: "Please enter both first and last name.",
+  });
+}
+
 
     // Reg_no validation
     if (roleUpper === "STUDENT") {
       if (!/^\d{11}$/.test(reg_no)) {
         return res.status(400).json({
-          error: "Wrong registration number please try Again.",
+          error: "Wrong registration number please try again",
         });
       }
     } else {
       if (reg_no.length < 5) {
         return res.status(400).json({
-          error: "Wrong registration number please try Again.",
+          error: "Wrong registration number please try again",
         });
       }
     }
@@ -459,7 +474,7 @@ exports.registerUser = async (req, res) => {
     // Phone validation (must be 0 + 9 digits = 10 digits total)
     if (!/^0\d{9}$/.test(phone_no)) {
       return res.status(400).json({
-        error: "Phone number must be 10 digits (e.g., 0674843431).",
+        error: "Phone number must be 10 digits (e.g., 0674843431)",
       });
     }
 
@@ -470,7 +485,7 @@ exports.registerUser = async (req, res) => {
     );
     if (existing.length > 0) {
       return res.status(409).json({
-        error: "Registration number already exists.",
+        error: "Registration number already exists",
       });
     }
 
@@ -490,13 +505,14 @@ exports.registerUser = async (req, res) => {
       (name, reg_no, department, program, college, year, role, gender, phone_no, photo, is_approved) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
+
     const values = [
       name,
       reg_no,
-      department || null,
-      program || null,
+      ["STUDENT", "GUEST"].includes(roleUpper) ? department : null,
+      ["STUDENT", "GUEST"].includes(roleUpper) ? program : null,
       college,
-      year || null,
+      ["STUDENT", "GUEST"].includes(roleUpper) ? year : null,
       role,
       gender,
       phone_no,
@@ -508,16 +524,20 @@ exports.registerUser = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "User registered successfully.",
-      sms: smsResult, // include SMS status in response
+      message: "User registered successfully",
+      sms: smsResult,
     });
   } catch (err) {
     console.error("❌ Registration error:", err);
-    return res
-      .status(500)
-      .json({ error: "Something went wrong while registering the user." });
+    return res.status(500).json({
+      error: "Something went wrong while registering the user",
+    });
   }
 };
+
+
+
+
 
 
 
