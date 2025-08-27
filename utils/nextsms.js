@@ -40,4 +40,21 @@ async function sendSms(phone, message) {
   }
 }
 
+
+
+
+// utils/nextsms.js
+async function sendSMS(to, message) {
+  try {
+    console.log(`Sending SMS to ${to}: ${message}`);
+    // integrate your NextSMS API here
+    return { success: true };
+  } catch (err) {
+    console.error("NextSMS error:", err);
+    return { success: false, message: err.message };
+  }
+}
+
+
+
 module.exports = { sendSms };

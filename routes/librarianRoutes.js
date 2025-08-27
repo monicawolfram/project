@@ -113,7 +113,7 @@ router.get('/generate-paper-code', librarianController.generatePaperCode);
 router.get('/generate-project-code', librarianController.generateProjectCode);
 router.get('/requests/resource-by-code/:code', librarianController.getRequestsByResourceCode);
 router.put('/requests/approve/:code', librarianController.approveRequest);
-
+router.post('/requests/send-reminder/:id', librarianController.sendReminder);
 
 
 

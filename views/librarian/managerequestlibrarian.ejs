@@ -211,185 +211,181 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  let currentStatus = 'all';
-  let debounceTimer;
+let currentStatus = 'all';
+let debounceTimer;
 
-  document.addEventListener('DOMContentLoaded', () => {
-    loadRequests();
-    setupTabClickHandlers();
-    setupFilterInput();
+document.addEventListener('DOMContentLoaded', () => {
+  loadRequests();
+  setupTabClickHandlers();
+  setupFilterInput();
+});
+
+function setupTabClickHandlers() {
+  const buttons = document.querySelectorAll('#requestTabs .tab-button');
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      buttons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      currentStatus = button.dataset.status;
+      loadRequests();
+    });
   });
+}
 
-  function setupTabClickHandlers() {
-    const buttons = document.querySelectorAll('#requestTabs .tab-button');
-    buttons.forEach(button => {
-      button.addEventListener('click', () => {
-        buttons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        currentStatus = button.dataset.status;
+function setupFilterInput() {
+  const filterInput = document.getElementById("filterUserId");
+  if (filterInput) {
+    filterInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
         loadRequests();
-      });
+      }, 500);
     });
   }
+}
 
-  function setupFilterInput() {
-    const filterInput = document.getElementById("filterUserId");
-    if (filterInput) {
-      filterInput.addEventListener('input', () => {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          loadRequests();
-        }, 500);
-      });
-    }
+async function loadRequests() {
+  try {
+    showLoading(true);
+    const regNoFilter = document.getElementById("filterUserId").value.trim();
+    let url = '/librarian/requests/all';
+    if (regNoFilter) url += `?reg_no=${encodeURIComponent(regNoFilter)}`;
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Network response not OK');
+    const data = await res.json();
+
+    const filtered = currentStatus === 'all'
+      ? data
+      : data.filter(r => r.status.toLowerCase() === currentStatus);
+
+    displayRequests(filtered);
+    autoSendReminders(filtered); // auto-send reminders for due returns
+  } catch (err) {
+    console.error('Failed to fetch requests:', err);
+    alert('Failed to load requests. Please try again later.');
+  } finally {
+    showLoading(false);
   }
+}
 
-  async function loadRequests() {
-    try {
-      showLoading(true);
-      const regNoFilter = document.getElementById("filterUserId").value.trim();
+function displayRequests(data) {
+  const tbody = document.getElementById("request-list");
+  tbody.innerHTML = "";
 
-      let url = '/librarian/requests/all';
-      if (regNoFilter) {
-        url += `?reg_no=${encodeURIComponent(regNoFilter)}`;
-      }
+  const thead = document.querySelector("thead tr");
+  thead.innerHTML = currentStatus === 'pending'
+    ? `<th>ID</th><th>Reg No</th><th>Name</th><th>Resource</th><th>Borrow Date</th><th>Return Date</th><th>Reason</th><th>Status</th><th>Action</th>`
+    : `<th>ID</th><th>Reg No</th><th>Name</th><th>Resource</th><th>Borrow Date</th><th>Return Date</th><th>Status</th><th>Action</th>`;
 
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('Network response not OK');
+  data.forEach(req => {
+    const badgeColor = {
+      pending: "warning",
+      approved: "success",
+      rejected: "danger"
+    }[req.status.toLowerCase()] || "secondary";
 
-      const data = await res.json();
+    const reasonCell = currentStatus === 'pending' ? `<td>${req.reason || 'N/A'}</td>` : '';
 
-      const filtered = currentStatus === 'all'
-        ? data
-        : data.filter(r => r.status.toLowerCase() === currentStatus);
+    let actionButtons = `<span class="text-muted">No Action</span>`;
 
-      displayRequests(filtered);
-
-      // After displaying, automatically send reminders for approved requests
-      autoSendReminders(filtered);
-
-    } catch (err) {
-      console.error('Failed to fetch requests:', err);
-      alert('Failed to load requests. Please try again later.');
-    } finally {
-      showLoading(false);
-    }
-  }
-
-  function displayRequests(data) {
-    const tbody = document.getElementById("request-list");
-    tbody.innerHTML = "";
-
-    const thead = document.querySelector("thead tr");
-    thead.innerHTML = currentStatus === 'pending'
-      ? `<th>ID</th><th>Reg No</th><th>Name</th><th>Resource</th><th>Borrow Date</th><th>Return Date</th><th>Reason</th><th>Status</th><th>Action</th>`
-      : `<th>ID</th><th>Reg No</th><th>Name</th><th>Resource</th><th>Borrow Date</th><th>Return Date</th><th>Status</th><th>Action</th>`;
-
-    data.forEach(req => {
-      const badgeColor = {
-        pending: "warning",
-        approved: "success",
-        rejected: "danger"
-      }[req.status.toLowerCase()] || "secondary";
-
-      const reasonCell = currentStatus === 'pending' ? `<td>${req.reason || 'N/A'}</td>` : '';
-
-      let actionButtons = `<span class="text-muted">No Action</span>`;
-
-      if (req.status.toLowerCase() === "pending") {
-        actionButtons = `
-          <button class="btn btn-sm btn-success me-2" onclick="confirmUpdateStatus(${req.id}, 'Approved')">Approve</button>
-        `;
-      } else if (req.status.toLowerCase() === "approved") {
-        const today = new Date();
-        const returnDate = new Date(req.return_date);
-        const daysLeft = Math.ceil((returnDate - today) / (1000 * 60 * 60 * 24));
-
-        actionButtons = `
-          <span class="text-success fw-bold">Approved</span><br/>
-          <small>📅 ${daysLeft} day(s) left</small>
-        `;
-      } else if (req.status.toLowerCase() === "rejected") {
-        actionButtons = `<span class="text-muted">Rejected</span>`;
-      }
-
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${req.id}</td>
-        <td>${req.borrower_id || 'N/A'}</td>
-        <td>${req.borrower_name}</td>
-        <td>${req.resource_type}</td>
-        <td>${new Date(req.borrow_date).toLocaleDateString()}</td>
-        <td>${new Date(req.return_date).toLocaleDateString()}</td>
-        ${reasonCell}
-        <td><span class="badge bg-${badgeColor}">${req.status}</span></td>
-        <td>${actionButtons}</td>
-      `;
-      tbody.appendChild(row);
-    });
-  }
-
-  // Automatically send reminders for approved requests 2 days before return
-  async function autoSendReminders(requests) {
-    const today = new Date();
-    const reminderDays = 2; // send reminder 2 days before return
-
-    for (const req of requests) {
-      if (req.status.toLowerCase() !== "approved") continue;
-
+    if (req.status.toLowerCase() === "pending") {
+      actionButtons = `<button class="btn btn-sm btn-success me-2" onclick="confirmUpdateStatus(${req.id}, 'Approved')">Approve</button>`;
+    } else if (req.status.toLowerCase() === "approved") {
+      const today = new Date();
       const returnDate = new Date(req.return_date);
       const daysLeft = Math.ceil((returnDate - today) / (1000 * 60 * 60 * 24));
 
-      if (daysLeft === reminderDays) {
-        try {
-          const res = await fetch(`/librarian/requests/send-reminder/${req.id}`, { method: 'POST' });
-          const data = await res.json();
-          if (data.success) {
-            console.log(`✅ Reminder sent automatically for request ID ${req.id}`);
-          } else {
-            console.warn(`❌ Failed to send reminder for request ID ${req.id}: ${data.message}`);
-          }
-        } catch (err) {
-          console.error(`⚠️ Error sending reminder for request ID ${req.id}:`, err);
-        }
+      actionButtons = `
+        <span class="text-success fw-bold">Approved</span><br/>
+        <small>📅 ${daysLeft} day(s) left</small><br/>
+        <button class="btn btn-sm btn-primary mt-1" onclick="sendReminderSMS(${req.id})">
+          <i class="fa fa-envelope"></i> Send SMS Reminder
+        </button>
+      `;
+    } else if (req.status.toLowerCase() === "rejected") {
+      actionButtons = `<span class="text-muted">Rejected</span>`;
+    }
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${req.id}</td>
+      <td>${req.borrower_id || 'N/A'}</td>
+      <td>${req.borrower_name}</td>
+      <td>${req.resource_type}</td>
+      <td>${new Date(req.borrow_date).toLocaleDateString()}</td>
+      <td>${new Date(req.return_date).toLocaleDateString()}</td>
+      ${reasonCell}
+      <td><span class="badge bg-${badgeColor}">${req.status}</span></td>
+      <td>${actionButtons}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// Auto-send reminders 2 days before return
+async function autoSendReminders(requests) {
+  const today = new Date();
+  const reminderDays = 2;
+  for (const req of requests) {
+    if (req.status.toLowerCase() !== "approved") continue;
+    const returnDate = new Date(req.return_date);
+    const daysLeft = Math.ceil((returnDate - today) / (1000 * 60 * 60 * 24));
+    if (daysLeft === reminderDays) {
+      try {
+        const res = await fetch(`/librarian/requests/send-reminder/${req.id}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) console.log(`✅ Reminder sent for request ID ${req.id}`);
+      } catch (err) {
+        console.error(`⚠️ Error sending reminder for request ID ${req.id}:`, err);
       }
     }
   }
+}
 
-  // Confirmation before update
-  function confirmUpdateStatus(id, status) {
-    if (confirm(`Are you sure you want to ${status.toLowerCase()} this request?`)) {
-      updateStatus(id, status);
-    }
-  }
-
-  async function updateStatus(id, status) {
-    try {
-      const res = await fetch('/librarian/requests/update-status', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status })
-      });
-
-      const result = await res.json();
-      if (result.success) {
-        loadRequests();
-      } else {
-        alert("Failed to update status.");
-      }
-    } catch (err) {
-      alert("Network error while updating status.");
-    }
-  }
-
-  function showLoading(show) {
-    if (show) {
-      console.log("Loading...");
+// Manual SMS reminder button
+async function sendReminderSMS(requestId) {
+  try {
+    const res = await fetch(`/librarian/requests/send-reminder/${requestId}`, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      alert('✅ SMS reminder sent successfully!');
     } else {
-      console.log("Done.");
+      alert(`❌ Failed to send SMS: ${data.message}`);
     }
+  } catch (err) {
+    console.error("Error sending SMS reminder:", err);
+    alert('⚠️ Error sending SMS reminder.');
   }
+}
+
+function confirmUpdateStatus(id, status) {
+  if (confirm(`Are you sure you want to ${status.toLowerCase()} this request?`)) {
+    updateStatus(id, status);
+  }
+}
+
+async function updateStatus(id, status) {
+  try {
+    const res = await fetch('/librarian/requests/update-status', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status })
+    });
+    const result = await res.json();
+    if (result.success) loadRequests();
+    else alert("Failed to update status.");
+  } catch (err) {
+    alert("Network error while updating status.");
+  }
+}
+
+function showLoading(show) {
+  if (show) console.log("Loading...");
+  else console.log("Done.");
+}
 </script>
+
 
 
 
@@ -466,6 +462,7 @@ modalBody.innerHTML = `
   }
   
 </script>
+
 <script>
   async function approveRequest(requestId) {
     if (!confirm(`Are you sure you want to approve request ID ${requestId}?`)) return;

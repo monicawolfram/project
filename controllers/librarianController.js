@@ -3,6 +3,7 @@ const path = require('path');
 const { body, param, query, validationResult } = require('express-validator'); // Include validationResult
 const { sendSms } = require('../utils/nextsms');
 
+
 exports.interface = (req, res) => {
  res.render('librarian/librarian _interface');
 };
@@ -1220,6 +1221,50 @@ exports.approveRequest = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+exports.sendReminder = async (req, res) => {
+  const requestId = req.params.id;
+
+  try {
+    // Fetch request details using the requested fields
+    const [rows] = await db.execute(
+      `SELECT id, borrower_id, borrower_name, resource_type, borrow_date, return_date, status, resource_code
+       FROM borrow_requests
+       WHERE id = ?`,
+      [requestId]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({ success: false, message: 'Request not found' });
+    }
+
+    const request = rows[0];
+
+    if (!request.borrower_id) {
+      return res.status(400).json({ success: false, message: 'Borrower information not found' });
+    }
+
+    if (request.status.toLowerCase() !== 'approved') {
+      return res.status(400).json({ success: false, message: 'Only approved requests can receive reminders' });
+    }
+
+    // Prepare SMS message
+    const message = `Hello ${request.borrower_name}, please return your ${request.resource_type} (Code: ${request.resource_code}) borrowed on ${new Date(request.borrow_date).toLocaleDateString()} by ${new Date(request.return_date).toLocaleDateString()}.`;
+
+    // Send SMS
+    const smsResult = await sendSms(request.borrower_id, message); // assuming sendSMS uses borrower_id or map to phone_no
+
+    if (smsResult.success) {
+      return res.json({ success: true, message: 'SMS reminder sent successfully' });
+    } else {
+      return res.status(500).json({ success: false, message: smsResult.message || 'Failed to send SMS' });
+    }
+
+  } catch (err) {
+    console.error('Error sending SMS reminder:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 
 
 
