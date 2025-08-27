@@ -196,14 +196,30 @@ exports.deleteUsersBulk = async (req, res) => {
   }
 
   try {
+    // First, fetch the roles of the users to ensure admins are not deleted
     const placeholders = ids.map(() => '?').join(',');
-    await db.query(`DELETE FROM users WHERE id IN (${placeholders})`, ids);
-    res.json({ message: `${ids.length} user(s) deleted successfully` });
+    const [users] = await db.query(`SELECT id, role FROM users WHERE id IN (${placeholders})`, ids);
+
+    // Filter out admins
+    const nonAdminIds = users.filter(u => u.role.toLowerCase() !== 'admin').map(u => u.id);
+
+    if (nonAdminIds.length === 0) {
+      return res.status(400).json({ error: 'No non-admin users found to delete' });
+    }
+
+    // Delete only non-admin users
+    const deletePlaceholders = nonAdminIds.map(() => '?').join(',');
+    await db.query(`DELETE FROM users WHERE id IN (${deletePlaceholders})`, nonAdminIds);
+
+    res.json({
+      message: `${nonAdminIds.length} user(s) deleted successfully.`
+    });
   } catch (err) {
     console.error('Error deleting users:', err);
     res.status(500).json({ error: 'Server error deleting users' });
   }
 };
+
 exports.approvePendingUsers = async (req, res) => {
   try {
     // Approve all users where is_approved = 'no'
@@ -218,29 +234,45 @@ exports.approvePendingUsers = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to approve users.' });
   }
 };
-exports.updateUsersBulk = async (req, res) => {
+exports.updateUsersBulk = async (req, res) => { 
   try {
-    const updates = req.body.updates; // [{ id, department, year }, ...]
+    const updates = req.body.updates; // [{ id, department, program, year }, ...]
 
     if (!Array.isArray(updates) || updates.length === 0) {
       return res.status(400).json({ message: 'No updates provided.' });
     }
 
-    const updatePromises = updates.map(user => {
-      return db.query(
-        'UPDATE users SET department = ?, year = ? WHERE id = ?',
-        [user.department, user.year, user.id]
-      );
+    // Fetch roles of the users to determine if department/program/year should be updated
+    const ids = updates.map(u => u.id);
+    const placeholders = ids.map(() => '?').join(',');
+    const [users] = await db.query(`SELECT id, role FROM users WHERE id IN (${placeholders})`, ids);
+
+    const updatePromises = updates.map(userUpdate => {
+      const dbUser = users.find(u => u.id === userUpdate.id);
+      if (!dbUser) return Promise.resolve(); // skip if user not found
+
+      const role = dbUser.role.toLowerCase();
+      if (role === 'admin' || role === 'librarian' || role === 'staff') {
+        // Skip updating department, program, year for these roles
+        return db.query('UPDATE users SET /* other fields if any */ WHERE id = ?', [userUpdate.id]);
+      } else {
+        // Update department, program, year for students/guests
+        return db.query(
+          'UPDATE users SET department = ?, program = ?, year = ? WHERE id = ?',
+          [userUpdate.department, userUpdate.program, userUpdate.year, userUpdate.id]
+        );
+      }
     });
 
     await Promise.all(updatePromises);
 
-    res.json({ success: true, message: `${updates.length} user(s) updated successfully.` });
+    res.json({ success: true, message: `${updates.length} user(s) processed successfully.` });
   } catch (err) {
     console.error('Error updating users:', err);
     res.status(500).json({ success: false, message: 'Server error while updating users.' });
   }
 };
+
 exports.viewAllUsers = async (req, res) => {
   try {
     const [users] = await db.query(`
