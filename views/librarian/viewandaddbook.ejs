@@ -196,11 +196,13 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="newBooks">
-                                    <p>Recently added books will be displayed here.</p>
-                                </div>
-                                <div class="tab-pane fade" id="updatedBooks">
-                                    <p>Recently updated book details will be displayed here.</p>
-                                </div>
+                                    <ul id="newBooksList" class="row"></ul>
+                                         </div>
+
+                              <div class="tab-pane fade" id="updatedBooks">
+                                <ul id="updatedBooksList" class="list-group"></ul>
+                              </div>
+
                             </div>
                         </div>
 
@@ -580,6 +582,101 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 </script>
+
+
+
+<script>
+async function fetchNewBooks() {
+  try {
+    const res = await fetch('/librarian/resources/new-books');
+    if (!res.ok) throw new Error("Failed to fetch new books");
+    const data = await res.json();
+
+    const list = document.getElementById('newBooksList');
+    list.innerHTML = '';
+
+    if (!data.length) {
+      list.innerHTML = `<p class="text-muted w-100 text-center">No new books found.</p>`;
+      return;
+    }
+
+    data.forEach(book => {
+      const li = document.createElement('li');
+      li.className = "col-md-4 mb-3"; // use grid column
+      li.innerHTML = `
+        <div class="card h-100 shadow-sm">
+          <img src="/uploads/books/${book.image || 'default.jpg'}" class="card-img-top" alt="${book.title}" style="height:200px; object-fit:cover;">
+          <div class="card-body">
+            <h5 class="card-title">${book.title}</h5>
+            <p class="card-text">
+              <strong>Author:</strong> ${book.author || 'Unknown'}<br>
+              <strong>Date Added:</strong> ${new Date(book.date_added).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+      `;
+      list.appendChild(li);
+    });
+  } catch (err) {
+    console.error(err);
+    document.getElementById('newBooksList').innerHTML =
+      `<p class="text-danger w-100 text-center">Error loading new books.</p>`;
+  }
+}
+
+// Auto-fetch whenever "New Books" tab is shown
+const newBooksTab = document.querySelector('a[href="#newBooks"]');
+if (newBooksTab) {
+  newBooksTab.addEventListener('shown.bs.tab', fetchNewBooks);
+}
+
+// Also fetch immediately if the tab is active on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const activeTab = document.querySelector('.tab-pane.active');
+  if (activeTab && activeTab.id === 'newBooks') {
+    fetchNewBooks();
+  }
+});
+</script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  fetch('/updated-books')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("updatedBooksList");
+
+      if (data.length > 0) {
+        container.innerHTML = data.map(book => `
+          <div class="col-md-4">
+            <div class="card mb-3 shadow">
+              ${book.image ? `<img src="/uploads/books/${book.image}" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">` : ''}
+              <div class="card-body">
+                <h5 class="card-title">${book.title}</h5>
+                <p class="card-text">
+                  <strong>Author:</strong> ${book.author || 'Unknown'}<br>
+                  <strong>Last Updated:</strong> ${book.last_updated ? new Date(book.last_updated).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : 'N/A'}
+                </p>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = `<p class="text-muted">No recently updated books found.</p>`;
+      }
+    })
+    .catch(err => {
+      console.error('Fetch error:', err);
+      document.getElementById("updatedBooksList").innerHTML =
+        `<p class="text-danger">Failed to load updated books.</p>`;
+    });
+});
+</script>
+
+
+
 
 
 

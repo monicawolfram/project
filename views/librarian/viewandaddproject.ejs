@@ -191,11 +191,13 @@
                                 <div id="departmentsList" class="row"></div>
                             </div>
                             <div class="tab-pane fade" id="newProjects" role="tabpanel" aria-labelledby="newProjects-tab">
-                                <p>Recently added projects will be displayed here.</p>
-                            </div>
-                            <div class="tab-pane fade" id="updatedProjects" role="tabpanel" aria-labelledby="updatedProjects-tab">
-                                <p>Recently updated project details will be displayed here.</p>
-                            </div>
+                              <div id="newProjectsList" class="row"></div>
+                          </div>
+
+                      <div class="tab-pane fade" id="updatedProjects" role="tabpanel" aria-labelledby="updatedProjects-tab">
+                          <div id="updatedProjectsList" class="row"></div>
+                      </div>
+
                         </div>
                     </div>
 
@@ -432,6 +434,139 @@
   });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  loadNewProjects();
+  loadUpdatedProjects();
+});
+
+// Load New Projects
+async function loadNewProjects() {
+  const container = document.getElementById("newProjectsList");
+  container.innerHTML = `<p class="text-muted">Loading...</p>`;
+
+  try {
+    const res = await fetch("/new-projects");
+    const projects = await res.json();
+
+    if (!projects.length) {
+      container.innerHTML = `<p class="text-muted">No new projects found.</p>`;
+      return;
+    }
+
+    container.innerHTML = projects.map(proj => `
+      <div class="col-md-4">
+        <div class="card mb-3 shadow">
+          ${proj.image ? `<img src="/uploads/projects/${proj.image}" class="card-img-top" style="height:200px; object-fit:cover;" alt="${proj.title}">` : ''}
+          <div class="card-body">
+            <h5 class="card-title">${proj.title}</h5>
+            <p class="card-text">
+              <strong>Author:</strong> ${proj.author || 'Unknown'}<br>
+              <strong>Date Added:</strong> ${new Date(proj.date_added).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// Load Updated Projects
+async function loadUpdatedProjects() {
+  const container = document.getElementById("updatedProjectsList");
+  container.innerHTML = `<p class="text-muted">Loading...</p>`;
+
+  try {
+    const res = await fetch("/updated-projects");
+    const projects = await res.json();
+
+    if (!projects.length) {
+      container.innerHTML = `<p class="text-muted">No updated projects found.</p>`;
+      return;
+    }
+
+    container.innerHTML = projects.map(proj => `
+      <div class="col-md-4">
+        <div class="card mb-3 shadow">
+          ${proj.image ? `<img src="/uploads/projects/${proj.image}" class="card-img-top" style="height:200px; object-fit:cover;" alt="${proj.title}">` : ''}
+          <div class="card-body">
+            <h5 class="card-title">${proj.title}</h5>
+            <p class="card-text">
+              <strong>Author:</strong> ${proj.author || 'Unknown'}<br>
+              <strong>Last Updated:</strong> ${proj.last_updated ? new Date(proj.last_updated).toLocaleDateString() : 'N/A'}
+            </p>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  fetch('/librarian/departments/projects')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.querySelector('#departments');
+
+      if (data.success && data.data.length > 0) {
+        const grouped = {};
+
+        // Organize by department and then by type
+        data.data.forEach(item => {
+          const dept = item.department;
+          const type = item.type; // 'paper' or 'project' or 'book'
+
+          if (!grouped[dept]) grouped[dept] = {};
+          if (!grouped[dept][type]) grouped[dept][type] = [];
+
+          grouped[dept][type].push(item);
+        });
+
+        // Render HTML
+        container.innerHTML = Object.entries(grouped).map(([dept, types]) => `
+          <div class="col-12 mb-4">
+            <h3 class="mt-4 text-primary">${dept}</h3>
+            ${Object.entries(types).map(([type, items]) => `
+              <h5 class="text-secondary mt-3 text-capitalize">${type}s</h5>
+              <div class="row">
+                ${items.map(item => `
+                  <div class="col-md-4">
+                    <div class="card mb-3 shadow-sm">
+                      ${item.image ? `<img src="/uploads/${type}s/${item.image}" class="card-img-top" alt="${item.title}" style="height:200px; object-fit:cover;">` : ''}
+                      <div class="card-body">
+                        <h5 class="card-title">${item.title}</h5>
+                        <p class="card-text">
+                          <strong>Author:</strong> ${item.author || 'Unknown'}<br>
+                          <strong>Year:</strong> ${item.year || 'N/A'}<br>
+                          <strong>Status:</strong> ${item.status || 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `).join('')}
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = `<p class="text-muted">No catalog entries found.</p>`;
+      }
+    })
+    .catch(err => {
+      console.error('Error loading catalogs:', err);
+      document.querySelector('#departments').innerHTML =
+        `<p class="text-danger">Failed to load catalogs.</p>`;
+    });
+});
+</script>
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

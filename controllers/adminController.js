@@ -459,11 +459,14 @@ exports.getAllResources = async (req, res) => {
   try {
     const [rows] = await db.execute(`
       SELECT * FROM (
-        SELECT id, title AS resource_name, 'book' AS resource_type, status, date_added FROM books WHERE is_deleted = 'no'
+        SELECT id, title AS resource_name, 'book' AS resource_type, status, date_added 
+        FROM books WHERE is_deleted = 'no'
         UNION ALL
-        SELECT id, title AS resource_name, 'paper' AS resource_type, status, date_added FROM papers WHERE is_deleted = 'no'
+        SELECT id, title AS resource_name, 'paper' AS resource_type, status, date_added 
+        FROM papers WHERE is_deleted = 'no'
         UNION ALL
-        SELECT id, title AS resource_name, 'project' AS resource_type, status, date_added FROM projects WHERE is_deleted = 'no'
+        SELECT id, title AS resource_name, 'project' AS resource_type, status, date_added 
+        FROM projects WHERE is_deleted = 'no'
       ) AS combined
       ${whereClause}
       ORDER BY date_added DESC
@@ -475,17 +478,30 @@ exports.getAllResources = async (req, res) => {
   }
 };
 
+
 exports.updateResourceStatus = async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, resourceType } = req.body;
 
-  if (!status) {
-    return res.status(400).json({ error: 'Status is required' });
+  if (!status || !resourceType) {
+    return res.status(400).json({ error: 'Status and resourceType are required' });
+  }
+
+  // Decide which table to update
+  const tableMap = {
+    book: "books",
+    paper: "papers",
+    project: "projects"
+  };
+
+  const table = tableMap[resourceType.toLowerCase()];
+  if (!table) {
+    return res.status(400).json({ error: 'Invalid resource type' });
   }
 
   try {
     const [result] = await db.execute(
-      `UPDATE resources SET status = ? WHERE id = ?`,
+      `UPDATE ${table} SET status = ? WHERE id = ?`,
       [status, id]
     );
 
@@ -499,4 +515,6 @@ exports.updateResourceStatus = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+
 

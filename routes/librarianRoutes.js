@@ -76,7 +76,12 @@ router.put('/projects/:id', authenticateLibrarian, upload.single('project_image'
 router.delete('/remove/project/:id', authenticateLibrarian, librarianController.removeProject);
 router.get('/borrowed/projects', authenticateLibrarian, librarianController.getBorrowedProjects);
 router.get('/departments/projects', librarianController.getDepartmentsProjects);
-
+router.get('/admin/resources/new-books', librarianController.getNewBooks);
+router.get('/updated-books', librarianController.getUpdatedBooks);
+router.get('/new-papers', librarianController.getNewPapers);
+router.get('/updated-papers', librarianController.getUpdatedPapers);
+router.get('/new-projects', librarianController.getNewProjects);
+router.get('/updated-projects', librarianController.getUpdatedProjects);
 
 
 

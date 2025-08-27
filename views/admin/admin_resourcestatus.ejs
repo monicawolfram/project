@@ -138,9 +138,12 @@
           <td><span class="badge ${badgeClass}">${capitalStatus}</span></td>
           <td>${new Date(resource.date_added).toLocaleString()}</td>
           <td>
-            <button class="btn btn-sm btn-success me-1" onclick="changeStatus(this, ${resource.id}, 'available')">Available</button>
-            <button class="btn btn-sm btn-warning me-1" onclick="changeStatus(this, ${resource.id}, 'checked-out')">Borrowed</button>
-            <button class="btn btn-sm btn-danger" onclick="changeStatus(this, ${resource.id}, 'reserved')">Removed</button>
+            <button class="btn btn-sm btn-success me-1" 
+              onclick="changeStatus(${resource.id}, '${resource.resource_type}', 'available')">Available</button>
+            <button class="btn btn-sm btn-warning me-1" 
+              onclick="changeStatus(${resource.id}, '${resource.resource_type}', 'checked-out')">Borrowed</button>
+            <button class="btn btn-sm btn-danger" 
+              onclick="changeStatus(${resource.id}, '${resource.resource_type}', 'reserved')">Removed</button>
           </td>
         `;
         tableBody.appendChild(row);
@@ -151,13 +154,13 @@
     }
   }
 
-  // Update resource status and disable buttons after update
-  async function changeStatus(button, id, newStatus) {
+  // Update resource status and reload table
+  async function changeStatus(id, resourceType, newStatus) {
     try {
       const res = await fetch(`/admin/resources/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus, resourceType })
       });
 
       if (!res.ok) throw new Error('Failed to update status.');
@@ -179,6 +182,7 @@
   // Load data on page load
   document.addEventListener("DOMContentLoaded", fetchResources);
 </script>
+
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

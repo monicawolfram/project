@@ -1846,6 +1846,93 @@ exports.addProject = async (req, res) => {
 };
 
 
+exports.getNewBooks = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT id, title, author, date_added, image
+      FROM books
+      WHERE is_deleted = 'no'
+      ORDER BY date_added DESC
+    `);
+
+    res.json(rows);
+  } catch (error) {
+    console.error("Error fetching new books:", error);
+    res.status(500).json({ error: "Failed to fetch new books" });
+  }
+};
+
+exports.getUpdatedBooks = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT id, title, author, last_updated 
+      FROM books
+      WHERE is_deleted = 'no'
+      ORDER BY last_updated DESC
+    `);
+
+    res.json(rows);
+  } catch (error) {
+    console.error("Error fetching updated books:", error);
+    res.status(500).json({ error: "Failed to fetch updated books" });
+  }
+};
+exports.getNewPapers = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT id, title, author, date_added, image
+      FROM papers
+      WHERE is_deleted = 'no' AND status = 'new'
+      ORDER BY date_added DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching new papers:", err);
+    res.status(500).json({ error: "Failed to fetch new papers" });
+  }
+};
+exports.getUpdatedPapers = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT id, title, author, last_updated, image
+      FROM papers
+      WHERE is_deleted = 'no' AND last_updated IS NOT NULL
+      ORDER BY last_updated DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching updated papers:", err);
+    res.status(500).json({ error: "Failed to fetch updated papers" });
+  }
+};
+exports.getNewProjects = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT id, title, author, date_added, image
+      FROM projects
+      WHERE is_deleted = 'no' AND status = 'new'
+      ORDER BY date_added DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching new projects:", err);
+    res.status(500).json({ error: "Failed to fetch new projects" });
+  }
+};
+exports.getUpdatedProjects = async (req, res) => {
+  try {
+    const [rows] = await db.execute(`
+      SELECT id, title, author, last_updated, image
+      FROM projects
+      WHERE is_deleted = 'no' AND last_updated IS NOT NULL
+      ORDER BY last_updated DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching updated projects:", err);
+    res.status(500).json({ error: "Failed to fetch updated projects" });
+  }
+};
 
 
 
