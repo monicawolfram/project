@@ -307,7 +307,7 @@
           card.className = 'col-md-4 mb-3';
           card.innerHTML = `
             <div class="card h-100 shadow-sm">
-              <img src="/uploads/projects/${project.image || 'default.jpg'}" 
+              <img src="/uploads/books/${project.image || 'default.jpg'}" 
                    class="card-img-top" alt="${project.title}" 
                    style="height: 200px; object-fit: cover;" />
               <div class="card-body">
@@ -316,7 +316,7 @@
                 <p class="card-text"><strong>Department:</strong> ${project.department}</p>
                 <p class="card-text"><strong>Drawer No:</strong> ${project.draw_no}</p>
                 <p class="card-text"><strong>Shelf No:</strong> ${project.shelf_no}</p>
-                <p class="card-text"><strong>Year:</strong> ${project.year}</p>
+               
               </div>
             </div>`;
           container.appendChild(card);

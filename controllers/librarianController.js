@@ -1221,15 +1221,28 @@ exports.approveRequest = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
+
 exports.sendReminder = async (req, res) => {
   const requestId = req.params.id;
 
   try {
-    // Fetch request details using the requested fields
+    // Fetch request details and borrower's phone_no from users table
     const [rows] = await db.execute(
-      `SELECT id, borrower_id, borrower_name, resource_type, borrow_date, return_date, status, resource_code
-       FROM borrow_requests
-       WHERE id = ?`,
+      `SELECT 
+         br.id AS request_id,
+         br.borrower_id,
+         u.name AS borrower_name,
+         u.phone_no,
+         br.resource_type,
+         br.borrow_date,
+         br.return_date,
+         br.status,
+         br.resource_code
+       FROM borrow_requests br
+       JOIN users u ON br.borrower_id = u.reg_no
+       WHERE br.id = ?`,
       [requestId]
     );
 
@@ -1239,8 +1252,8 @@ exports.sendReminder = async (req, res) => {
 
     const request = rows[0];
 
-    if (!request.borrower_id) {
-      return res.status(400).json({ success: false, message: 'Borrower information not found' });
+    if (!request.phone_no) {
+      return res.status(400).json({ success: false, message: 'Borrower phone number not found' });
     }
 
     if (request.status.toLowerCase() !== 'approved') {
@@ -1248,13 +1261,13 @@ exports.sendReminder = async (req, res) => {
     }
 
     // Prepare SMS message
-    const message = `Hello ${request.borrower_name}, please return your ${request.resource_type} (Code: ${request.resource_code}) borrowed on ${new Date(request.borrow_date).toLocaleDateString()} by ${new Date(request.return_date).toLocaleDateString()}.`;
+    const smsMessage = `Hello ${request.borrower_name}, please return your ${request.resource_type} (Code: ${request.resource_code}) borrowed on ${new Date(request.borrow_date).toLocaleDateString()} by ${new Date(request.return_date).toLocaleDateString()}.`;
 
-    // Send SMS
-    const smsResult = await sendSms(request.borrower_id, message); // assuming sendSMS uses borrower_id or map to phone_no
+    // Send SMS using nextsms utility
+    const smsResult = await sendSms(request.phone_no, smsMessage);
 
     if (smsResult.success) {
-      return res.json({ success: true, message: 'SMS reminder sent successfully' });
+      return res.json({ success: true, message: `✅ SMS reminder sent successfully to ${request.borrower_name}` });
     } else {
       return res.status(500).json({ success: false, message: smsResult.message || 'Failed to send SMS' });
     }
@@ -1264,6 +1277,9 @@ exports.sendReminder = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+
+
 
 
 
