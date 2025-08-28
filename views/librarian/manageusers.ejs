@@ -195,68 +195,121 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Dynamic User Script -->
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    loadUsers();
+document.addEventListener('DOMContentLoaded', () => {
+  showTable('students'); // show students by default
+  loadUsers();
+});
+
+function loadUsers() {
+  const studentsTable = document.getElementById('studentsTable');
+  const librariansTable = document.getElementById('librariansTable');
+
+  // Clear existing rows
+  studentsTable.innerHTML = '';
+  librariansTable.innerHTML = '';
+
+  // Fetch students
+  fetch('http://localhost:3000/librarian/students')
+    .then(res => res.json())
+    .then(students => {
+      students.forEach(user => {
+        const photo = user.photo_url || '/images/default-user.png';
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><img src="${photo}" alt="Photo" width="40" height="40" style="border-radius:50%; object-fit:cover;"></td>
+          <td>${user.name}</td>
+          <td>${user.reg_no}</td>
+          <td>${user.department || '-'}</td>
+          <td>${user.year || '-'}</td>
+          <td>${user.role || 'STUDENT'}</td>
+          <td>
+            <button class="btn btn-sm btn-info me-1"><i class="fas fa-pen"></i></button>
+            <button class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+          </td>
+        `;
+        studentsTable.appendChild(row);
+      });
+    })
+    .catch(error => console.error('Failed to load students:', error));
+
+  // Fetch librarians
+  fetch('http://localhost:3000/librarian/librarians')
+    .then(res => res.json())
+    .then(librarians => {
+      librarians.forEach(user => {
+        const photo = user.photo_url || '/images/default-user.png';
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><img src="${photo}" alt="Photo" width="40" height="40" style="border-radius:50%; object-fit:cover;"></td>
+          <td>${user.name}</td>
+          <td>${user.reg_no}</td>
+          <td>${user.role || 'LIBRARIAN'}</td>
+          <td>
+            <button class="btn btn-sm btn-info me-1"><i class="fas fa-pen"></i></button>
+            <button class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+          </td>
+        `;
+        librariansTable.appendChild(row);
+      });
+    })
+    .catch(error => console.error('Failed to load librarians:', error));
+}
+
+// Show/hide tables
+function showTable(table) {
+  const studentsTable = document.getElementById('studentsTable');
+  const librariansTable = document.getElementById('librariansTable');
+  const studentsTab = document.getElementById('studentsTab');
+  const librariansTab = document.getElementById('librariansTab');
+
+  if (table === 'students') {
+    studentsTable.parentElement.querySelector('thead').innerHTML = `
+      <tr>
+        <th>Photo</th>
+        <th>Name</th>
+        <th>Reg. No</th>
+        <th>Department</th>
+        <th>Year</th>
+        <th>Role</th>
+        <th>Actions</th>
+      </tr>
+    `;
+    studentsTable.style.display = '';
+    librariansTable.style.display = 'none';
+    studentsTab.classList.add('active');
+    librariansTab.classList.remove('active');
+  } else if (table === 'librarians') {
+    librariansTable.parentElement.querySelector('thead').innerHTML = `
+      <tr>
+        <th>Photo</th>
+        <th>Name</th>
+        <th>Reg. No</th>
+        <th>Role</th>
+        <th>Actions</th>
+      </tr>
+    `;
+    studentsTable.style.display = 'none';
+    librariansTable.style.display = '';
+    studentsTab.classList.remove('active');
+    librariansTab.classList.add('active');
+  }
+}
+
+// Search functionality
+function searchTable() {
+  const input = document.getElementById("searchInput").value.toLowerCase();
+  const rows = document.querySelectorAll("tbody tr");
+
+  rows.forEach(row => {
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(input) ? "" : "none";
   });
-
-  function loadUsers() {
-    fetch('http://localhost:3000/librarian/users')
-      .then(res => res.json())
-      .then(users => {
-        const studentsTable = document.getElementById('studentsTable');
-        const librariansTable = document.getElementById('librariansTable');
-        studentsTable.innerHTML = '';
-        librariansTable.innerHTML = '';
-
-        users.forEach(user => {
-          const photo = user.photo_url || '/images/default-user.png';
-
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>
-              <img src="${photo}" alt="Photo" width="40" height="40" style="border-radius: 50%; object-fit: cover;" />
-            </td>
-            <td>${user.name}</td>
-            <td>${user.reg_no}</td>
-            <td>${user.department}</td>
-            <td>${user.year}</td>
-            <td>${user.role}</td>
-            <td>
-              <button class="btn btn-sm btn-info me-1"><i class="fas fa-pen"></i></button>
-              <button class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
-            </td>
-          `;
-
-          if (user.role === 'student') {
-            studentsTable.appendChild(row);
-          } else {
-            librariansTable.appendChild(row);
-          }
-        });
-      })
-      .catch(error => console.error('Failed to load users:', error));
-  }
-
-  function showTable(table) {
-    document.getElementById('studentsTable').style.display = table === 'students' ? '' : 'none';
-    document.getElementById('librariansTable').style.display = table === 'librarians' ? '' : 'none';
-
-    document.getElementById('studentsTab').classList.toggle('active', table === 'students');
-    document.getElementById('librariansTab').classList.toggle('active', table === 'librarians');
-  }
-
-  function searchTable() {
-    const input = document.getElementById("searchInput").value.toLowerCase();
-    const rows = document.querySelectorAll("tbody tr");
-
-    rows.forEach(row => {
-      const text = row.innerText.toLowerCase();
-      row.style.display = text.includes(input) ? "" : "none";
-    });
-  }
+}
 </script>
+
+
+
 
 </body>
 </html>

@@ -892,13 +892,13 @@ exports.getFineById = async (req, res) => {
 exports.getStudentUsers = async (req, res) => {
   try {
     const [rows] = await db.execute(
-      `SELECT name, reg_no, department, year, photo FROM users WHERE role = 'student'`
+      `SELECT name, reg_no, department, year, photo FROM users WHERE role = 'STUDENT'`
     );
 
     const studentsWithPhoto = rows.map(user => ({
       ...user,
       photo_url: user.photo
-        ? `/uploads/users/${user.photo}`
+        ? `/uploads/books/${user.photo}`
         : '/images/default-user.png',
     }));
 
@@ -912,14 +912,18 @@ exports.getStudentUsers = async (req, res) => {
 // Get all librarian users
 exports.getLibrarianUsers = async (req, res) => {
   try {
+    // Fetch only the necessary fields
     const [rows] = await db.execute(
-      `SELECT name, reg_no, department, year, photo FROM users WHERE role = 'librarian'`
+      `SELECT name, reg_no, photo FROM users WHERE role = 'LIBRARIAN'`
     );
 
+    // Map each user to include a proper photo URL and role
     const librariansWithPhoto = rows.map(user => ({
-      ...user,
+      name: user.name,
+      reg_no: user.reg_no,
+      role: 'LIBRARIAN',
       photo_url: user.photo
-        ? `/uploads/users/${user.photo}`
+        ? `/uploads/books/${user.photo}`
         : '/images/default-user.png',
     }));
 
@@ -929,6 +933,8 @@ exports.getLibrarianUsers = async (req, res) => {
     res.status(500).json([]);
   }
 };
+
+
 
 
 
@@ -946,7 +952,7 @@ exports.getAllUsers = async (req, res) => {
       ...user,
       photo_url: user.photo
         ? `/uploads/users/${user.photo}`
-        : '/images/default-user.png', // fallback default
+        : '/public/books/default-user.png', // fallback default
     }));
 
     res.json(usersWithPhotoUrl);

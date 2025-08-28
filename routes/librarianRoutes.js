@@ -88,10 +88,12 @@ router.get('/updated-projects', librarianController.getUpdatedProjects);
 router.get('/requests/all', librarianController.getAllRequests);
 router.post('/requests/add', librarianController.addRequest);
 router.put('/requests/update-status', librarianController.updateRequestStatus);
+
 router.get('/inventory', librarianController.getAllInventory);
 router.post('/inventory', librarianController.addInventory);
 router.put('/inventory/:id', librarianController.updateInventoryStatus);
 router.delete('/inventory/:id', librarianController.deleteInventory);
+
 router.get('/all-messages', librarianController.getAllMessages);
 router.post('/add-massages', librarianController.addMessage);
 router.post('/report', librarianController.generateReport);
