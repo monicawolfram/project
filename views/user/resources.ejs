@@ -165,78 +165,83 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-      const availableList = document.getElementById('availableList');
-      const borrowedList = document.getElementById('borrowedList');
-      const returnedList = document.getElementById('returnedList');
-      const newList = document.getElementById('newList');
+   <script>
+const availableList = document.getElementById('availableList');
+const borrowedList = document.getElementById('borrowedList');
+const returnedList = document.getElementById('returnedList');
+const newList = document.getElementById('newList');
 
-      function renderResources(resources) {
-        availableList.innerHTML = '';
-        borrowedList.innerHTML = '';
-        returnedList.innerHTML = '';
-        newList.innerHTML = '';
+function renderResources(resources) {
+  availableList.innerHTML = '';
+  borrowedList.innerHTML = '';
+  returnedList.innerHTML = '';
+  newList.innerHTML = '';
 
-        let hasAvailable = false, hasBorrowed = false, hasReturned = false, hasNew = false;
+  let hasAvailable = false, hasBorrowed = false, hasReturned = false, hasNew = false;
 
-        resources.forEach(item => {
-          let row = document.createElement('tr');
+  resources.forEach(item => {
+    let row = document.createElement('tr');
 
-          if (item.status === 'available') {
-            row.innerHTML = `<td>${item.resource}</td><td>${item.type}</td>`;
-            availableList.appendChild(row); hasAvailable = true;
-          }
+    if (item.status === 'available') {
+      row.innerHTML = `<td>${item.resource}</td><td>${item.type}</td>`;
+      availableList.appendChild(row); 
+      hasAvailable = true;
+    }
 
-          if (item.status === 'borrowed') {
-            row.innerHTML = `
-              <td>${item.borrower}</td>
-              <td>${item.resource}</td>
-              <td>${item.type}</td>
-              <td>${item.borrowDate}</td>
-              <td>${item.returnDate}</td>`;
-            borrowedList.appendChild(row); hasBorrowed = true;
-          }
+    if (item.status === 'borrowed') {
+      row.innerHTML = `
+        <td>${item.borrower}</td>
+        <td>${item.resource}</td>
+        <td>${item.type}</td>
+        <td>${item.borrowDate}</td>
+        <td>${item.returnDate}</td>`;
+      borrowedList.appendChild(row); 
+      hasBorrowed = true;
+    }
 
-          if (item.status === 'returned') {
-            row.innerHTML = `
-              <td>${item.resource}</td>
-              <td>${item.type}</td>
-              <td>${item.returnDate}</td>
-              <td><button class="btn btn-sm btn-primary" onclick="borrowResource('${item.resource}')">Borrow</button></td>`;
-            returnedList.appendChild(row); hasReturned = true;
-          }
+    if (item.status === 'returned') {
+      row.innerHTML = `
+        <td>${item.resource}</td>
+        <td>${item.type}</td>
+        <td>${item.returnDate}</td>
+        <td><button class="btn btn-sm btn-primary" onclick="borrowResource('${item.resource}')">Borrow</button></td>`;
+      returnedList.appendChild(row); 
+      hasReturned = true;
+    }
 
-          if (item.status === 'new') {
-            row.innerHTML = `<td>${item.resource}</td><td>${item.type}</td><td>${item.dateAdded}</td>`;
-            newList.appendChild(row); hasNew = true;
-          }
-        });
+    if (item.status === 'new') {
+      row.innerHTML = `<td>${item.resource}</td><td>${item.type}</td><td>${item.dateAdded}</td>`;
+      newList.appendChild(row); 
+      hasNew = true;
+    }
+  });
 
-        if (!hasAvailable) availableList.innerHTML = '<tr><td colspan="2">No available resources</td></tr>';
-        if (!hasBorrowed) borrowedList.innerHTML = '<tr><td colspan="5">No borrowed resources</td></tr>';
-        if (!hasReturned) returnedList.innerHTML = '<tr><td colspan="4">No returned resources</td></tr>';
-        if (!hasNew) newList.innerHTML = '<tr><td colspan="3">No new resources</td></tr>';
-      }
+  if (!hasAvailable) availableList.innerHTML = '<tr><td colspan="2">No available resources</td></tr>';
+  if (!hasBorrowed) borrowedList.innerHTML = '<tr><td colspan="5">No borrowed resources</td></tr>';
+  if (!hasReturned) returnedList.innerHTML = '<tr><td colspan="4">No returned resources</td></tr>';
+  if (!hasNew) newList.innerHTML = '<tr><td colspan="3">No new resources</td></tr>';
+}
 
-      async function fetchResources() {
-        try {
-          const res = await fetch('/user/resources/all');
-          if (!res.ok) throw new Error('Failed to fetch');
-          const data = await res.json();
-          renderResources(data);
-        } catch (err) {
-          console.error(err);
-          renderResources([]);
-        }
-      }
+async function fetchResources() {
+  try {
+    const res = await fetch('/user/resources/all');
+    if (!res.ok) throw new Error('Failed to fetch');
+    const data = await res.json();
+    renderResources(data);
+  } catch (err) {
+    console.error(err);
+    renderResources([]);
+  }
+}
 
-      function borrowResource(resource) {
-        alert(`Borrow request for "${resource}" sent!`);
-        // TODO: POST /user/borrow
-      }
+function borrowResource(resource) {
+  alert(`Borrow request for "${resource}" sent!`);
+  // TODO: Implement POST /user/borrow
+}
 
-      document.addEventListener('DOMContentLoaded', fetchResources);
-    </script>
+document.addEventListener('DOMContentLoaded', fetchResources);
+</script>
+
 </body>
 
 

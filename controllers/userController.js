@@ -409,7 +409,7 @@ exports.registerUser = async (req, res) => {
     const missingFields = [];
     const roleUpper = role?.toUpperCase();
 
-    // Basic required fields
+    // Required fields
     if (!name) missingFields.push("name");
     if (!reg_no) missingFields.push("reg_no");
     if (!college) missingFields.push("college");
@@ -418,14 +418,13 @@ exports.registerUser = async (req, res) => {
     if (!phone_no) missingFields.push("phone_no");
     if (!photoFile) missingFields.push("photo");
 
-    // Academic fields required only for STUDENT and GUEST
+    // Academic fields for STUDENT and GUEST
     if (["STUDENT", "GUEST"].includes(roleUpper)) {
       if (!department) missingFields.push("department");
       if (!program) missingFields.push("program");
       if (!year) missingFields.push("year");
     }
 
-    // Return if missing
     if (missingFields.length > 0) {
       return res.status(400).json({
         error: "Missing required registration fields",
@@ -433,7 +432,7 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    // ✅ File type validation (images only)
+    // File type validation
     const allowedMimeTypes = ["image/jpeg", "image/png", "image/jpg"];
     if (!allowedMimeTypes.includes(photoFile.mimetype)) {
       return res.status(400).json({
@@ -441,54 +440,38 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    // ✅ Name validation
+    // Name validation
     const namePattern = /^[A-Za-z\s]+$/;
-    if (!name || name.trim() === "") {
-      return res.status(400).json({ error: "Please enter full name" });
-    }
     if (!namePattern.test(name)) {
       return res.status(400).json({
-        error: "Name can contain only letters and spaces. Please enter full name.",
+        error: "Name can contain only letters and spaces.",
       });
-    }
-    const nameWords = name.trim().split(/\s+/);
-    if (nameWords.length < 2) {
-      return res.status(400).json({ error: "Please enter both first and last name." });
     }
 
     // Reg_no validation
-    if (roleUpper === "STUDENT") {
-      if (!/^\d{11}$/.test(reg_no)) {
-        return res.status(400).json({ error: "Wrong registration number please try again" });
-      }
-    } else {
-      if (reg_no.length < 5) {
-        return res.status(400).json({ error: "Wrong registration number please try again" });
-      }
+    if (roleUpper === "STUDENT" && !/^\d{11}$/.test(reg_no)) {
+      return res.status(400).json({ error: "Invalid student registration number." });
+    }
+    if (!["STUDENT", "GUEST"].includes(roleUpper) && (!reg_no || reg_no.length < 4)) {
+      return res.status(400).json({ error: "Invalid staff registration number." });
     }
 
-    // Phone validation (must be 0 + 9 digits = 10 digits total)
+    // Phone validation
     if (!/^0\d{9}$/.test(phone_no)) {
-      return res.status(400).json({
-        error: "Phone number must be 10 digits (e.g., 0674843431)",
-      });
+      return res.status(400).json({ error: "Phone number must be 10 digits." });
     }
 
     // Check duplicates
-    const [existing] = await db.execute("SELECT reg_no FROM users WHERE reg_no = ?", [reg_no]);
+    const [existing] = await db.execute(
+      "SELECT reg_no FROM users WHERE reg_no = ?",
+      [reg_no]
+    );
     if (existing.length > 0) {
       return res.status(409).json({ error: "Registration number already exists" });
     }
 
-    // Send SMS
-    const smsResult = await sendSms(
-      phone_no,
-      `Welcome ${name}, your registration is successful. Your reg_no is ${reg_no}.`
-    );
-
-    if (!smsResult.success) {
-      console.warn("⚠️ SMS failed:", smsResult.error);
-    }
+    // Auto-approve staff/librarian/admin
+    const isApproved = ["STAFF", "LIBRARIAN", "ADMIN"].includes(roleUpper) ? "yes" : "no";
 
     // Save user
     const sql = `
@@ -504,20 +487,31 @@ exports.registerUser = async (req, res) => {
       ["STUDENT", "GUEST"].includes(roleUpper) ? program : null,
       college,
       ["STUDENT", "GUEST"].includes(roleUpper) ? year : null,
-      role,
+      roleUpper,
       gender,
       phone_no,
       photoFile.filename,
-      "no",
+      isApproved,
     ];
 
     await db.execute(sql, values);
 
+    // Determine redirect based on role
+    let redirectUrl = "/user/interface"; // default
+    if (roleUpper === "STAFF") redirectUrl = "/user/home";
+    else if (roleUpper === "LIBRARIAN") redirectUrl = "/librarian/librarian_home";
+    else if (roleUpper === "ADMIN") redirectUrl = "/admin/dashboard";
+
+    // Return registration info for scanning/login
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
-      sms: smsResult,
+      reg_no,    // for scanning verification
+      role: roleUpper,
+      isApproved,
+      redirect: redirectUrl,
     });
+
   } catch (err) {
     console.error("❌ Registration error:", err);
     return res.status(500).json({
@@ -525,6 +519,9 @@ exports.registerUser = async (req, res) => {
     });
   }
 };
+
+
+
 
 
 
@@ -1006,7 +1003,7 @@ exports.saveQuestion = async (req, res) => {
 };
 exports.getAllResourcesStatus = async (req, res) => {
   try {
-    // 1. Fetch all resources (books, papers, projects)
+    // 1. Fetch all resources
     const [resources] = await db.execute(`
       SELECT id, title AS resource, 'book' AS type, date_added
       FROM books WHERE is_deleted = 'no'
@@ -1019,7 +1016,7 @@ exports.getAllResourcesStatus = async (req, res) => {
       ORDER BY date_added DESC
     `);
 
-    // 2. Fetch borrow records with borrower name (all types included)
+    // 2. Fetch borrow_records
     const [borrowRecords] = await db.execute(`
       SELECT br.resource_id, br.resource_type, u.name AS borrower_name, 
              br.borrow_date, br.return_date, br.status
@@ -1028,19 +1025,32 @@ exports.getAllResourcesStatus = async (req, res) => {
       ORDER BY br.borrow_date DESC
     `);
 
-    // 3. Map: resource_type + resource_id → latest borrow record
+   // 3. Fetch approved borrow_requests
+const [approvedRequests] = await db.execute(`
+  SELECT br.resource_code AS resource_id, br.resource_type, br.borrower_name,
+         br.borrow_date, br.return_date, 'approved' AS status
+  FROM borrow_requests br
+  WHERE br.status = 'approved'
+  ORDER BY br.borrow_date DESC
+`);
+
+
+    // 4. Merge all borrows
+    const allBorrows = [...borrowRecords, ...approvedRequests];
+
+    // 5. Map latest borrow per resource
     const borrowMap = new Map();
-    for (const record of borrowRecords) {
+    for (const record of allBorrows) {
       const key = record.resource_type + '-' + record.resource_id;
       if (!borrowMap.has(key)) {
-        borrowMap.set(key, record); // keep the latest (since query ordered DESC)
+        borrowMap.set(key, record); // latest due to ORDER BY DESC
       }
     }
 
     const now = new Date();
     const NEW_THRESHOLD_DAYS = 7;
 
-    // 4. Merge resource and borrow data
+    // 6. Merge resources + borrow info
     const result = resources.map(res => {
       const key = res.type + '-' + res.id;
       const latestBorrow = borrowMap.get(key);
@@ -1062,7 +1072,7 @@ exports.getAllResourcesStatus = async (req, res) => {
           ? new Date(latestBorrow.return_date).toISOString().split('T')[0]
           : '';
 
-        if (latestBorrow.status === 'borrowed') {
+        if (latestBorrow.status === 'borrowed' || latestBorrow.status === 'approved') {
           status = 'borrowed';
         } else if (latestBorrow.status === 'returned') {
           status = 'returned';
@@ -1091,6 +1101,7 @@ exports.getAllResourcesStatus = async (req, res) => {
     res.status(500).json({ message: 'Server error fetching resources' });
   }
 };
+
 
 
 
