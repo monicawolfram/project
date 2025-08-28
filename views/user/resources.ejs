@@ -98,7 +98,6 @@
         </a>
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" href="/user/resources">Resources</a></li>
-         
           <li><a class="dropdown-item" href="/user/payment">Payment</a></li>
           <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
         </ul>
@@ -109,223 +108,136 @@
       <h2 class="text-center mb-4"><i class="fas fa-folder-open"></i> Resources Status</h2>
 
       <ul class="nav nav-tabs" id="resourceTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="available-tab" data-bs-toggle="tab" data-bs-target="#available" type="button" role="tab" aria-controls="available" aria-selected="true">Available</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="borrowed-tab" data-bs-toggle="tab" data-bs-target="#borrowed" type="button" role="tab" aria-controls="borrowed" aria-selected="false">Borrowed</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="returned-tab" data-bs-toggle="tab" data-bs-target="#returned" type="button" role="tab" aria-controls="returned" aria-selected="false">Returned</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="new-tab" data-bs-toggle="tab" data-bs-target="#new" type="button" role="tab" aria-controls="new" aria-selected="false">New</button>
-        </li>
+        <li class="nav-item"><button class="nav-link active" id="available-tab" data-bs-toggle="tab" data-bs-target="#available">Available</button></li>
+        <li class="nav-item"><button class="nav-link" id="borrowed-tab" data-bs-toggle="tab" data-bs-target="#borrowed">Borrowed</button></li>
+        <li class="nav-item"><button class="nav-link" id="returned-tab" data-bs-toggle="tab" data-bs-target="#returned">Returned</button></li>
+        <li class="nav-item"><button class="nav-link" id="new-tab" data-bs-toggle="tab" data-bs-target="#new">New</button></li>
       </ul>
 
       <div class="tab-content mt-3">
-        <div class="tab-pane fade show active" id="available" role="tabpanel" aria-labelledby="available-tab">
+        <!-- Available -->
+        <div class="tab-pane fade show active" id="available">
           <table class="table table-bordered text-center">
             <thead class="table-success">
-              <tr>
-                <th>Resource</th>
-                <th>Type</th>
-              </tr>
+              <tr><th>Resource</th><th>Type</th></tr>
             </thead>
-            <tbody id="availableList">
-              <tr><td colspan="2" class="text-center">Loading resources...</td></tr>
-            </tbody>
+            <tbody id="availableList"><tr><td colspan="2">Loading resources...</td></tr></tbody>
           </table>
         </div>
 
-        <div class="tab-pane fade" id="borrowed" role="tabpanel" aria-labelledby="borrowed-tab">
+        <!-- Borrowed -->
+        <div class="tab-pane fade" id="borrowed">
           <table class="table table-bordered text-center">
             <thead class="table-warning">
-              <tr>
-                <th>Borrower</th>
-                <th>Resource</th>
-                <th>Type</th>
-                <th>Borrow Date</th>
-                <th>Return Date</th>
-              </tr>
+              <tr><th>Borrower</th><th>Resource</th><th>Type</th><th>Borrow Date</th><th>Return Date</th></tr>
             </thead>
-            <tbody id="borrowedList">
-              <tr><td colspan="5" class="text-center">Loading resources...</td></tr>
-            </tbody>
+            <tbody id="borrowedList"><tr><td colspan="5">Loading resources...</td></tr></tbody>
           </table>
         </div>
 
-        <div class="tab-pane fade" id="returned" role="tabpanel" aria-labelledby="returned-tab">
+        <!-- Returned -->
+        <div class="tab-pane fade" id="returned">
           <table class="table table-bordered text-center">
             <thead class="table-info">
-              <tr>
-                <th>Resource</th>
-                <th>Type</th>
-                <th>Return Date</th>
-                <th>Borrow Again</th>
-              </tr>
+              <tr><th>Resource</th><th>Type</th><th>Return Date</th><th>Borrow Again</th></tr>
             </thead>
-            <tbody id="returnedList">
-              <tr><td colspan="4" class="text-center">Loading resources...</td></tr>
-            </tbody>
+            <tbody id="returnedList"><tr><td colspan="4">Loading resources...</td></tr></tbody>
           </table>
         </div>
 
-        <div class="tab-pane fade" id="new" role="tabpanel" aria-labelledby="new-tab">
+        <!-- New -->
+        <div class="tab-pane fade" id="new">
           <table class="table table-bordered text-center">
             <thead class="table-primary">
-              <tr>
-                <th>Resource</th>
-                <th>Type</th>
-                <th>Date Added</th>
-              </tr>
+              <tr><th>Resource</th><th>Type</th><th>Date Added</th></tr>
             </thead>
-            <tbody id="newList">
-              <tr><td colspan="3" class="text-center">Loading resources...</td></tr>
-            </tbody>
+            <tbody id="newList"><tr><td colspan="3">Loading resources...</td></tr></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    
+    <!-- Footer -->
+    <div class="footer-btns text-center mt-3 mb-4">
+      <a href="/user/AboutUs" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
+      <a href="/user/help" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
+    </div>
 
-  <!-- Footer Buttons -->
-  <div class="footer-btns text-center mt-3 mb-4">
-    <a href="/user/AboutUs" class="btn btn-success"><i class="fa-solid fa-info-circle"></i> About Us</a>
-    <a href="/user/help" class="btn btn-success"><i class="fa-solid fa-question-circle"></i> Help</a>
-  </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-   
-    const regNo = "23IT013"; 
+    <script>
+      const availableList = document.getElementById('availableList');
+      const borrowedList = document.getElementById('borrowedList');
+      const returnedList = document.getElementById('returnedList');
+      const newList = document.getElementById('newList');
 
-    // Get tbody elements to populate tables
-    const availableList = document.getElementById('availableList');
-    const borrowedList = document.getElementById('borrowedList');
-    const returnedList = document.getElementById('returnedList');
-    const newList = document.getElementById('newList');
+      function renderResources(resources) {
+        availableList.innerHTML = '';
+        borrowedList.innerHTML = '';
+        returnedList.innerHTML = '';
+        newList.innerHTML = '';
 
-    // Render resources to respective tables based on status
-    function renderResources(resources) {
-      availableList.innerHTML = '';
-      borrowedList.innerHTML = '';
-      returnedList.innerHTML = '';
-      newList.innerHTML = '';
+        let hasAvailable = false, hasBorrowed = false, hasReturned = false, hasNew = false;
 
-      let hasAvailable = false, hasBorrowed = false, hasReturned = false, hasNew = false;
+        resources.forEach(item => {
+          let row = document.createElement('tr');
 
-      resources.forEach(item => {
-        let row = document.createElement('tr');
+          if (item.status === 'available') {
+            row.innerHTML = `<td>${item.resource}</td><td>${item.type}</td>`;
+            availableList.appendChild(row); hasAvailable = true;
+          }
 
-        if (item.status === 'available') {
-          row.innerHTML = `
-            <td>${item.resource}</td>
-            <td>${item.type}</td>
-          `;
-          availableList.appendChild(row);
-          hasAvailable = true;
-        }
+          if (item.status === 'borrowed') {
+            row.innerHTML = `
+              <td>${item.borrower}</td>
+              <td>${item.resource}</td>
+              <td>${item.type}</td>
+              <td>${item.borrowDate}</td>
+              <td>${item.returnDate}</td>`;
+            borrowedList.appendChild(row); hasBorrowed = true;
+          }
 
-        if (item.status === 'borrowed') {
-          row.innerHTML = `
-            <td>${item.borrower || ''}</td>
-            <td>${item.resource}</td>
-            <td>${item.type}</td>
-            <td>${item.borrowDate || ''}</td>
-            <td>${item.returnDate || ''}</td>
-          `;
-          borrowedList.appendChild(row);
-          hasBorrowed = true;
-        }
+          if (item.status === 'returned') {
+            row.innerHTML = `
+              <td>${item.resource}</td>
+              <td>${item.type}</td>
+              <td>${item.returnDate}</td>
+              <td><button class="btn btn-sm btn-primary" onclick="borrowResource('${item.resource}')">Borrow</button></td>`;
+            returnedList.appendChild(row); hasReturned = true;
+          }
 
-        if (item.status === 'returned') {
-          row.innerHTML = `
-            <td>${item.resource}</td>
-            <td>${item.type}</td>
-            <td>${item.returnDate || ''}</td>
-            <td><button class="btn btn-borrow" onclick="borrowResource('${item.resource}')">Borrow</button></td>
-          `;
-          returnedList.appendChild(row);
-          hasReturned = true;
-        }
+          if (item.status === 'new') {
+            row.innerHTML = `<td>${item.resource}</td><td>${item.type}</td><td>${item.dateAdded}</td>`;
+            newList.appendChild(row); hasNew = true;
+          }
+        });
 
-        if (item.status === 'new') {
-          row.innerHTML = `
-            <td>${item.resource}</td>
-            <td>${item.type}</td>
-            <td>${item.dateAdded || ''}</td>
-          `;
-          newList.appendChild(row);
-          hasNew = true;
-        }
-      });
-
-      if (!hasAvailable) {
-        availableList.innerHTML = '<tr><td colspan="2" class="text-center">No available resources</td></tr>';
+        if (!hasAvailable) availableList.innerHTML = '<tr><td colspan="2">No available resources</td></tr>';
+        if (!hasBorrowed) borrowedList.innerHTML = '<tr><td colspan="5">No borrowed resources</td></tr>';
+        if (!hasReturned) returnedList.innerHTML = '<tr><td colspan="4">No returned resources</td></tr>';
+        if (!hasNew) newList.innerHTML = '<tr><td colspan="3">No new resources</td></tr>';
       }
-      if (!hasBorrowed) {
-        borrowedList.innerHTML = '<tr><td colspan="5" class="text-center">No borrowed resources</td></tr>';
-      }
-      if (!hasReturned) {
-        returnedList.innerHTML = '<tr><td colspan="4" class="text-center">No returned resources</td></tr>';
-      }
-      if (!hasNew) {
-        newList.innerHTML = '<tr><td colspan="3" class="text-center">No new resources</td></tr>';
-      }
-    }
 
-    // Show success toast notification
-    function showResourcesSuccessToast() {
-      const toastEl = document.getElementById('resources-toast');
-      toastEl.classList.remove('text-bg-danger');
-      toastEl.classList.add('text-bg-success');
-      toastEl.querySelector('.toast-body').textContent = 'Resources loaded successfully!';
-      const toast = new bootstrap.Toast(toastEl);
-      toast.show();
-    }
-
-    // Show error toast notification
-    function showResourcesErrorToast(message) {
-      const toastEl = document.getElementById('resources-toast');
-      toastEl.classList.remove('text-bg-success');
-      toastEl.classList.add('text-bg-danger');
-      toastEl.querySelector('.toast-body').textContent = message;
-      const toast = new bootstrap.Toast(toastEl);
-      toast.show();
-    }
-
-    // Fetch resource data from backend API
-    async function fetchResources() {
-      try {
-        const response = await fetch('/user/resources/all');
-        if (response.ok) {
-          const resources = await response.json();
-          renderResources(resources);
-          showResourcesSuccessToast();
-        } else {
-          console.error('Failed to fetch resources:', response.status);
+      async function fetchResources() {
+        try {
+          const res = await fetch('/user/resources/all');
+          if (!res.ok) throw new Error('Failed to fetch');
+          const data = await res.json();
+          renderResources(data);
+        } catch (err) {
+          console.error(err);
           renderResources([]);
-          showResourcesErrorToast('Failed to load resources');
         }
-      } catch (error) {
-        console.error('Error fetching resources:', error);
-        renderResources([]);
-        showResourcesErrorToast('Error loading resources');
       }
-    }
 
-    // Placeholder borrow action
-    function borrowResource(resource) {
-      alert(`Borrow request for "${resource}" sent!`);
-      // TODO: Implement borrow API POST request here
-    }
+      function borrowResource(resource) {
+        alert(`Borrow request for "${resource}" sent!`);
+        // TODO: POST /user/borrow
+      }
 
-    // Load resources when DOM is ready
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchResources();
-    });
-  </script>
+      document.addEventListener('DOMContentLoaded', fetchResources);
+    </script>
 </body>
+
+
 </html>

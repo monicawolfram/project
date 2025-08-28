@@ -1019,20 +1019,21 @@ exports.getAllResourcesStatus = async (req, res) => {
       ORDER BY date_added DESC
     `);
 
-    // 2. Fetch borrow records with borrower name (no is_deleted filter here)
+    // 2. Fetch borrow records with borrower name (all types included)
     const [borrowRecords] = await db.execute(`
-      SELECT br.resource_id, br.resource_type, u.name AS borrower_name, br.borrow_date, br.return_date, br.status
+      SELECT br.resource_id, br.resource_type, u.name AS borrower_name, 
+             br.borrow_date, br.return_date, br.status
       FROM borrow_records br
       LEFT JOIN users u ON br.borrower_reg_no = u.reg_no
       ORDER BY br.borrow_date DESC
     `);
 
-    // 3. Prepare map keyed by resource_type + resource_id to get latest borrow record
+    // 3. Map: resource_type + resource_id → latest borrow record
     const borrowMap = new Map();
     for (const record of borrowRecords) {
       const key = record.resource_type + '-' + record.resource_id;
       if (!borrowMap.has(key)) {
-        borrowMap.set(key, record);
+        borrowMap.set(key, record); // keep the latest (since query ordered DESC)
       }
     }
 
@@ -1043,6 +1044,7 @@ exports.getAllResourcesStatus = async (req, res) => {
     const result = resources.map(res => {
       const key = res.type + '-' + res.id;
       const latestBorrow = borrowMap.get(key);
+
       const dateAdded = new Date(res.date_added);
       const isNew = (now - dateAdded) / (1000 * 60 * 60 * 24) <= NEW_THRESHOLD_DAYS;
 
@@ -1070,6 +1072,7 @@ exports.getAllResourcesStatus = async (req, res) => {
       }
 
       return {
+        id: res.id,
         resource: res.resource,
         type: res.type,
         status,
@@ -1088,6 +1091,7 @@ exports.getAllResourcesStatus = async (req, res) => {
     res.status(500).json({ message: 'Server error fetching resources' });
   }
 };
+
 
 
 
