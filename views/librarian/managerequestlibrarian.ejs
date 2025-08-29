@@ -413,23 +413,40 @@ if (requests.length > 0) {
 
   console.log(resource);
   // Display scanned resource info in modal
- const modalBody = document.getElementById("bookDetailsBody");
+// Display scanned resource info in modal
+const modalBody = document.getElementById("bookDetailsBody");
+
+// Determine which code field to display based on type
+let codeLabel = "";
+let codeValue = "";
+
+if (resource.type === "book") {
+  codeLabel = "Book Code";
+  codeValue = resource.book_code;
+} else if (resource.type === "paper") {
+  codeLabel = "Paper Code";
+  codeValue = resource.paper_code;
+} else if (resource.type === "project") {
+  codeLabel = "Project Code";
+  codeValue = resource.project_code;
+}
+
 modalBody.innerHTML = `
   <div class="row mb-3">
     <div class="col-md-4">
-      <img src="/uploads/books/${resource.image}" alt="${resource.title}" class="img-fluid rounded border" />
+     <img src="/uploads/books/${resource.image}" alt="${resource.title}" class="img-fluid rounded border" />
     </div>
     <div class="col-md-8">
       <p><strong>Title:</strong> ${resource.title}</p>
       <p><strong>Author:</strong> ${resource.author}</p>
-      <p><strong>Code:</strong> ${resource.book_code}</p>
+      <p><strong>${codeLabel}:</strong> ${codeValue}</p>
       <p><strong>Type:</strong> ${resource.type}</p>
       <p><strong>Status:</strong> ${resource.status}</p>
     </div>
   </div>
 
   <div class="text-end">
-    <button class="btn btn-success" onclick="approveRequest('${resource.book_code}')">
+    <button class="btn btn-success" onclick="approveRequest('${codeValue}', '${resource.type}')">
       <i class="fa fa-check-circle"></i> Approve
     </button>
   </div>

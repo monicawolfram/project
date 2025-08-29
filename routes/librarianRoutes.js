@@ -104,8 +104,8 @@ router.post('/it-support', upload.single('attachment'), librarianController.subm
 router.post('/fines', librarianController.addFine);
 router.get('/fines', librarianController.getAllFines);
 router.delete('/fines/:id', librarianController.deleteFine);
-router.put('/fines/:id', librarianController.updateFine);
 router.get('/fines/:id', librarianController.getFineById);
+router.put('/fines/:id', librarianController.updateFine);
 router.get('/students', librarianController.getStudentUsers);
 router.get('/librarians', librarianController.getLibrarianUsers);
 router.get('/view-users', librarianController.getAllUsers);

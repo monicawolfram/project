@@ -227,74 +227,106 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+  // Load fines on page load
+  document.addEventListener("DOMContentLoaded", () => {
+    loadFines();
+  });
+
+  // Fetch fines from backend
+  function loadFines() {
+    fetch("http://localhost:3000/librarian/fines")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.fines)) {
+          const tbody = document.querySelector("#finesTable tbody");
+          tbody.innerHTML = ""; // clear existing rows
+          data.fines.forEach(fine => {
+            appendFineToTable({
+              id: fine.borrower_reg_no,
+              resource: fine.resource_title || fine.resource_type || "N/A",
+              date: fine.fine_date ? fine.fine_date.split("T")[0] : "",
+              amount: fine.fine_amount,
+              status: fine.status
+            });
+          });
+        } else {
+          console.warn("⚠️ No fines found");
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching fines:", err);
+        alert("❌ Failed to load fines from server.");
+      });
+  }
+
   // Search functionality
-  document.getElementById('searchBar').addEventListener('input', function () {
+  document.getElementById("searchBar").addEventListener("input", function () {
     const query = this.value.toLowerCase();
-    const rows = document.querySelectorAll('#finesTable tbody tr');
+    const rows = document.querySelectorAll("#finesTable tbody tr");
     rows.forEach(row => {
       const match = Array.from(row.children).some(cell =>
         cell.textContent.toLowerCase().includes(query)
       );
-      row.style.display = match ? '' : 'none';
+      row.style.display = match ? "" : "none";
     });
   });
 
   // Add Fine
-  document.getElementById('newFineForm').addEventListener('submit', function (e) {
+  document.getElementById("newFineForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
     const fine = {
-      id: document.getElementById('fineId').value.trim(),
-      resource: document.getElementById('fineResource').value,
-      date: document.getElementById('fineDate').value,
-      amount: document.getElementById('fineAmount').value.trim(),
-      status: document.getElementById('fineStatus').value,
+      id: document.getElementById("fineId").value.trim(),
+      resource: document.getElementById("fineResource").value,
+      date: document.getElementById("fineDate").value,
+      amount: document.getElementById("fineAmount").value.trim(),
+      status: document.getElementById("fineStatus").value,
     };
 
     if (!fine.resource) {
-      alert('Please select a Resource.');
+      alert("Please select a Resource.");
       return;
     }
 
-    fetch('http://localhost:3000/librarian/fines', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("http://localhost:3000/librarian/fines", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(fine),
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          alert('✅ Fine added successfully');
+          alert("✅ Fine added successfully");
           appendFineToTable(fine);
           this.reset();
-          const collapseElem = document.getElementById('addFineForm');
+          const collapseElem = document.getElementById("addFineForm");
           const bsCollapse = bootstrap.Collapse.getInstance(collapseElem);
           if (bsCollapse) bsCollapse.hide();
         } else {
-          alert('❌ Failed to add fine');
+          alert("❌ Failed to add fine");
         }
       })
       .catch(err => {
         console.error(err);
-        alert('❌ Error sending fine data to server.');
+        alert("❌ Error sending fine data to server.");
       });
   });
 
   // Append Fine
   function appendFineToTable(fine) {
-    const table = document.querySelector('#finesTable tbody');
-    const row = document.createElement('tr');
+    const table = document.querySelector("#finesTable tbody");
+    const row = document.createElement("tr");
     row.innerHTML = `
       <td>${fine.id}</td>
       <td>${fine.resource}</td>
       <td>${fine.date}</td>
       <td>Tsh ${Number(fine.amount).toLocaleString()}</td>
-      <td><span class="badge ${fine.status === 'Paid' ? 'bg-success' : 'bg-danger'}">${fine.status}</span></td>
+      <td><span class="badge ${fine.status === "Paid" ? "bg-success" : "bg-danger"}">${fine.status}</span></td>
       <td>
         <button class="btn btn-sm btn-info me-2" onclick="editFine('${fine.id}')">
           <i class="fas fa-pen"></i> Edit
         </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteFine(this)">
+        <button class="btn btn-sm btn-danger" onclick="deleteFine('${fine.id}', this)">
           <i class="fas fa-trash-alt"></i> Delete
         </button>
       </td>
@@ -309,66 +341,81 @@
       .then(data => {
         if (data.success) {
           const fine = data.fine;
-          document.getElementById('editFineId').value = fine.borrower_reg_no;
-          document.getElementById('editFineResource').value = fine.resource_title;
-          document.getElementById('editFineDate').value = fine.fine_date;
-          document.getElementById('editFineAmount').value = fine.fine_amount;
-          document.getElementById('editFineStatus').value = fine.status;
+          document.getElementById("editFineId").value = fine.id;
+          document.getElementById("editFineResource").value = fine.resource_title || fine.resource_type;
+          document.getElementById("editFineDate").value = fine.fine_date.split("T")[0];
+          document.getElementById("editFineAmount").value = fine.fine_amount;
+          document.getElementById("editFineStatus").value = fine.status;
 
-          const modal = new bootstrap.Modal(document.getElementById('editFineModal'));
+          const modal = new bootstrap.Modal(document.getElementById("editFineModal"));
           modal.show();
         } else {
-          alert('❌ Fine not found.');
+          alert("❌ Fine not found.");
         }
       })
       .catch(err => {
         console.error(err);
-        alert('❌ Error fetching fine data.');
+        alert("❌ Error fetching fine data.");
       });
   }
 
   // Submit Edit Fine Form
-  document.getElementById('editFineForm').addEventListener('submit', function (e) {
+  document.getElementById("editFineForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
     const updatedFine = {
-      resource: document.getElementById('editFineResource').value,
-      date: document.getElementById('editFineDate').value,
-      amount: document.getElementById('editFineAmount').value,
-      status: document.getElementById('editFineStatus').value,
+      resource: document.getElementById("editFineResource").value,
+      date: document.getElementById("editFineDate").value,
+      amount: document.getElementById("editFineAmount").value,
+      status: document.getElementById("editFineStatus").value,
     };
 
-    const id = document.getElementById('editFineId').value;
+    const id = document.getElementById("editFineId").value;
 
     fetch(`http://localhost:3000/librarian/fines/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedFine),
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          alert('✅ Fine updated successfully');
-          location.reload(); // You can replace this with manual row update logic
+          alert("✅ Fine updated successfully");
+          location.reload(); // optional: replace with row update logic
         } else {
-          alert('❌ Failed to update fine');
+          alert("❌ Failed to update fine");
         }
       })
       .catch(err => {
         console.error(err);
-        alert('❌ Error updating fine');
+        alert("❌ Error updating fine");
       });
   });
 
   // Delete Fine
-  function deleteFine(button) {
-    if (confirm('⚠️ Are you sure you want to delete this fine?')) {
-      const row = button.closest('tr');
-      row.remove();
-      alert('✅ Fine deleted successfully');
+  function deleteFine(id, button) {
+    if (confirm("⚠️ Are you sure you want to delete this fine?")) {
+      fetch(`http://localhost:3000/librarian/fines/${id}`, {
+        method: "DELETE",
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const row = button.closest("tr");
+            row.remove();
+            alert("✅ Fine deleted successfully");
+          } else {
+            alert("❌ Failed to delete fine");
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert("❌ Error deleting fine");
+        });
     }
   }
 </script>
+
 
 
 </body>

@@ -867,7 +867,7 @@ exports.updateFine = async (req, res) => {
 
   try {
     await db.execute(
-      `UPDATE fines SET resource_title = ?, fine_date = ?, fine_amount = ?, status = ? WHERE borrower_reg_no = ?`,
+      `UPDATE fines SET resource_title = ?, fine_date = ?, fine_amount = ?, status = ? WHERE id = ?`,
       [resource, date, amount, status, id]
     );
     res.json({ success: true, message: 'Fine updated successfully' });

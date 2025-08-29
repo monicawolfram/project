@@ -2,8 +2,8 @@
 const axios = require("axios");
 
 async function sendSms(phone, message) {
-  const username = 'developer_nkya';
-  const password = '123123@1';
+  const username = 'monicamgeni';
+  const password = 'jm@pbQXud4jdXEn';
   const url = "https://messaging-service.co.tz/api/sms/v1/text/single";
 
   // Normalize: if phone starts with 0 and has 10 digits → convert to +255
@@ -13,7 +13,7 @@ async function sendSms(phone, message) {
   }
 
   const postData = {
-    from: "SCHOOL", // your registered sender ID
+    from: "REMINDER", // your registered sender ID
     to: normalizedPhone,
     text: message,
   };
@@ -25,6 +25,7 @@ async function sendSms(phone, message) {
         "Accept": "application/json",
         "Authorization":
           "Basic " + Buffer.from(`${username}:${password}`).toString("base64"),
+        // "Basic bW9uaWNhbWdlbmk6am1AcGJRWHVkNGpkWEVu"
       },
     });
 

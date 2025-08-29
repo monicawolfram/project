@@ -496,6 +496,14 @@ exports.registerUser = async (req, res) => {
 
     await db.execute(sql, values);
 
+     // 🔹 Send SMS with due date
+    const smsMessage = `Hello ${name}, your registration as ${roleUpper} is successful. Your ID: ${reg_no}. `;
+    const smsResult = await sendSms(phone_no, smsMessage);
+
+    if (!smsResult.success) {
+      console.warn("⚠️ SMS failed:", smsResult.error);
+    }
+  
     // Determine redirect based on role
     let redirectUrl = "/user/interface"; // default
     if (roleUpper === "STAFF") redirectUrl = "/user/home";
